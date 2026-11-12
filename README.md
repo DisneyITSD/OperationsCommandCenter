@@ -1,59 +1,26 @@
-# Operations Command Center
+# Operations Command Center — live Google Sheets build
 
-A responsive, single-page operations dashboard prototype for management and supervisors.
+This build connects the landing page to the same Google Sheets spreadsheet and tab IDs referenced by the uploaded Agent and Supervisor dashboards.
 
-## Preview
+## Files
+- `index.html` — live command-center landing page, source connection status, and performance ranking snapshot.
+- `supervisor-console.html` — original Supervisor dashboard, preserved with its existing calculations and live-sheet loaders.
+- `agent-scorecard.html` — original Agent dashboard, preserved with its existing calculations and live-sheet loaders.
 
-This project is a static HTML/CSS/JavaScript prototype. It currently uses illustrative sample data and does **not** connect to Google Sheets or any live operational system.
+## Run / publish
+1. Keep all three HTML files in the same repository root.
+2. Test locally with a local web server (for example, VS Code Live Server). Browser restrictions may prevent `fetch()` from working when opening the file directly.
+3. Push the files to GitHub.
+4. For GitHub Pages: repository **Settings → Pages → Deploy from a branch → main → /(root)**.
 
-## Features
+## Live data and refresh
+The landing page requests CSV exports from the configured Google Sheets tabs and refreshes every 60 seconds. Use **Data Connections** to see per-tab success/failure and row counts. The detailed Agent and Supervisor pages are the original uploaded dashboards, retained rather than reimplementing their calculations.
 
-- Command Center overview with workforce KPI cards
-- 30-minute staffing coverage visualization
-- Operational alerts
-- Live Operations coverage table
-- Attendance exception table
-- Agent performance ranking
-- Quality Monitor
-- Historical Analytics layout
-- Management / Supervisor view selector
-- Responsive layout for desktop and smaller screens
+## Important privacy warning
+This implementation uses browser-readable Google Sheets CSV endpoints. Anyone who can load the published dashboard can inspect the requests and read any sheet data that Google makes available through those endpoints. A sheet shared as “Anyone with the link” is not private. Employee names, attendance, QA, and performance data are sensitive workforce information. Do not publish this repository or dashboard publicly unless your organization has explicitly approved public disclosure. For production, use a private repository plus authenticated backend / Apps Script proxy with access checks; never put service-account keys, OAuth client secrets, or other credentials in browser JavaScript.
 
-## Run locally
-
-No build tools or dependencies are required.
-
-1. Download or clone this repository.
-2. Open `index.html` in a modern browser.
-
-## Publish with GitHub Pages
-
-1. Push these files to a GitHub repository.
-2. Open **Settings → Pages**.
-3. Under **Build and deployment**, select **Deploy from a branch**.
-4. Select the `main` branch and `/ (root)` folder.
-5. Save. GitHub Pages will publish the site and show its URL in the Pages settings.
-
-## Project structure
-
-```text
-operations-command-center/
-├── index.html
-├── README.md
-└── .gitignore
-```
-
-## Connecting real data
-
-Before connecting this prototype to operational data:
-
-- Replace the illustrative values and sample records in `index.html`.
-- Reuse and centralize the existing attendance, coverage, QA, and agent scorecard calculations.
-- Keep the KPI definitions and score thresholds consistent with the source dashboards.
-- Avoid putting private credentials, API keys, or service-account secrets in browser-side JavaScript.
-- Do not publish employee-level or confidential operational data in a public repository.
-- For private data, use a private repository and a secure backend or an appropriately permissioned data service. A public GitHub Pages site is not a secure place to expose internal workforce data.
-
-## Notes
-
-This is a visual and interaction prototype, not a production workforce-management system. Validate business rules, data permissions, refresh behavior, and calculations before operational use.
+## Limitations
+- The landing-page counts are source-row counts, not an independent calculation of present/absent/currently-working agents.
+- The original Supervisor and Agent dashboards retain their own formulas, schedule logic, score thresholds, and data loaders.
+- Google Sheets access, tab permissions, header changes, quotas, and browser CORS behavior can affect connectivity. The landing page reports connection errors per tab.
+- The landing page is read-only and does not write to Google Sheets.

@@ -1,10 +1,11 @@
-# OS/editor files
+# OS / editor
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
 
-# Local environment and secrets
+# Secrets and local configuration
 .env
 .env.*
-!.env.example
+*.key
+*.pem
