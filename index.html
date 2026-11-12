@@ -333,6 +333,44 @@ tr.grp-head:hover{filter:brightness(.97)}
 @media(min-width:1600px){
   .schedule-container{height:calc(100vh - 150px)}
 }
+/* ---------- Dashboard: compact, no nested scrolling ---------- */
+#lookupTab .stats{gap:10px;margin:0 0 10px}
+#lookupTab .stats .card{min-height:0;padding:10px 14px;text-align:left;border-radius:12px}
+#lookupTab .stats .card h3{font-size:13px;font-weight:600;color:var(--muted);margin:0 0 2px}
+#lookupTab .stats .card .value{font-size:30px;line-height:1.15;font-weight:700;color:var(--c)}
+#lookupTab .stats .card .value small{font-size:13px;font-weight:600;color:var(--muted);margin-left:4px}
+#lookupTab .stats .card .pct{font-size:12px;font-weight:600;color:var(--muted);margin:5px 0 0;text-align:left}
+#lookupTab .stats .card.alert .pct{color:#c62828}
+#lookupTab .stats .card.warn .pct{color:#b26a00}
+.meter{height:5px;border-radius:999px;background:#e5e7eb;overflow:hidden;margin-top:6px}
+.meter i{display:block;height:100%;width:0;background:var(--c);border-radius:999px;transition:width .3s}
+.panels .panel{height:auto!important;min-height:0!important;overflow:visible!important}
+.panels .panel h3{position:static;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.link{font-size:12px;font-weight:600;color:var(--blue);cursor:pointer;white-space:nowrap}
+#workingList li.sup-h{cursor:pointer;user-select:none}
+#workingList li.sup-h::after{content:'\25B8';margin-left:8px;color:var(--muted);flex:none}
+#workingList li.sup-h.open::after{content:'\25BE'}
+.shift-panel{margin:0 0 10px;padding:10px 14px}
+.shift-panel h3{margin:0 0 8px;padding-bottom:6px}
+.shift-grid{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:14px;align-items:start}
+.shift-grid h4{margin:0 0 6px;font-size:13px;color:var(--navy);display:flex;align-items:center;gap:6px}
+.shift-grid h4.in::before,.shift-grid h4.out::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--dot)}
+.shift-grid h4.in{--dot:#28a745}.shift-grid h4.out{--dot:#dc3545}
+.shift-grid .cnt{color:var(--muted);font-weight:600}
+#comingOnList,#goingOffList{display:flex;flex-wrap:wrap;gap:6px}
+#comingOnList li,#goingOffList li{margin:0;padding:4px 8px;font-size:13px;line-height:1.25;background:#f8fafc;border-radius:6px}
+#comingOnList li.empty,#goingOffList li.empty{padding:6px 8px;font-size:13px}
+#comingOnList li.more-btn,#goingOffList li.more-btn{background:none;border-left:0;color:var(--blue);font-weight:600;cursor:pointer;align-self:center}
+.alert-bar{margin:10px 16px 0;border-radius:8px;overflow:hidden;border-left:5px solid var(--red);background:#fdeaea;color:#7a1c24}
+.alert-toggle{width:100%;display:flex;align-items:center;gap:10px;background:none;color:inherit;padding:8px 12px;text-align:left;font-weight:600;border-radius:0}
+.alert-toggle .txt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#alertBody{padding:0 12px 10px}
+#alertBody .note,#alertBody #statusBanner{margin:8px 0 0;padding:8px 0 0;border:0;border-top:1px solid #f1b5ba;border-radius:0;background:none}
+.nav-badge{display:inline-block;min-width:18px;margin-left:6px;padding:0 6px;border-radius:999px;background:#dc3545;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.nav-badge.info{background:#1e88e5}
+#refreshBtn{background:none;color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:999px;padding:3px 10px;font-size:15px;line-height:1.2}
+#refreshBtn:hover{background:rgba(255,255,255,.12)}
+@media(max-width:900px){.shift-grid{grid-template-columns:1fr}}
 </style>
 </head>
 
@@ -361,6 +399,7 @@ tr.grp-head:hover{filter:brightness(.97)}
         <a href="#ptoTab" data-tab="ptoTab">Leaves</a>
         <a href="#calledOffTab" data-tab="calledOffTab">Absenteeism</a>
         <a href="#lateTab" data-tab="lateTab">Late / Left early</a>
+        <a href="#missingTab" data-tab="missingTab">Missing Agent Checker</a>
       </div></div>
     <div class="dropdown"><button class="tab-btn">Scorecard ▾</button>
       <div class="dropdown-content">
@@ -374,8 +413,7 @@ tr.grp-head:hover{filter:brightness(.97)}
         <a href="#supervisorTab" data-tab="supervisorTab">Supervisor summary</a>
         <a href="#forecastTab" data-tab="forecastTab">Coverage forecast</a>
       </div></div>
-    <div class="dropdown"><a class="tab-btn" href="#announcementsTab" data-tab="announcementsTab">Announcements</a></div>
-    <div class="dropdown"><a class="tab-btn" href="#missingTab" data-tab="missingTab">Missing Agent Checker</a></div>
+    <div class="dropdown"><a class="tab-btn" href="#announcementsTab" data-tab="announcementsTab">Announcements<span id="annBadge" class="nav-badge" hidden></span></a></div>
     <div class="dropdown"><button class="tab-btn">+ Submit ▾</button>
       <div class="dropdown-content">
         <a href="#attendanceFormTab" data-tab="attendanceFormTab">Attendance form</a>
@@ -387,60 +425,63 @@ tr.grp-head:hover{filter:brightness(.97)}
 
   <div class="live">
     <span id="lastUpdated"></span>
+    <button type="button" id="refreshBtn" title="Refresh data" aria-label="Refresh data" onclick="refreshAttendanceData(true)">↻</button>
   </div>
 </div>
 
-<div id="statusBanner" class="note red" hidden></div>
-<div id="highAnnouncements" class="note red" style="margin:10px 16px 0;white-space:pre-wrap" hidden></div>
+<div id="alertBar" class="alert-bar" hidden>
+  <button type="button" class="alert-toggle" onclick="toggleAlertBar()"><span class="txt" id="alertText"></span><span id="alertCaret">▸</span></button>
+  <div id="alertBody" hidden>
+    <div id="statusBanner" class="note red" hidden></div>
+    <div id="highAnnouncements" class="note red" style="white-space:pre-wrap" hidden></div>
+  </div>
+</div>
 
 <!-- ============ DASHBOARD ============ -->
 <section class="tab-panel" id="lookupTab">
   <div class="controls">
-    <input type="date" id="selectedDate">
-    <select id="interval"></select>
-    <select id="supervisor"><option>All Supervisors</option></select>
-    <label style="display:flex;align-items:center;gap:6px;font-weight:600">🎯 Min agents <input type="number" min="0" class="minTargetInput"></label>
-    <button id="showStaffingBtn" onclick="runLookup()">Show Staffing</button>
-    <button class="blue" onclick="refreshAttendanceData(true)">↻ Refresh Attendance</button>
+    <input type="date" id="selectedDate" onchange="runLookup()">
+    <select id="interval" onchange="runLookup()"></select>
+    <select id="supervisor" onchange="runLookup()"><option>All Supervisors</option></select>
+    <label style="display:flex;align-items:center;gap:6px;font-weight:600">Min agents <input type="number" min="0" class="minTargetInput"></label>
   </div>
 
   <div class="cards stats">
-    <div class="card stat" id="workingCard" style="--c:#28a745" data-tab="scheduleTab"><h3>👷 Working</h3><div class="value" id="workingCount">0</div><div class="pct" id="staffingPercent">0%</div><div class="pct" id="targetNote"></div></div>
-    <div class="card stat" style="--c:#ff9800" data-tab="scheduleTab"><h3>☕ Break</h3><div class="value" id="breakCount">0</div><div class="pct" id="breakPercent">0%</div></div>
-    <div class="card stat" style="--c:#dc3545" data-tab="scheduleTab"><h3>🍽️ Lunch</h3><div class="value" id="lunchCount">0</div><div class="pct" id="lunchPercent">0%</div></div>
-    <div class="card stat" style="--c:#17a2b8" data-tab="ptoTab"><h3>🗓️ Leave</h3><div class="value" id="ptoCount">0</div><div class="pct" id="ptoPercent">0%</div></div>
-    <div class="card stat" style="--c:#dc3545" data-tab="calledOffTab"><h3>🚫 Absent</h3><div class="value" id="calledOffCount">0</div><div class="pct" id="attendancePercent">0%</div></div>
+    <div class="card stat" id="workingCard" style="--c:#28a745" data-tab="scheduleTab"><h3>Working</h3><div class="value"><span id="workingCount">0</span><small id="workingTarget"></small></div><div class="meter"><i id="workingMeter"></i></div><div class="pct" id="staffingPercent">0%</div></div>
+    <div class="card stat" style="--c:#ff9800" data-tab="scheduleTab"><h3>Break</h3><div class="value" id="breakCount">0</div><div class="meter"><i id="breakMeter"></i></div><div class="pct" id="breakPercent">0%</div></div>
+    <div class="card stat" style="--c:#dc3545" data-tab="scheduleTab"><h3>Lunch</h3><div class="value" id="lunchCount">0</div><div class="meter"><i id="lunchMeter"></i></div><div class="pct" id="lunchPercent">0%</div></div>
+    <div class="card stat" style="--c:#17a2b8" data-tab="ptoTab"><h3>Leave</h3><div class="value" id="ptoCount">0</div><div class="meter"><i id="ptoMeter"></i></div><div class="pct" id="ptoPercent">0%</div></div>
+    <div class="card stat" style="--c:#dc3545" data-tab="calledOffTab"><h3>Absent</h3><div class="value" id="calledOffCount">0</div><div class="meter"><i id="calledOffMeter"></i></div><div class="pct" id="attendancePercent">0%</div></div>
+  </div>
+
+  <div class="panel shift-panel">
+    <h3>🔄 Next 2 hours: shift changes <span id="shiftWindowLabel" style="font-weight:400;font-size:13px;color:#6b7280"></span></h3>
+    <div class="shift-grid">
+      <div><h4 class="in">Coming on <span class="cnt" id="comingCount"></span></h4><ul id="comingOnList"></ul></div>
+      <div><h4 class="out">Going off <span class="cnt" id="goingCount"></span></h4><ul id="goingOffList"></ul></div>
+      <div><h4>Projected headcount (vs. minimum)</h4><div id="projectionRow"></div></div>
+    </div>
   </div>
 
   <div class="panels">
-    <div class="panel"><h3>👷 Working</h3><ul id="workingList"></ul></div>
+    <div class="panel"><h3><span>👷 Working</span><span class="link" id="workToggleAll" onclick="workToggleAll()">Expand all</span></h3><ul id="workingList"></ul></div>
     <div class="panel">
       <h3>☕ Break</h3>
       <ul id="breakList"></ul>
       <hr>
-      <h4>⏩☕ Upcoming Breaks</h4>
+      <h4>Upcoming breaks</h4>
       <ul id="upcomingBreakList"></ul>
     </div>
 
     <div class="panel">
-      <h3>🍽️Lunch</h3>
+      <h3>🍽️ Lunch</h3>
       <ul id="lunchList"></ul>
       <hr>
-      <h4>⏩ 🍽️ Upcoming Lunches</h4>
+      <h4>Upcoming lunches</h4>
       <ul id="upcomingLunchList"></ul>
     </div>
     <div class="panel"><h3>📋 Leave</h3><div id="ptoList"></div></div>
     <div class="panel"><h3>🚫 Absenteeism</h3><div id="calledOffList"></div></div>
-  </div>
-
-  <div class="panel shift-panel">
-    <h3>🔄 Next 2 Hours: Shift Changes <span id="shiftWindowLabel" style="font-weight:400;font-size:13px;color:#6b7280"></span></h3>
-    <div class="two-col">
-      <div><h4>🟢 Coming on</h4><ul id="comingOnList"></ul></div>
-      <div><h4>🔴 Going off</h4><ul id="goingOffList"></ul></div>
-    </div>
-    <h4>📊 Projected headcount (vs. minimum)</h4>
-    <div id="projectionRow"></div>
   </div>
 </section>
 
@@ -1123,7 +1164,8 @@ const guard = async (key, msg, fn) => {
 function renderStatus() {
   const msgs = Object.values(loadErrors).filter(Boolean);
   $('statusBanner').hidden = !msgs.length;
-  $('statusBanner').innerHTML = '⚠️ ' + msgs.map(esc).join(' · ');
+  $('statusBanner').innerHTML = msgs.map(esc).join(' · ');
+  alertState.err = msgs.length; updateAlertBar();
   $('lastUpdated').textContent = lastUpdated
     ? `Last updated ${lastUpdated.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'America/New_York' })} ET` : '';
 }
@@ -1292,10 +1334,10 @@ function loadSup() {
    ===================================================================== */
 function toggleRealtime() {
   realtimeMode = !realtimeMode;
-  $('realtimeBtn').innerHTML = realtimeMode ? '🔴 Stop Live Mode' : '🟢 Live Mode';
+  $('realtimeBtn').textContent = realtimeMode ? 'Stop Live Mode' : 'Live Mode';
   $('realtimeBtn').classList.toggle('on', realtimeMode);
   $('missingCheckBtn').disabled = !realtimeMode;
-  ['selectedDate', 'interval', 'supervisor', 'showStaffingBtn'].forEach(id => $(id).disabled = realtimeMode);
+  ['selectedDate', 'interval', 'supervisor'].forEach(id => $(id).disabled = realtimeMode);
 
   clearInterval(realtimeTimer);
   if (realtimeMode) {
@@ -1423,13 +1465,13 @@ function dayInfo(date) {
 /* =====================================================================
    DASHBOARD (live lookup)
    ===================================================================== */
-function groupedBlocks(items, types, fallback, useReasonAsHeader) {
+function groupedBlocks(items, types, fallback, useReasonAsHeader, showIcon = true) {
   const groups = {};
   items.forEach(x => (groups[x.reason] ??= []).push(x.name));
   return Object.entries(groups).map(([reason, names]) => {
     const t = matchType(types, reason, fallback);
     return `<div class="group" style="--c:${t.color}">
-      <div class="group-title">${t.icon} ${esc(useReasonAsHeader ? reason : t.label)}</div>
+      <div class="group-title">${showIcon ? t.icon + ' ' : ''}${esc(useReasonAsHeader ? reason : t.label)}</div>
       ${names.map(n => `<div>• ${esc(n)}</div>`).join('')}
     </div>`;
   }).join('');
@@ -1497,33 +1539,40 @@ function runLookup() {
   });
 
   const total = w.length + pto.length + calledOff.length;
-  const pct = n => (total ? ((n / total) * 100).toFixed(1) : 0) + '% of team';
-  [['workingCount', 'staffingPercent', w.length], ['breakCount', 'breakPercent', b.length],
-   ['lunchCount', 'lunchPercent', l.length], ['ptoCount', 'ptoPercent', pto.length],
-   ['calledOffCount', 'attendancePercent', calledOff.length]]
-    .forEach(([countId, pctId, n]) => { $(countId).textContent = n; $(pctId).textContent = pct(n); });
+  const share = n => total ? (n / total) * 100 : 0;
+  [['workingCount', 'staffingPercent', 'workingMeter', w.length], ['breakCount', 'breakPercent', 'breakMeter', b.length],
+   ['lunchCount', 'lunchPercent', 'lunchMeter', l.length], ['ptoCount', 'ptoPercent', 'ptoMeter', pto.length],
+   ['calledOffCount', 'attendancePercent', 'calledOffMeter', calledOff.length]]
+    .forEach(([countId, pctId, meterId, n]) => {
+      $(countId).textContent = n;
+      $(pctId).textContent = share(n).toFixed(1) + '% of team';
+      $(meterId).style.width = share(n) + '%';
+    });
 
   const order = { working: 1, break: 2, lunch: 3 };
   w.sort((x, y) => order[x.type] - order[y.type] || x.name.localeCompare(y.name));
   currentWorkingAgents = w.map(x => up(x.name));
 
-  $('workingList').innerHTML = bySup(w, x => `<li class="${x.type}">${esc(x.name)}</li>`);
-  $('breakList').innerHTML = b.length ? b.map(x => nameTimeItem('break', x)).join('') : emptyItem('#ff9800', '☕ No ongoing breaks');
-  $('lunchList').innerHTML = l.length ? l.map(x => nameTimeItem('lunch', x)).join('') : emptyItem('#dc3545', '🍽️ No ongoing lunches');
-  $('upcomingBreakList').innerHTML = upBreaks.length ? upBreaks.map(x => nameTimeItem('', x)).join('') : emptyItem('#ff9800', '☕ No upcoming breaks');
-  $('upcomingLunchList').innerHTML = upLunches.length ? upLunches.map(x => nameTimeItem('', x)).join('') : emptyItem('#dc3545', '🍽️ No upcoming lunches');
-  $('ptoList').innerHTML = groupedBlocks(pto, PTO_TYPES, { ...PTO_OTHER, label: 'Leave' }, true);
-  $('calledOffList').innerHTML = groupedBlocks(calledOff, ATT_TYPES, ATT_OTHER, true);
+  $('workingList').innerHTML = workingBySup(w);
+  $('breakList').innerHTML = b.length ? b.map(x => nameTimeItem('break', x)).join('') : emptyItem('#ff9800', 'No ongoing breaks');
+  $('lunchList').innerHTML = l.length ? l.map(x => nameTimeItem('lunch', x)).join('') : emptyItem('#dc3545', 'No ongoing lunches');
+  $('upcomingBreakList').innerHTML = upBreaks.length ? upBreaks.map(x => nameTimeItem('', x)).join('') : emptyItem('#ff9800', 'No upcoming breaks');
+  $('upcomingLunchList').innerHTML = upLunches.length ? upLunches.map(x => nameTimeItem('', x)).join('') : emptyItem('#dc3545', 'No upcoming lunches');
+  $('ptoList').innerHTML = groupedBlocks(pto, PTO_TYPES, { ...PTO_OTHER, label: 'Leave' }, true, false);
+  $('calledOffList').innerHTML = groupedBlocks(calledOff, ATT_TYPES, ATT_OTHER, true, false);
 
   const dip = buildShiftChanges(date, mins, supFilter);
   const target = supFilter === ALL ? targetFor(time) : 0;
   const lowNow = target > 0 && w.length < target;
   $('workingCard').classList.toggle('alert', lowNow);
   $('workingCard').classList.toggle('warn', !lowNow && !!dip);
-  $('targetNote').textContent = !target ? ''
-    : lowNow ? `⚠️ Below minimum (${w.length}/${target})`
-    : dip ? `⚠️ Dip ahead: ${dip.label} (${dip.count}/${dip.target})`
-    : `✔ Target ${target}`;
+  /* Working card: "42 / 45 min" with a bar against the minimum (share of team when no minimum is set) */
+  $('workingTarget').textContent = target > 0 ? `/ ${target} min` : '';
+  if (target > 0) {
+    $('workingMeter').style.width = Math.min(100, w.length / target * 100) + '%';
+    $('staffingPercent').textContent = lowNow ? `Below minimum (${w.length}/${target})`
+      : dip ? `Dip ahead: ${dip.label} (${dip.count}/${dip.target})` : 'On target';
+  }
 }
 
 /* =====================================================================
@@ -1579,9 +1628,21 @@ function renderHighAnnouncements() {
   });
   const el = $('highAnnouncements');
   el.hidden = !high.length;
+  alertState.high = high.map(a => a['Announcement Title']);
+  updateAlertBar();
+  const active = announcementList.filter(a => {
+    if (!(a['Announcement Title'] || '').trim()) return false;
+    const s = normalizeDate(a['Start Date']), e = normalizeDate(a['End Date']);
+    return (!s || s <= today) && (!e || e >= today);
+  });
+  const badge = $('annBadge');
+  badge.hidden = !active.length;
+  badge.textContent = active.length;
+  badge.className = 'nav-badge' + (high.length ? '' : ' info');
+  badge.title = `${active.length} active announcement${active.length === 1 ? '' : 's'}`;
   el.innerHTML = high.map(a => {
     const ts = fmtStamp(a.Timestamp);
-    return `🔴 ${ts ? `<small style="opacity:.75">${ts}</small> - ` : ''}` +
+    return `${ts ? `<small style="opacity:.75">${ts}</small> - ` : ''}` +
            `<strong>${esc(a['Announcement Title'])}</strong> -- ${esc(a['Announcement Message'])}`;
   }).join('<br>');
 }
@@ -2830,6 +2891,9 @@ function buildShiftChanges(date, mins, supFilter) {
     ? coming.sort(byTime).map(x => li(x, 'starts')).join('') : emptyItem('#28a745', 'No one starting');
   $('goingOffList').innerHTML = going.length
     ? going.sort(byTime).map(x => li(x, 'ends')).join('') : emptyItem('#dc3545', 'No one finishing');
+  $('comingCount').textContent = `(${coming.length})`;
+  $('goingCount').textContent = `(${going.length})`;
+  capList('comingOnList'); capList('goingOffList');
   $('shiftWindowLabel').textContent = `(${fmtAMPM(toHHMM(mins))} – ${fmtAMPM(toHHMM(mins + WINDOW))})`;
 
   const chips = [];
@@ -3387,6 +3451,87 @@ function buildSummary() {
 }
 
 /* =====================================================================
+   DASHBOARD HELPERS: collapsible Working list, capped chip lists, combined alert bar
+   ===================================================================== */
+const workOpen = new Set(), capOpen = new Set();
+let workSups = [];
+
+/* Working list grouped by supervisor; each group starts collapsed and remembers when opened */
+function workingBySup(items) {
+  const g = {};
+  items.forEach(x => (g[x.sup || 'Unassigned'] ??= []).push(x));
+  workSups = Object.keys(g).sort((a, b) => a.localeCompare(b));
+  workSupSync();
+  return workSups.map(s => {
+    const open = workOpen.has(s);
+    return `<li class="sup-h${open ? ' open' : ''}" data-sup="${esc(s)}" style="--sc:${supColor(s) || '#6c757d'}"><span>${esc(s)}</span><small>${g[s].length}</small></li>` +
+      g[s].map(x => `<li class="${x.type}" data-g="${esc(s)}"${open ? '' : ' hidden'}>${esc(x.name)}</li>`).join('');
+  }).join('');
+}
+function workSupSync() {
+  const all = workSups.length > 0 && workSups.every(s => workOpen.has(s));
+  const el = $('workToggleAll');
+  if (el) el.textContent = all ? 'Collapse all' : 'Expand all';
+}
+function workApply() {
+  document.querySelectorAll('#workingList li.sup-h').forEach(h => h.classList.toggle('open', workOpen.has(h.dataset.sup)));
+  document.querySelectorAll('#workingList li[data-g]').forEach(li => li.hidden = !workOpen.has(li.dataset.g));
+  workSupSync();
+}
+function workToggleAll() {
+  const all = workSups.length > 0 && workSups.every(s => workOpen.has(s));
+  all ? workOpen.clear() : workSups.forEach(s => workOpen.add(s));
+  workApply();
+}
+function initDashboard() {
+  $('workingList').addEventListener('click', e => {
+    const h = e.target.closest('li.sup-h');
+    if (!h) return;
+    const s = h.dataset.sup;
+    workOpen.has(s) ? workOpen.delete(s) : workOpen.add(s);
+    workApply();
+  });
+}
+
+/* Show the first few names, with a "+N more" toggle (state kept across refreshes) */
+function capList(id, max = 6) {
+  const ul = $(id), items = [...ul.querySelectorAll('li:not(.empty)')];
+  if (items.length <= max) return;
+  const extra = items.slice(max), open0 = capOpen.has(id);
+  extra.forEach(li => li.hidden = !open0);
+  const b = document.createElement('li');
+  b.className = 'more-btn';
+  const label = open => open ? 'Show less' : `+${extra.length} more`;
+  b.textContent = label(open0);
+  b.onclick = () => {
+    const open = !capOpen.has(id);
+    open ? capOpen.add(id) : capOpen.delete(id);
+    extra.forEach(li => li.hidden = !open);
+    b.textContent = label(open);
+  };
+  ul.appendChild(b);
+}
+
+/* One slim alert bar for data-load problems and high-priority announcements */
+const alertState = { err: 0, high: [], open: false };
+function updateAlertBar() {
+  const bar = $('alertBar');
+  if (!bar) return;
+  const n = alertState.err + alertState.high.length;
+  bar.hidden = !n;
+  if (!n) return;
+  const parts = [];
+  if (alertState.err) parts.push(`${alertState.err} data issue${alertState.err > 1 ? 's' : ''}`);
+  if (alertState.high.length) parts.push(alertState.high.length === 1
+    ? `High priority: ${alertState.high[0]}`
+    : `${alertState.high.length} high-priority announcements: ${alertState.high[0]}…`);
+  $('alertText').textContent = '⚠️ ' + parts.join(' · ');
+  $('alertCaret').textContent = alertState.open ? '▾' : '▸';
+  $('alertBody').hidden = !alertState.open;
+}
+function toggleAlertBar() { alertState.open = !alertState.open; updateAlertBar(); }
+
+/* =====================================================================
    MENUS + TOAST
    ===================================================================== */
 function initMenus() {
@@ -3429,6 +3574,7 @@ window.addEventListener('load', async () => {
   initQa();
   initMcsMonth();
   initSummary();
+  initDashboard();
 
   const today = ymd(estNow());
   ['selectedDate', 'ptoDate', 'calledOffDate', 'scheduleDate', 'supervisorDate', 'forecastDate']
