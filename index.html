@@ -285,6 +285,32 @@ tr.grp-head:hover{filter:brightness(.97)}
 .pod small{color:var(--muted)}
 @media(max-width:560px){.podium{grid-template-columns:1fr}}
 
+/* ---------- Summary ---------- */
+.sum-cards.stats{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.sum-cards .card{cursor:default}
+.sum-cards .card .pct{color:var(--muted);font-weight:600;font-size:12px}
+.sum-h{margin:18px 0 8px;color:var(--navy);font-size:15px}
+.sum-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:start}
+.sum-grid3 .panel h3{font-size:13px}
+.attn li{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
+.attn li small{color:var(--muted);display:block}
+.attn li strong{white-space:nowrap}
+#sumSupTable td{text-align:center}
+#sumSupTable td:first-child,#sumSupTable th:first-child{text-align:left;font-weight:600}
+#sumSupTable th{text-align:center;cursor:default}
+#sumSupTable tr.sum-total td{font-weight:700;border-top:2px solid var(--line)}
+#sumSupTable td.sc-good{background:#e8f5e9;color:#2e7d32;font-weight:600}
+#sumSupTable td.sc-mid{background:#fff8e1;color:#b26a00;font-weight:600}
+#sumSupTable td.sc-low{background:#ffebee;color:#c62828;font-weight:600}
+.bars{display:flex;align-items:flex-end;gap:6px}
+.bar-col{display:flex;flex-direction:column;align-items:center;flex:1;min-width:0}
+.bar-val{font-size:11px;font-weight:700;color:var(--navy);margin-bottom:2px}
+.bar-area{height:130px;width:100%;display:flex;align-items:flex-end}
+.bar-fill{width:100%;border-radius:4px 4px 0 0}
+.bar-lbl{font-size:11px;color:var(--muted);margin-top:4px}
+.bar-axis{font-size:11px;color:var(--muted);margin-top:6px;text-align:right}
+@media(max-width:900px){.sum-grid3{grid-template-columns:1fr}}
+
 /* ---------- Responsive ---------- */
 @media(max-width:980px){
   .panels{grid-template-columns:1fr 1fr}
@@ -307,50 +333,6 @@ tr.grp-head:hover{filter:brightness(.97)}
 @media(min-width:1600px){
   .schedule-container{height:calc(100vh - 150px)}
 }
-/* ---------- Daily Overview ---------- */
-.dov .panel{background:#fff;border:0;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.dov-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin:0 0 10px}
-.dov-date{font-size:20px;font-weight:700;color:var(--navy)}
-.dov-sub{font-size:12px;color:var(--muted)}
-.dov-status{margin-bottom:12px;font-weight:600}
-.dov-status small{display:block;font-weight:400;margin-top:2px}
-.dov-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:0 0 12px}
-.dov-kpi{background:#fff;border-top:5px solid var(--c);border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:10px 12px;text-align:center}
-.dov-kpi .k-label{font-size:13px;font-weight:700;color:#1f2937}
-.dov-kpi .k-val{font-size:32px;font-weight:700;color:var(--c);line-height:1.2}
-.dov-kpi .k-sub{font-size:12px;color:var(--muted)}
-.dov-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:12px;margin-bottom:12px;align-items:start}
-.dov-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:12px;align-items:start}
-.dov-scroll{max-height:420px;overflow:auto}
-.dov-item{padding:7px 10px;margin:0 0 6px;border-left:4px solid var(--c);background:#f8fafc;border-radius:6px;font-size:14px;line-height:1.35}
-.dov-item small{display:block;color:var(--muted)}
-.dov-line{padding:4px 0;font-size:14px;border-bottom:1px solid var(--line)}
-.dov-line:last-child{border-bottom:0}
-.dov-line small{color:var(--muted)}
-.dov-empty{padding:10px;color:var(--muted);font-style:italic;font-size:14px}
-.dov-table th,.dov-table td{text-align:center;white-space:nowrap}
-.dov-table th:first-child,.dov-table td:first-child{text-align:left}
-.dov-table tr.dov-row{cursor:pointer}
-.dov-table tr.dov-bad td{background:#fff5f5}
-.dov-table tr.dov-detail td{white-space:normal;text-align:left;background:#f8fafc;font-size:13px}
-.dov-table tfoot td{font-weight:700;background:#eef6ff;color:var(--navy)}
-.dov-cov-good{color:#2e7d32;font-weight:700}
-.dov-cov-bad{color:#c62828;font-weight:700}
-.dov-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted);margin-top:6px}
-.dov-legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:-1px}
-.dov details{margin-top:10px}
-.dov summary{cursor:pointer;font-weight:600;color:var(--navy)}
-.dov-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-top:10px}
-.dov-slot{padding:6px 10px;border-radius:8px;font-size:13px;border-left:4px solid}
-.dov-link{color:var(--blue);cursor:pointer;font-weight:600;font-size:13px}
-@media(max-width:980px){.dov-grid,.dov-grid3{grid-template-columns:1fr}}
-@media print{
-  .bar,.controls,#statusBanner,#toast,.view-hint{display:none!important}
-  body{background:#fff}
-  .dov .panel,.dov-kpi{box-shadow:none;border:1px solid #ddd}
-  .dov-scroll{max-height:none;overflow:visible}
-  .dov-table tr.dov-detail{display:none}
-}
 </style>
 </head>
 
@@ -367,7 +349,7 @@ tr.grp-head:hover{filter:brightness(.97)}
 
   <nav class="tabs">
     <div class="dropdown"><a class="tab-btn active" href="#lookupTab" data-tab="lookupTab">Dashboard</a></div>
-    <div class="dropdown"><a class="tab-btn" href="#dailyOverviewTab" data-tab="dailyOverviewTab">Summary</a></div>
+    <div class="dropdown"><a class="tab-btn" href="#summaryTab" data-tab="summaryTab">Summary</a></div>
     <div class="dropdown"><button class="tab-btn">Schedule ▾</button>
       <div class="dropdown-content">
         <a href="#scheduleTab" data-tab="scheduleTab">Daily view</a>
@@ -462,19 +444,36 @@ tr.grp-head:hover{filter:brightness(.97)}
   </div>
 </section>
 
-<!-- ============ DAILY OVERVIEW ============ -->
-<section class="tab-panel dov" id="dailyOverviewTab" hidden>
-  <div class="view-hint">🗓️ One-page operations summary for the selected day: staffing, coverage gaps, exceptions and what changes next.</div>
+<!-- ============ SUMMARY ============ -->
+<section class="tab-panel" id="summaryTab" hidden>
+  <div class="view-hint">📈 Team summary: attendance, quality, performance score and volumes for the months you pick. Choose one or more months (or Year to date) and a supervisor.</div>
   <div class="controls">
-    <button type="button" class="blue" onclick="dovShiftDay(-1)" title="Previous day">‹</button>
-    <input type="date" id="dailyOverviewDate" onchange="buildDailyOverviewTab()">
-    <button type="button" class="blue" onclick="dovShiftDay(1)" title="Next day">›</button>
-    <button type="button" class="blue" onclick="dovToday()">Today</button>
-    <label style="display:flex;align-items:center;gap:6px;font-weight:600">🎯 Min agents <input type="number" min="0" class="minTargetInput"></label>
-    <button type="button" onclick="copyDailyOverview()">📋 Copy summary</button>
-    <button type="button" class="blue" onclick="window.print()">🖨️ Print</button>
+    <div class="msel" id="sumMonthWrap">
+      <button type="button" id="sumMonthBtn" class="msel-btn">Month ▾</button>
+      <div class="msel-panel" id="sumMonthPanel" hidden></div>
+    </div>
+    <select id="sumSupervisor" onchange="buildSummary()"><option>All Supervisors</option></select>
+    <button class="blue" onclick="refreshAttendanceData(true)">↻ Refresh</button>
   </div>
-  <div id="dovBody"></div>
+  <div id="sumRange" class="range-banner"></div>
+  <div class="stats sum-cards" id="sumCards"></div>
+
+  <h3 class="sum-h" id="sumTodayTitle">Today's staffing</h3>
+  <div class="daily-summary" id="sumToday"></div>
+
+  <h3 class="sum-h">Supervisor comparison</h3>
+  <div class="panel"><div class="schedule-container" style="height:auto;max-height:60vh">
+    <table id="sumSupTable" class="nosort"><thead></thead><tbody></tbody></table>
+  </div></div>
+
+  <h3 class="sum-h">Top performers</h3>
+  <div class="podium" id="sumPodium"></div>
+
+  <h3 class="sum-h">Needs attention</h3>
+  <div class="sum-grid3" id="sumAttention"></div>
+
+  <h3 class="sum-h">Monthly trend</h3>
+  <div class="sum-grid3" id="sumTrend"></div>
 </section>
 
 <!-- ============ SUPERVISOR SUMMARY ============ -->
@@ -1265,7 +1264,7 @@ const TAB_RENDERERS = {
   qaTab: buildQA,
   metricTab: buildMetric,
   mcsTab: buildMcs,
-  dailyOverviewTab: buildDailyOverviewTab,
+  summaryTab: buildSummary,
   supervisorTab: buildSupervisorSummary,
   forecastTab: refreshForecast,
   announcementsTab: buildAnnouncementsTab
@@ -1280,7 +1279,7 @@ function renderAll() {
 
 function loadSup() {
   const options = `<option>${ALL}</option>` + uniqueSupervisors().map(s => `<option>${esc(s)}</option>`).join('');
-  ['supervisor', 'scheduleSupervisor', 'ptoSupervisor', 'calledOffSupervisor', 'lateSupervisor', 'rosterSupervisor', 'trackerSupervisor', 'teamSupervisor']
+  ['supervisor', 'scheduleSupervisor', 'ptoSupervisor', 'calledOffSupervisor', 'lateSupervisor', 'rosterSupervisor', 'trackerSupervisor', 'teamSupervisor', 'sumSupervisor']
     .forEach(id => {
       const el = $(id), prev = el.value;
       el.innerHTML = options;
@@ -2790,7 +2789,6 @@ function initMinTarget() {
       try { localStorage.setItem(TARGET_KEY, i.value); } catch (e) {}
       runLookup();
       refreshForecast();
-      if (activeTab === 'dailyOverviewTab') buildDailyOverviewTab();
     });
   });
 }
@@ -3176,291 +3174,216 @@ function initTracker() {
 }
 
 /* =====================================================================
-   DAILY OVERVIEW
-   One page for the selected day. Everything comes from data the other tabs already use:
-   dayInfo / coverageSlots (staffing + coverage), PTO + Called Off + ATTENDANCE TIME (exceptions),
-   "Schedule By Date" (schedule changes), Announcements, Missing Agent Checker.
-   Absent = Called off / NCNS only. Running Late / Left early agents are counted as Present
-   (they worked part of the shift) and shown in their own column.
-   Coverage % = (Scheduled - Leave - Absent) / Scheduled.
+   SUMMARY
+   One pass builds per-agent, per-month figures from the attendance, QA, Performance Stack Ranking and
+   Overall Metric Scorecard data. The cards, supervisor table, lists and trend all read from that.
    ===================================================================== */
-const dovOpen = new Set();
-let dovSummaryText = '';
+let sumSel = new Set(), sumSelInit = false, sumMonths = [];
+const sumMonthName = ym => new Date(+ym.slice(0, 4), +ym.slice(5, 7) - 1, 1).toLocaleDateString('en-US', { month: 'long' }).toLowerCase();
+const sumMonthShort = ym => new Date(+ym.slice(0, 4), +ym.slice(5, 7) - 1, 1).toLocaleDateString('en-US', { month: 'short' });
+const mean = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+/* [green at or above, amber at or above] - same targets used elsewhere on this page */
+const SUM_BANDS = { att: [95, 91], qa: [95, 85], total: [85, 60], fcr: [10, 6] };
+const BAND_COL = { good: '#28a745', mid: '#ff9800', low: '#dc3545' };
+const bandOf = (k, v) => v == null ? '' : v >= SUM_BANDS[k][0] ? 'good' : v >= SUM_BANDS[k][1] ? 'mid' : 'low';
 
-const dovNowMins = () => { const n = estNow(); return n.getHours() * 60 + n.getMinutes(); };
-const dovRange = (a, b) => `${fmtAMPM(toHHMM(a))} – ${fmtAMPM(toHHMM(b))}`;
-const dovShift = s => isOff(s) ? 'OFF' : convertShiftRange(s);
+function summaryData() {
+  const now = estNow(), today = ymd(now), year = now.getFullYear();
+  const yms = Array.from({ length: now.getMonth() + 1 }, (_, i) => `${year}-${pad(i + 1)}`);
+  const idx = { pto: indexRecords(ptoList), att: indexAttendance(calledOffList, attTimeList) };
+  const agents = estData.map(r => ({ name: r.Name, sup: r.Supervisor || 'Unassigned', m: {} }));
+  const byKey = new Map(agents.map(a => [normName(a.name), a]));
 
-function dovShiftDay(n) {
-  const el = $('dailyOverviewDate');
-  el.value = addDays(el.value || ymd(estNow()), n);
-  buildDailyOverviewTab();
-}
-function dovToday() {
-  $('dailyOverviewDate').value = ymd(estNow());
-  buildDailyOverviewTab();
-}
-function dovToggle(tr) {
-  const detail = tr.nextElementSibling;
-  if (!detail) return;
-  detail.hidden = !detail.hidden;
-  detail.hidden ? dovOpen.delete(tr.dataset.sup) : dovOpen.add(tr.dataset.sup);
-}
-
-function dovData(date) {
-  const times = timeEntries();
-  const groups = {}, absentList = [], pendingList = [];
-  const tot = { team: 0, scheduled: 0, leave: 0, absent: 0, partial: 0, off: 0 };
-
-  dayInfo(date).forEach(({ r, scheduled, leave }) => {
-    const sup = r.Supervisor || 'Unassigned';
-    const g = groups[sup] ??= { team: 0, scheduled: 0, leave: [], absent: [], partial: [], off: [] };
-    g.team++; tot.team++;
-    if (!scheduled) { g.off.push(r.Name); tot.off++; return; }
-    g.scheduled++; tot.scheduled++;
-    if (leave) { g.leave.push(r.Name); tot.leave++; return; }
-
-    const co = recFor(calledOffList, r.Name, date);
-    const ent = times.get(normName(r.Name) + '|' + date);
-    const partial = co ? !!matchType(ATT_TYPES, co.Reason, ATT_OTHER).partial : !!ent;
-    if (co && !partial) {
-      g.absent.push(r.Name); tot.absent++;
-      absentList.push({ name: r.Name, sup, reason: String(co.Reason ?? '').trim() });
-    } else if (partial) {
-      g.partial.push(r.Name); tot.partial++;
-      if (!ent) pendingList.push({ name: r.Name, sup, reason: String(co?.Reason ?? '').trim() });
+  /* Attendance: hours worked / expected, leave days, late / left early and called-off days */
+  estData.forEach((r, n) => yms.forEach(ym => {
+    const [y, mo] = ym.split('-').map(Number), dim = new Date(y, mo, 0).getDate();
+    const a = { worked: 0, exp: 0, leave: 0, late: 0, abs: 0 };
+    for (let d = 1; d <= dim; d++) {
+      const date = `${ym}-${pad(d)}`;
+      if (date > today) break;
+      const x = attendanceFor(r, date, today, idx);
+      a.worked += x.worked; a.exp += x.exp;
+      if (x.kind === 'leave') a.leave++; else if (x.kind === 'partial') a.late++; else if (x.kind === 'absent') a.abs++;
     }
-  });
-
-  const slots = coverageSlots(date);
-  const target = targetFor('');
-  const below = [];
-  let cur = null;
-  slots.forEach((s, i) => {
-    if (target > 0 && s.available < target) {
-      if (cur && cur.end === i * 30) { cur.end = i * 30 + 30; cur.worst = Math.min(cur.worst, s.available); }
-      else below.push(cur = { start: i * 30, end: i * 30 + 30, worst: s.available });
-    }
-  });
-  const low = slots.reduce((a, s) => s.available < a.available ? s : a, slots[0]);
-
-  const changes = [];
-  estData.forEach(r0 => {
-    const d = dailyFor(r0, date);
-    if (!d) return;
-    const weekly = r0[dayName(date)];
-    const shiftChg = normShift(d.shift) !== normShift(weekly);
-    const supChg = !!d.supervisor && d.supervisor !== r0.Supervisor;
-    if (shiftChg || supChg) changes.push({
-      name: r0.Name, weekly, now: d.shift, shiftChg,
-      sup: d.supervisor || r0.Supervisor || 'Unassigned', supFrom: supChg ? r0.Supervisor : ''
-    });
-  });
-
-  const ann = announcementList.filter(a => {
-    if (!(a['Announcement Title'] || '').trim() || !(a.Priority || '').includes('High')) return false;
-    const s = normalizeDate(a['Start Date']), e = normalizeDate(a['End Date']);
-    return (!s || s <= date) && (!e || e >= date);
-  });
-
-  return { groups, tot, absentList, pendingList, slots, target, below, low, changes, ann };
-}
-
-function dovChart(slots, target, date) {
-  const W = 960, H = 190, L = 30, R = 8, T = 10, B = 24, pw = W - L - R, ph = H - T - B, base = T + ph;
-  const max = Math.max(1, target, ...slots.map(s => Math.max(s.expected, s.available)));
-  const top = Math.ceil(max / 4) * 4;
-  const y = v => base - (v / top) * ph;
-  const bw = pw / slots.length;
-  let g = '';
-  for (let i = 0; i <= 4; i++) {
-    const v = top * i / 4;
-    g += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#e5e7eb"/>` +
-         `<text x="${L - 5}" y="${y(v) + 4}" text-anchor="end" font-size="10" fill="#6b7280">${Math.round(v)}</text>`;
-  }
-  slots.forEach((s, i) => {
-    const x = L + i * bw, bad = target > 0 && s.available < target;
-    g += `<g><title>${fmtAMPM(s.time)} · Actual ${s.available} / Expected ${s.expected}${target > 0 ? ' / Min ' + target : ''}</title>` +
-         `<rect x="${x + 1}" y="${y(s.expected)}" width="${bw - 2}" height="${base - y(s.expected)}" fill="#dbe4f0"/>` +
-         `<rect x="${x + 1}" y="${y(s.available)}" width="${bw - 2}" height="${base - y(s.available)}" fill="${bad ? '#dc3545' : '#1e88e5'}"/></g>`;
-    if (i % 6 === 0) g += `<text x="${x}" y="${H - 7}" font-size="10" fill="#6b7280">${short12(s.time)}</text>`;
-  });
-  if (target > 0) g += `<line x1="${L}" x2="${W - R}" y1="${y(target)}" y2="${y(target)}" stroke="#ff9800" stroke-width="2" stroke-dasharray="6 4"/>`;
-  if (date === ymd(estNow())) {
-    const nx = L + dovNowMins() / 1440 * pw;
-    g += `<line x1="${nx}" x2="${nx}" y1="${T}" y2="${base}" stroke="#0d6efd" stroke-width="1.5"/>` +
-         `<text x="${nx + 3}" y="${T + 9}" font-size="10" fill="#0d6efd" font-weight="700">now</text>`;
-  }
-  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Agents available per half hour" style="display:block">${g}</svg>`;
-}
-
-function dovByTime(arr) {
-  const m = new Map();
-  [...arr].sort((a, b) => a.t - b.t || a.name.localeCompare(b.name))
-    .forEach(x => { if (!m.has(x.t)) m.set(x.t, []); m.get(x.t).push(x.name); });
-  return [...m].map(([t, names]) =>
-    `<div class="dov-line"><strong>${fmtAMPM(toHHMM(t))}${t >= 1440 ? ' (next day)' : ''}</strong> ${names.map(esc).join(', ')}</div>`).join('');
-}
-
-function buildDailyOverviewTab() {
-  const date = $('dailyOverviewDate').value;
-  if (!date) return;
-  const d = dovData(date);
-  const { tot, groups, slots, target, below, low, absentList, pendingList, changes, ann } = d;
-  const today = ymd(estNow()), isToday = date === today;
-  const present = tot.scheduled - tot.leave - tot.absent;
-  const covPct = tot.scheduled ? (present / tot.scheduled * 100) : null;
-  const covTxt = covPct == null ? '—' : covPct.toFixed(1) + '%';
-  const missingCount = $('missingAgents')?.children.length || 0;
-
-  /* ---- status banner ---- */
-  let cls, headline, subline;
-  if (!tot.scheduled) {
-    cls = 'amber'; headline = '⚪ No agents scheduled on this date';
-    subline = estData.length ? 'Check the date, or the Schedule By Date tab.' : 'Schedules have not loaded yet.';
-  } else if (below.length) {
-    cls = 'red';
-    headline = `🔴 ${below.length} coverage gap${below.length > 1 ? 's' : ''} below the minimum of ${target}`;
-    subline = `Lowest: ${low.available} agents at ${fmtAMPM(low.time)}.`;
-  } else if (tot.absent || pendingList.length || missingCount) {
-    cls = 'amber';
-    headline = `🟠 ${tot.absent} absent${pendingList.length ? `, ${pendingList.length} late / left-early time${pendingList.length > 1 ? 's' : ''} pending` : ''}`;
-    subline = target > 0 ? 'No intervals below the minimum.' : 'Set “Min agents” to get coverage-gap alerts.';
-  } else {
-    cls = 'green'; headline = '🟢 On track: no absences and no coverage gaps';
-    subline = target > 0 ? '' : 'Set “Min agents” to get coverage-gap alerts.';
-  }
-
-  /* ---- KPI cards ---- */
-  const kpi = (label, val, color, sub = '') =>
-    `<div class="dov-kpi" style="--c:${color}"><div class="k-label">${label}</div><div class="k-val">${val}</div><div class="k-sub">${sub || '&nbsp;'}</div></div>`;
-  const lowBad = target > 0 && low.available < target;
-  const kpis =
-    kpi('👥 Scheduled', tot.scheduled, '#0d6efd', `${tot.team} on the team · ${tot.off} OFF`) +
-    kpi('✅ Present', present, '#28a745', tot.scheduled ? `${(present / tot.scheduled * 100).toFixed(0)}% of scheduled` : '') +
-    kpi('📋 Leave', tot.leave, '#17a2b8') +
-    kpi('🚫 Absent', tot.absent, '#dc3545', 'Called off / NCNS') +
-    kpi('⏰ Late / Left early', tot.partial, '#ff9800', pendingList.length ? `${pendingList.length} time(s) pending` : '') +
-    kpi('📊 Coverage', covTxt, tot.absent ? '#dc3545' : '#28a745', 'After leave + absent') +
-    kpi('📉 Lowest', low ? low.available : '—', lowBad ? '#dc3545' : '#6f42c1', low ? fmtAMPM(low.time) + (target > 0 ? ` · min ${target}` : '') : '');
-
-  /* ---- needs attention ---- */
-  const item = (color, html, sub = '') => `<div class="dov-item" style="--c:${color}">${html}${sub ? `<small>${sub}</small>` : ''}</div>`;
-  let att = '';
-  below.forEach(b => att += item('#dc3545', `🔴 <strong>${dovRange(b.start, b.end)}</strong> below minimum`, `Lowest ${b.worst} vs minimum ${target}`));
-  absentList.sort((a, b) => a.sup.localeCompare(b.sup) || a.name.localeCompare(b.name))
-    .forEach(x => att += item('#dc3545', `🚫 <strong>${esc(x.name)}</strong>`, `${esc(x.sup)} · ${x.reason ? esc(x.reason) : 'No reason recorded'}`));
-  pendingList.sort((a, b) => a.sup.localeCompare(b.sup) || a.name.localeCompare(b.name))
-    .forEach(x => att += item('#ff9800', `⏰ <strong>${esc(x.name)}</strong>`, `${esc(x.sup)} · ${esc(x.reason || 'Late / Left early')}: actual time not submitted (half shift assumed)`));
-  if (missingCount) att += item('#ff9800', `❓ <strong>${missingCount} agent${missingCount > 1 ? 's' : ''}</strong> flagged in Missing Agent Checker`,
-    `<span class="dov-link" onclick="showTab('missingTab')">Open Missing Agent Checker</span>`);
-  if (!att) att = '<div class="dov-empty">✅ Nothing needs attention</div>';
-
-  /* ---- supervisor table ---- */
-  const names = arr => arr.length ? arr.map(esc).join(', ') : '<em>None</em>';
-  const rows = Object.entries(groups)
-    .sort((a, b) => (b[1].absent.length > 0) - (a[1].absent.length > 0) || a[0].localeCompare(b[0]))
-    .map(([sup, g]) => {
-      const pres = g.scheduled - g.leave.length - g.absent.length;
-      const cov = g.scheduled ? (pres / g.scheduled * 100).toFixed(1) + '%' : '—';
-      const bad = g.absent.length > 0, open = dovOpen.has(sup);
-      return `<tr class="dov-row ${bad ? 'dov-bad ' : ''}${supClass(sup)}" style="${supStyle(sup)}" data-sup="${esc(sup)}" onclick="dovToggle(this)" title="Click for names">
-        <td><strong>${esc(sup)}</strong></td><td>${g.team}</td><td>${g.scheduled}</td><td>${g.leave.length}</td>
-        <td>${g.absent.length}</td><td>${g.partial.length}</td><td>${g.off.length}</td>
-        <td class="${bad ? 'dov-cov-bad' : 'dov-cov-good'}">${cov}</td></tr>
-        <tr class="dov-detail" ${open ? '' : 'hidden'}><td colspan="8">
-          <strong>🚫 Absent:</strong> ${names(g.absent)}<br><strong>⏰ Late / Left early:</strong> ${names(g.partial)}<br>
-          <strong>📋 Leave:</strong> ${names(g.leave)}<br><strong>⚫ OFF:</strong> ${names(g.off)}</td></tr>`;
-    }).join('');
-  const supTable = `<div class="dov-scroll"><table class="nosort dov-table"><thead><tr>
-      <th>Supervisor</th><th>Team</th><th>Sched.</th><th>Leave</th><th>Absent</th><th>Late / LE</th><th>OFF</th><th>Coverage</th>
-    </tr></thead><tbody>${rows || '<tr><td colspan="8">No agents loaded</td></tr>'}</tbody>
-    <tfoot><tr><td>Total</td><td>${tot.team}</td><td>${tot.scheduled}</td><td>${tot.leave}</td><td>${tot.absent}</td><td>${tot.partial}</td><td>${tot.off}</td><td>${covTxt}</td></tr></tfoot>
-    </table></div>`;
-
-  /* ---- chart + half-hour detail ---- */
-  const cells = slots.map(s => {
-    const bad = target > 0 && s.available < target, ok = s.available >= s.expected && !bad;
-    const c = ok ? '#2e7d32' : '#c62828';
-    return `<div class="dov-slot" style="background:${ok ? '#e8f5e9' : '#ffebee'};color:${c};border-color:${c}"><strong>${fmtAMPM(s.time)}</strong> · Actual <strong>${s.available}</strong> / Expected ${s.expected}${target > 0 ? ` / Min ${target}` : ''}</div>`;
-  }).join('');
-  const chart = dovChart(slots, target, date) +
-    `<div class="dov-legend"><span><i style="background:#1e88e5"></i>Available</span><span><i style="background:#dc3545"></i>Below minimum</span>` +
-    `<span><i style="background:#dbe4f0"></i>Expected (scheduled)</span>${target > 0 ? '<span><i style="background:#ff9800"></i>Minimum</span>' : ''}</div>` +
-    `<details><summary>Show half-hour detail</summary><div class="dov-slots">${cells}</div></details>`;
-
-  /* ---- next 2 hours ---- */
-  let next;
-  if (isToday) {
-    const mins = dovNowMins(), coming = [], going = [];
-    estData.forEach(r => shiftsAround(r, date)
-      .filter(s => !recFor(ptoList, r.Name, s.date) && !recFor(calledOffList, r.Name, s.date))
-      .forEach(s => {
-        if (s.start > mins && s.start <= mins + 120) coming.push({ name: r.Name, t: s.start });
-        if (s.start <= mins && s.end > mins && s.end <= mins + 120) going.push({ name: r.Name, t: s.end });
-      }));
-    next = `<h3>🔄 Next 2 hours <span style="font-weight:400;text-transform:none">(${dovRange(mins, mins + 120)})</span></h3><div class="dov-scroll">
-      <div style="font-weight:700;color:#28a745;margin-bottom:2px">🟢 Coming on (${coming.length})</div>${dovByTime(coming) || '<div class="dov-empty">No one starting</div>'}
-      <div style="font-weight:700;color:#dc3545;margin:10px 0 2px">🔴 Going off (${going.length})</div>${dovByTime(going) || '<div class="dov-empty">No one finishing</div>'}</div>`;
-  } else {
-    next = '<h3>🔄 Next 2 hours</h3><div class="dov-empty">Shift changes are shown when the selected date is today.</div>';
-  }
-
-  /* ---- schedule changes + announcements ---- */
-  const chgHtml = changes.length
-    ? changes.sort((a, b) => a.name.localeCompare(b.name)).map(c => `<div class="dov-line"><strong>${esc(c.name)}</strong> ` +
-        (c.shiftChg ? `${esc(dovShift(c.weekly))} → <strong>${esc(dovShift(c.now))}</strong>` : '') +
-        `<br><small>${esc(c.sup)}${c.supFrom ? ` (was ${esc(c.supFrom)})` : ''}</small></div>`).join('')
-    : '<div class="dov-empty">No schedule changes for this date</div>';
-  const annHtml = ann.length
-    ? ann.map(a => `<div class="dov-item" style="--c:#dc3545"><strong>🔴 ${esc(a['Announcement Title'])}</strong><div style="white-space:pre-wrap;font-size:13px">${esc(a['Announcement Message'])}</div></div>`).join('')
-    : '<div class="dov-empty">No high-priority announcements</div>';
-
-  $('dovBody').innerHTML = `
-    <div class="dov-head"><span class="dov-date">${fmtDate(parseYMD(date))}${isToday ? ' · Today' : ''}</span>
-      <span class="dov-sub">${esc($('lastUpdated')?.textContent || '')}</span></div>
-    <div class="note ${cls} dov-status">${headline}${subline ? `<small>${subline}</small>` : ''}</div>
-    <div class="dov-kpis">${kpis}</div>
-    <div class="dov-grid">
-      <div class="panel"><h3>⚠️ Needs attention</h3><div class="dov-scroll">${att}</div></div>
-      <div class="panel"><h3>👔 By supervisor <span style="font-weight:400;text-transform:none">(click a row for names)</span></h3>${supTable}</div>
-    </div>
-    <div class="panel"><h3>📈 Coverage by half hour</h3>${chart}</div>
-    <div class="dov-grid3">
-      <div class="panel">${next}</div>
-      <div class="panel"><h3>🔁 Schedule changes <span style="font-weight:400;text-transform:none">(${changes.length})</span></h3><div class="dov-scroll">${chgHtml}</div></div>
-      <div class="panel"><h3>📢 High-priority announcements</h3><div class="dov-scroll">${annHtml}</div>
-        <div style="margin-top:8px"><span class="dov-link" onclick="showTab('announcementsTab')">View all announcements</span></div></div>
-    </div>`;
-
-  /* ---- plain-text version for Copy summary ---- */
-  const L = [];
-  L.push(`DITSC L1 English – Phone | ${fmtDate(parseYMD(date))}`);
-  L.push(`Scheduled ${tot.scheduled} | Present ${present} | Leave ${tot.leave} | Absent ${tot.absent} | Late/Left early ${tot.partial} | Coverage ${covTxt}`);
-  if (low) L.push(`Lowest coverage: ${low.available} agents at ${fmtAMPM(low.time)}${target > 0 ? ` (min ${target})` : ''}`);
-  L.push(below.length ? 'Below minimum: ' + below.map(b => `${dovRange(b.start, b.end)} (${b.worst} vs ${target})`).join('; ')
-                      : (target > 0 ? 'Below minimum: none' : 'Below minimum: no target set'));
-  if (absentList.length) L.push('Absent: ' + absentList.map(x => `${x.name} (${x.sup}${x.reason ? ', ' + x.reason : ''})`).join('; '));
-  if (pendingList.length) L.push('Late/Left early, time pending: ' + pendingList.map(x => x.name).join(', '));
-  L.push('By supervisor:');
-  Object.entries(groups).sort((a, b) => a[0].localeCompare(b[0])).forEach(([sup, g]) =>
-    L.push(`  ${sup}: sched ${g.scheduled}, leave ${g.leave.length}, absent ${g.absent.length}, late/LE ${g.partial.length}, OFF ${g.off.length}`));
-  if (changes.length) L.push(`Schedule changes: ${changes.length} (${changes.map(c => c.name).join(', ')})`);
-  dovSummaryText = L.join('\n');
-}
-
-function copyDailyOverview() {
-  buildDailyOverviewTab();
-  const text = dovSummaryText;
-  const fallback = () => {
-    const ta = document.createElement('textarea');
-    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select();
-    let ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
-    ta.remove(); toast(ok ? '✅ Summary copied' : '⚠️ Could not copy');
+    agents[n].m[ym] = a;
+  }));
+  const ymOf = Object.fromEntries(yms.map(ym => [sumMonthName(ym), ym]));
+  const slot = (monthCell, agentCell) => {
+    const ym = ymOf[String(monthCell ?? '').toLowerCase().trim()], a = byKey.get(normName(agentCell));
+    return ym && a ? a.m[ym] : null;
   };
-  if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(() => toast('✅ Summary copied'), fallback);
-  else fallback();
+
+  /* Performance Stack Ranking: TOTAL and FCR points */
+  const I = metricIdx, ti = I.total, fi = metricHeads.findIndex(h => h.toLowerCase().trim() === 'fcr');
+  if (I.month >= 0) metricRows.forEach(r => {
+    const m = slot(r[I.month], r[I.agent]);
+    if (!m) return;
+    const t = ti >= 0 ? metricVal(r[ti]) : null, f = fi >= 0 ? metricVal(r[fi]) : null;
+    if (typeof t === 'number') m.total = t;
+    if (typeof f === 'number') m.fcr = f;
+  });
+
+  /* Overall Metric Scorecard: calls handled, tickets opened */
+  const keys = mcsHeads.map(mcsKey), ci = keys.indexOf('callshandled'), ki = keys.indexOf('ticketsopened');
+  if (mcsI.month >= 0) mcsRows.forEach(r => {
+    const m = slot(r[mcsI.month], r[mcsI.agent]);
+    if (!m) return;
+    const c = ci >= 0 ? metricVal(r[ci]) : null, k = ki >= 0 ? metricVal(r[ki]) : null;
+    if (typeof c === 'number') m.calls = c;
+    if (typeof k === 'number') m.tickets = k;
+  });
+
+  /* Quality Assurance: every audit lands in its call-date month */
+  qaList.forEach(x => {
+    const d = normalizeDate(x.CallDate), a = byKey.get(normName(x['Analyst Name'])), s = qaPct(x.Score);
+    const m = d && a && s != null ? a.m[d.slice(0, 7)] : null;
+    if (!m) return;
+    m.qs = (m.qs || 0) + s; m.qn = (m.qn || 0) + 1;
+  });
+  return { agents, yms, today };
+}
+
+/* One agent over the chosen months */
+function sumRoll(a, sel) {
+  const o = { name: a.name, sup: a.sup, w: 0, e: 0, leave: 0, late: 0, abs: 0, qs: 0, qn: 0, calls: 0, tickets: 0, hasVol: false };
+  const t = [], f = [];
+  sel.forEach(ym => {
+    const m = a.m[ym];
+    if (!m) return;
+    o.w += m.worked; o.e += m.exp; o.leave += m.leave; o.late += m.late; o.abs += m.abs;
+    o.qs += m.qs || 0; o.qn += m.qn || 0;
+    if (typeof m.total === 'number') t.push(m.total);
+    if (typeof m.fcr === 'number') f.push(m.fcr);
+    if (typeof m.calls === 'number') { o.calls += m.calls; o.hasVol = true; }
+    if (typeof m.tickets === 'number') o.tickets += m.tickets;
+  });
+  o.pct = o.e ? o.w / o.e * 100 : null;
+  o.qa = o.qn ? o.qs / o.qn : null;
+  o.total = mean(t); o.fcr = mean(f);
+  return o;
+}
+
+/* A group of agents: attendance from total hours, QA over all audits, scores averaged per agent */
+function sumTeam(list) {
+  const sum = k => list.reduce((s, x) => s + x[k], 0), w = sum('w'), e = sum('e'), qn = sum('qn');
+  return { n: list.length, w, e, pct: e ? w / e * 100 : null, qn, qa: qn ? sum('qs') / qn : null,
+           total: mean(list.map(x => x.total).filter(v => v != null)), fcr: mean(list.map(x => x.fcr).filter(v => v != null)),
+           calls: sum('calls'), tickets: sum('tickets'), hasVol: list.some(x => x.hasVol),
+           leave: sum('leave'), late: sum('late'), abs: sum('abs') };
+}
+
+function renderSumMonthPicker() {
+  const allOn = sumMonths.length > 1 && sumMonths.every(m => sumSel.has(m));
+  $('sumMonthPanel').innerHTML =
+    `<label class="ytd"><input type="checkbox" data-ytd ${allOn ? 'checked' : ''}> 📅 Year to date</label>` +
+    sumMonths.map(m => `<label><input type="checkbox" data-m="${esc(m)}" ${sumSel.has(m) ? 'checked' : ''}> ${esc(qaYmLabel(m))}</label>`).join('');
+  $('sumMonthBtn').textContent = (allOn ? 'Year to date' : sumSel.size === 1 ? qaYmLabel([...sumSel][0]) : `${sumSel.size} months`) + ' ▾';
+}
+
+function initSummary() {
+  $('sumMonthBtn').addEventListener('click', e => { e.stopPropagation(); $('sumMonthPanel').hidden = !$('sumMonthPanel').hidden; });
+  $('sumMonthWrap').addEventListener('click', e => e.stopPropagation());
+  document.addEventListener('click', () => $('sumMonthPanel').hidden = true);
+  $('sumMonthPanel').addEventListener('change', e => {
+    const t = e.target;
+    if (t.dataset.ytd !== undefined) {
+      sumSel = t.checked ? new Set(sumMonths) : new Set([sumMonths[sumMonths.length - 1]]);
+    } else if (t.dataset.m) {
+      t.checked ? sumSel.add(t.dataset.m) : sumSel.delete(t.dataset.m);
+      if (!sumSel.size) sumSel.add(t.dataset.m);                // always keep at least one month
+    }
+    buildSummary();
+  });
+}
+
+function buildSummary() {
+  if (!estData.length) { $('sumCards').innerHTML = '<div class="empty" style="--c:#6c757d">Loading data...</div>'; return; }
+  const D = summaryData();
+  sumMonths = D.yms;
+  if (!sumSelInit) {                                             // default: the latest month that has scores
+    const withScores = D.yms.filter(ym => D.agents.some(a => typeof a.m[ym].total === 'number'));
+    sumSel = new Set([(withScores.length ? withScores : D.yms).slice(-1)[0]]);
+    sumSelInit = true;
+  }
+  sumSel = new Set([...sumSel].filter(m => D.yms.includes(m)));
+  if (!sumSel.size) sumSel.add(D.yms[D.yms.length - 1]);
+  renderSumMonthPicker();
+  const sel = D.yms.filter(m => sumSel.has(m));
+
+  const sup = $('sumSupervisor').value || ALL;
+  const inSup = a => sup === ALL || a.sup === sup;
+  const all = D.agents.map(a => sumRoll(a, sel));
+  const list = all.filter(inSup), T = sumTeam(list);
+  const f1 = v => v == null ? '—' : v.toFixed(1), f2 = v => v == null ? '—' : v.toFixed(2);
+
+  $('sumRange').textContent = '📅 ' + (sel.length === 1 ? qaYmLabel(sel[0]) : `${qaYmLabel(sel[0])} - ${qaYmLabel(sel[sel.length - 1])} (${sel.length} months)`) +
+    (sup === ALL ? '' : ` · ${sup}`);
+
+  /* 1. Headline cards */
+  const col = (k, v) => BAND_COL[bandOf(k, v)] || '#1e88e5';
+  const card = (title, value, sub, color) => `<div class="card" style="--c:${color}"><h3>${title}</h3><div class="value">${value}</div><div class="pct">${sub}</div></div>`;
+  $('sumCards').innerHTML =
+    card('📊 Attendance', T.pct == null ? '—' : T.pct.toFixed(1) + '%', `${Math.round(T.w).toLocaleString()} / ${Math.round(T.e).toLocaleString()} hrs`, col('att', T.pct)) +
+    card('⭐ QA score', T.qa == null ? '—' : T.qa.toFixed(1) + '%', `${T.qn} audits`, col('qa', T.qa)) +
+    card('🏆 Avg total score', f2(T.total), 'Performance Stack Ranking', col('total', T.total)) +
+    card('🎯 Avg FCR', f2(T.fcr), 'points', col('fcr', T.fcr)) +
+    card('📞 Calls handled', T.hasVol ? T.calls.toLocaleString() : '—', 'Overall Metric Scorecard', '#1e88e5') +
+    card('🎫 Tickets opened', T.hasVol ? T.tickets.toLocaleString() : '—', 'Overall Metric Scorecard', '#1e88e5') +
+    card('🌴 Leave days', T.leave, 'approved leave', '#17a2b8') +
+    card('⏰ Late / left early', T.late, `${T.abs} called off / NCNS`, T.late ? '#ff9800' : '#28a745');
+
+  /* 2. Today's staffing */
+  const day = dayInfo(D.today).filter(x => sup === ALL || (x.r.Supervisor || 'Unassigned') === sup);
+  const sched = day.filter(x => x.scheduled).length, lv = day.filter(x => x.leave).length, ab = day.filter(x => x.absent).length;
+  $('sumTodayTitle').textContent = `Today's staffing · ${fmtDate(parseYMD(D.today))}`;
+  $('sumToday').innerHTML =
+    `<div class="summary-box">👥 Scheduled: <span>${sched}</span></div><div class="summary-box">✅ Working: <span>${sched - lv - ab}</span></div>` +
+    `<div class="summary-box">📋 Leave: <span>${lv}</span></div><div class="summary-box">🚫 Absenteeism: <span>${ab}</span></div>` +
+    `<div class="summary-box">⚫ OFF: <span>${day.length - sched}</span></div>`;
+
+  /* 3. Supervisor comparison (always every supervisor) */
+  const sups = [...new Set(all.map(a => a.sup))].sort((a, b) => a.localeCompare(b));
+  const td = (k, v, txt) => `<td class="${bandOf(k, v) ? 'sc-' + bandOf(k, v) : ''}">${txt}</td>`;
+  const supRow = (label, g, cls, st) => `<tr class="${cls}" style="${st || ''}"><td>${esc(label)}</td><td>${g.n}</td>` +
+    td('att', g.pct, g.pct == null ? '—' : g.pct.toFixed(1) + '%') + td('qa', g.qa, g.qa == null ? '—' : g.qa.toFixed(1) + '%') +
+    td('total', g.total, f2(g.total)) + td('fcr', g.fcr, f2(g.fcr)) + `<td>${g.abs}</td><td>${g.late}</td></tr>`;
+  $('sumSupTable').tHead.innerHTML = '<tr><th>🧑‍💼 Supervisor</th><th>Agents</th><th>Attendance</th><th>Avg QA</th><th>Avg total</th><th>Avg FCR</th><th title="Called off / NCNS days">Absences</th><th title="Late / left early days">Late / LE</th></tr>';
+  $('sumSupTable').tBodies[0].innerHTML = sups.map(s => supRow(s, sumTeam(all.filter(a => a.sup === s)), supClass(s), supStyle(s))).join('') +
+    supRow('Team total', sumTeam(all), 'sum-total', '');
+
+  /* 4. Top 3 */
+  const medals = [['🥇', '#f5b301'], ['🥈', '#94a3b8'], ['🥉', '#cd7f32']];
+  const top = list.filter(a => a.total != null).sort((a, b) => b.total - a.total).slice(0, 3);
+  $('sumPodium').innerHTML = top.length ? top.map((a, n) => `<div class="pod" style="--c:${medals[n][1]}"><div class="medal">${medals[n][0]}</div>
+    <div class="pn">${esc(a.name)}</div><div class="ps">${a.total.toFixed(2)}</div><small>${esc(a.sup)}</small></div>`).join('')
+    : '<div class="empty" style="--c:#6c757d">No scores for these months yet</div>';
+
+  /* 5. Needs attention */
+  const attn = (title, items, fmt) => `<div class="panel"><h3>${title}</h3><ul class="attn">` + (items.length
+    ? items.map(a => `<li><span>${esc(a.name)}<small>${esc(a.sup)}</small></span><strong>${fmt(a)}</strong></li>`).join('')
+    : '<li class="empty" style="--c:#6c757d">Nothing to flag</li>') + '</ul></div>';
+  $('sumAttention').innerHTML =
+    attn('⭐ Lowest QA', list.filter(a => a.qa != null).sort((a, b) => a.qa - b.qa).slice(0, 5), a => a.qa.toFixed(1) + '%') +
+    attn('📊 Lowest attendance', list.filter(a => a.pct != null).sort((a, b) => a.pct - b.pct).slice(0, 5), a => a.pct.toFixed(1) + '%') +
+    attn('⏰ Most late / left early', list.filter(a => a.late > 0).sort((a, b) => b.late - a.late).slice(0, 5), a => a.late + ' day' + (a.late === 1 ? '' : 's'));
+
+  /* 6. Monthly trend (every month so far this year, same supervisor filter) */
+  const pts = D.yms.map(ym => ({ ym, T: sumTeam(D.agents.filter(inSup).map(a => sumRoll(a, [ym]))) }))
+    .filter(p => p.T.pct != null || p.T.qa != null || p.T.total != null);
+  const bars = (key, color, unit) => {
+    const vals = pts.map(p => p.T[key]).filter(v => v != null);
+    if (!vals.length) return '<div class="empty" style="--c:#6c757d">No data yet</div>';
+    const lo = Math.max(0, Math.floor((Math.min(...vals) - 5) / 5) * 5), hi = 100;
+    return '<div class="bars">' + pts.map(p => {
+      const v = p.T[key], h = v == null ? 0 : Math.max(2, (v - lo) / (hi - lo) * 100);
+      return `<div class="bar-col"><div class="bar-val">${v == null ? '—' : v.toFixed(1)}</div>
+        <div class="bar-area"><div class="bar-fill" style="height:${h}%;background:${color}"></div></div><div class="bar-lbl">${sumMonthShort(p.ym)}</div></div>`;
+    }).join('') + `</div><div class="bar-axis">Scale ${lo} - ${hi}${unit}</div>`;
+  };
+  $('sumTrend').innerHTML =
+    `<div class="panel"><h3>📊 Attendance %</h3>${bars('pct', '#1e88e5', '%')}</div>` +
+    `<div class="panel"><h3>⭐ QA score %</h3>${bars('qa', '#17a2b8', '%')}</div>` +
+    `<div class="panel"><h3>🏆 Avg total score</h3>${bars('total', '#28a745', '')}</div>`;
 }
 
 /* =====================================================================
@@ -3505,9 +3428,10 @@ window.addEventListener('load', async () => {
   initGroupToggle();
   initQa();
   initMcsMonth();
+  initSummary();
 
   const today = ymd(estNow());
-  ['selectedDate', 'ptoDate', 'calledOffDate', 'scheduleDate', 'supervisorDate', 'forecastDate', 'dailyOverviewDate']
+  ['selectedDate', 'ptoDate', 'calledOffDate', 'scheduleDate', 'supervisorDate', 'forecastDate']
     .forEach(id => $(id).value = today);
   $('trackerMonth').value = today.slice(0, 7);
 
