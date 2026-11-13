@@ -80,7 +80,6 @@ a.tab-btn{display:inline-block;padding:8px 12px;border-radius:8px;text-decoratio
 .card:hover{transform:none;box-shadow:0 2px 8px rgba(0,0,0,.08)}
 .card .details{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;text-align:left}
 .value{font-size:40px;font-weight:700;color:var(--navy)}
-#supervisorSummaryCards,
 #dailyOverviewCards{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:10px;align-items:start}
 
 /* ---------- Dashboard stat cards ---------- */
@@ -298,7 +297,6 @@ tr.grp-head:hover{filter:brightness(.97)}
   .two-col{grid-template-columns:1fr}
 }
 @media(max-width:900px){
-  #supervisorSummaryCards,
   #dailyOverviewCards{grid-auto-columns:minmax(200px,1fr);overflow-x:auto;padding-bottom:6px}
 }
 @media(max-width:768px){
@@ -397,7 +395,7 @@ select:focus,input:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 3px
 .card hr{border:0;border-top:1px solid var(--line);margin:10px 0}
 .card .details{border-top:1px solid var(--line);line-height:1.6}
 #dailyOverviewCards .card .value{font-size:30px;color:var(--c)}
-#supervisorSummaryCards,#dailyOverviewCards{grid-auto-flow:row;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+#dailyOverviewCards{grid-auto-flow:row;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
 
 /* Panels */
 .panel{padding:18px 20px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:none}
@@ -465,6 +463,23 @@ td.sc-good::before,td.sc-mid::before,td.sc-low::before{content:"";display:inline
 #ssTable th{cursor:pointer;user-select:none}
 #ssCards .ss-good{color:#15803d}#ssCards .ss-mid{color:#b45309}#ssCards .ss-low{color:#b91c1c}
 html[data-theme=dark] #ssCards .ss-good{color:#4ade80}html[data-theme=dark] #ssCards .ss-mid{color:#fbbf24}html[data-theme=dark] #ssCards .ss-low{color:#f87171}
+.lc-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(12,auto);grid-auto-flow:column;gap:10px;margin-top:15px}
+.lc-cell{padding:8px 10px;border-radius:8px;border-left:4px solid var(--c);background:var(--bg);color:var(--c);font-size:13px;min-width:0}
+.lc-cell small{display:block;margin-top:3px;font-size:11.5px;font-weight:500;line-height:1.35;overflow-wrap:anywhere}
+.lc-0{--c:#757575;--bg:#f1f2f4}.lc-1{--c:#1565c0;--bg:#e3f2fd}.lc-peak{--c:#e65100;--bg:#fff3e0}
+html[data-theme=dark] .lc-0{--c:#9ca3af;--bg:#1b2331}html[data-theme=dark] .lc-1{--c:#93c5fd;--bg:#16263d}html[data-theme=dark] .lc-peak{--c:#fdba74;--bg:#3a2a12}
+@media(max-width:900px){.lc-grid{grid-template-columns:repeat(2,1fr);grid-template-rows:none;grid-auto-flow:row}}
+@media(max-width:560px){.lc-grid{grid-template-columns:1fr}}
+/* Hide / show the side menu (desktop; phones keep the ☰ button) */
+.side-toggle{display:none}
+@media(min-width:901px){
+  .side-toggle{display:grid;place-items:center;position:fixed;top:26px;left:calc(var(--side) - 13px);width:26px;height:26px;padding:0;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:16px;line-height:1;cursor:pointer;z-index:80;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .side-toggle:hover{color:var(--ink);background:#f3f4f6;transform:none}
+  .side-toggle:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  body.nav-hidden .side{display:none}
+  body.nav-hidden .side-toggle{left:8px}
+}
+html[data-theme=dark] .side-toggle:hover{background:#1e2735}
 .page-head #refreshBtn{width:36px;height:36px;padding:0;display:grid;place-items:center;font-size:18px;line-height:1}
 
 /* Agent file: single calendar view with an agent summary strip */
@@ -569,6 +584,7 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
 
 <div class="app">
 <div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+<button type="button" class="side-toggle" id="sideToggle" aria-label="Hide menu" title="Hide menu">‹</button>
 <aside class="side">
   <div class="brand">
     <img src="logo.gif" class="logo" alt="Logo" onerror="this.style.display='none'">
@@ -592,9 +608,9 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
     <a class="tab-btn" href="#qaTab" data-tab="qaTab">Quality Assurance</a>
     <a class="tab-btn" href="#metricTab" data-tab="metricTab">Performance Stack Ranking</a>
     <a class="tab-btn" href="#mcsTab" data-tab="mcsTab">Overall Metric Scorecard</a>
-    <div class="nav-label">Reports</div>
-    <a class="tab-btn" href="#supervisorTab" data-tab="supervisorTab">Supervisor summary</a>
-    <a class="tab-btn" href="#forecastTab" data-tab="forecastTab">Coverage forecast</a>
+    <div class="nav-label">Shift Coverage</div>
+    <a class="tab-btn" href="#forecastTab" data-tab="forecastTab">Daily Intervals</a>
+    <a class="tab-btn" href="#lunchTab" data-tab="lunchTab">Lunch Concurrency</a>
     <a class="tab-btn" href="#missingTab" data-tab="missingTab">Missing Agent Checker</a>
     <div class="nav-label">Submit</div>
     <a class="tab-btn" href="#attendanceFormTab" data-tab="attendanceFormTab">Attendance form</a>
@@ -671,25 +687,9 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
   </div>
 </section>
 
-<!-- ============ SUPERVISOR SUMMARY ============ -->
-<section class="tab-panel" id="supervisorTab" hidden>
-  <div class="view-hint">📈 Full-day supervisor staffing summary including Scheduled, Leave, Absenteeism, OFF and Coverage.</div>
-  <div class="controls">
-    <input type="date" id="supervisorDate">
-    <select id="summaryView">
-      <option value="daily">Daily</option>
-      <option value="mtd">Month To Date</option>
-      <option value="weekly">Weekly</option>
-    </select>
-    <button onclick="buildSupervisorSummary()">Show Summary</button>
-  </div>
-  <div id="summaryDateRange" class="range-banner" style="margin-top:10px"></div>
-  <div class="cards" id="supervisorSummaryCards"></div>
-</section>
-
 <!-- ============ COVERAGE FORECAST ============ -->
 <section class="tab-panel" id="forecastTab" hidden>
-  <div class="view-hint">📊 Full-day staffing coverage forecast.</div>
+  <div class="view-hint">📊 Full-day staffing coverage by 30-minute interval.</div>
   <div class="controls">
     <input type="date" id="forecastDate">
     <label style="display:flex;align-items:center;gap:6px;font-weight:600">🎯 Min agents <input type="number" min="0" class="minTargetInput"></label>
@@ -697,6 +697,16 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
   </div>
   <div id="dailyOverviewCards" class="cards" style="margin:15px 0"></div>
   <div id="coverageTimelinePanel" class="panel"></div>
+</section>
+
+<!-- ============ LUNCH CONCURRENCY ============ -->
+<section class="tab-panel" id="lunchTab" hidden>
+  <div class="view-hint">🍽️ Lunch Concurrency: how many agents are on lunch (60 minutes) in each 30-minute interval. Leave and called-off shifts are not counted.</div>
+  <div class="controls">
+    <input type="date" id="lunchDate" onchange="buildLunchConcurrency()">
+    <button onclick="buildLunchConcurrency()">Show Lunches</button>
+  </div>
+  <div id="lunchConcurrencyPanel" class="panel"></div>
 </section>
 
 <!-- ============ ANNOUNCEMENTS ============ -->
@@ -1482,8 +1492,8 @@ const TAB_RENDERERS = {
   qaTab: buildQA,
   metricTab: buildMetric,
   mcsTab: buildMcs,
-  supervisorTab: buildSupervisorSummary,
   forecastTab: refreshForecast,
+  lunchTab: buildLunchConcurrency,
   announcementsTab: buildAnnouncementsTab
 };
 
@@ -1523,7 +1533,7 @@ function toggleRealtime() {
 
 function updateRealtime() {
   const now = estNow(), today = ymd(now);
-  ['selectedDate', 'ptoDate', 'calledOffDate', 'scheduleDate', 'supervisorDate'].forEach(id => $(id).value = today);
+  ['selectedDate', 'ptoDate', 'calledOffDate', 'scheduleDate'].forEach(id => $(id).value = today);
   $('interval').value = `${pad(now.getHours())}:${now.getMinutes() >= 30 ? '30' : '00'}`;
   renderAll();
 }
@@ -1804,112 +1814,6 @@ function renderHighAnnouncements() {
 }
 
 /* =====================================================================
-   SUPERVISOR SUMMARY
-   ===================================================================== */
-function buildSupervisorSummary() {
-  const date = $('supervisorDate').value;
-  if (!date) return;
-  const view = $('summaryView').value;
-  const end = parseYMD(date);
-
-  if (view === 'daily') {
-    $('summaryDateRange').innerHTML = `📅 Daily Summary: ${fmtDate(end)}`;
-    return buildDailySummary(date);
-  }
-  const start = view === 'mtd'
-    ? new Date(end.getFullYear(), end.getMonth(), 1)
-    : new Date(end.getFullYear(), end.getMonth(), end.getDate() - 6);
-  const label = view === 'mtd' ? 'Month To Date' : 'Weekly Summary';
-  $('summaryDateRange').innerHTML = `📅 ${label}: ${fmtDate(start)} - ${fmtDate(end)}`;
-  buildRangeSummary(start, end, view === 'mtd' ? 'Vacation Leave Days' : 'Vacation Days');
-}
-
-function buildDailySummary(date) {
-  const groups = {};
-  dayInfo(date).forEach(({ r, scheduled, leave, absent }) => {
-    const g = groups[r.Supervisor || 'Unassigned'] ??= { team: 0, scheduled: [], leave: [], absent: [], off: [] };
-    g.team++;
-    if (!scheduled) return g.off.push(r.Name);
-    g.scheduled.push(r.Name);
-    if (leave) g.leave.push(r.Name);
-    else if (absent) g.absent.push(r.Name);
-  });
-
-  const section = (label, arr) => `<strong>${label} (${arr.length})</strong><br>${arr.map(esc).join('<br>')}`;
-
-  $('supervisorSummaryCards').innerHTML = Object.entries(groups)
-    .sort((a, b) => (b[1].absent.length > 0) - (a[1].absent.length > 0) || a[0].localeCompare(b[0]))
-    .map(([name, g]) => {
-      const coverage = g.scheduled.length
-        ? (((g.scheduled.length - g.leave.length - g.absent.length) / g.scheduled.length) * 100).toFixed(1) : 0;
-      const bad = g.absent.length > 0;
-      return `
-        <div class="card" onclick="toggleDetails(this)" style="--c:${bad ? '#dc3545' : '#28a745'};background:${bad ? '#fff5f5' : '#fff'}">
-          <h3>${bad ? '🔴' : '🟢'} 👔 ${esc(name)}</h3>
-          <div>👥 Team Size: ${g.team}</div>
-          <div>📅 Scheduled: ${g.scheduled.length}</div>
-          <div>📋 Leave: ${g.leave.length}</div>
-          <div>🚫 Absenteeism: ${g.absent.length}</div>
-          <div>⚫ OFF: ${g.off.length}</div>
-          <hr>
-          <div>📊 Coverage: <strong>${coverage}%</strong></div>
-          <div class="details" hidden>
-            ${section('📅 Scheduled', g.scheduled)}<hr>${section('📋 Leave', g.leave)}<hr>
-            ${section('🚫 Absenteeism', g.absent)}<hr>${section('⚫ OFF', g.off)}
-          </div>
-        </div>`;
-    }).join('');
-}
-
-function rangeDetailSection(label, items) {
-  const line = x => `${esc(x.name)} — ${fmtDate(parseYMD(x.date))}` + (x.reason ? ` (${esc(x.reason)})` : '');
-  const sorted = [...items].sort((a, b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name));
-  return `<strong>${label} (${items.length})</strong><br>${sorted.map(line).join('<br>') || '<em>None</em>'}`;
-}
-
-function buildRangeSummary(start, end, leaveLabel) {
-  const groups = {};
-  estData.forEach(a => {
-    (groups[a.Supervisor || 'Unassigned'] ??= { team: 0, leaveAgents: [], attendanceAgents: [] }).team++;
-  });
-  const inRange = d => { if (!d) return false; const x = parseYMD(d); return x >= start && x <= end; };
-
-  ptoList.forEach(rec => {
-    const d = normalizeDate(rec['EST Date']);
-    if (!inRange(d) || !up(rec.Reason).includes('VACATION')) return;
-    const agent = findAgent(rec.Name);
-    if (agent) groups[agent.Supervisor || 'Unassigned'].leaveAgents.push({ name: rec.Name, date: d, reason: rec.Reason });
-  });
-  calledOffList.forEach(rec => {
-    const d = normalizeDate(rec['EST Date']);
-    if (!inRange(d)) return;
-    const agent = findAgent(rec.Name);
-    if (agent) groups[agent.Supervisor || 'Unassigned'].attendanceAgents.push({ name: rec.Name, date: d, reason: rec.Reason || 'No Reason' });
-  });
-
-  $('supervisorSummaryCards').innerHTML = Object.entries(groups)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([name, g]) => {
-      const leave = g.leaveAgents.length, attendance = g.attendanceAgents.length;
-      const reliability = g.team ? (((g.team - attendance) / g.team) * 100).toFixed(1) : 100;
-      const bad = attendance > 0;
-      return `
-        <div class="card" onclick="toggleDetails(this)" style="--c:${bad ? '#dc3545' : '#28a745'}">
-          <h3>${bad ? '🔴' : '🟢'} 👔 ${esc(name)}</h3>
-          <div>👥 Team Size: ${g.team}</div>
-          <div>🌴 ${leaveLabel}: ${leave}</div>
-          <div>🚫 Attendance Incidents: ${attendance}</div>
-          <hr>
-          <div>📊 Reliability Rate: <strong>${reliability}%</strong></div>
-          <div class="details" hidden>
-            ${rangeDetailSection('🌴 ' + leaveLabel, g.leaveAgents)}<hr>
-            ${rangeDetailSection('🚫 Attendance Incidents', g.attendanceAgents)}
-          </div>
-        </div>`;
-    }).join('');
-}
-
-/* =====================================================================
    COVERAGE FORECAST
    ===================================================================== */
 function refreshForecast() {
@@ -2017,6 +1921,49 @@ function buildCoverageTimeline() {
   $('coverageTimelinePanel').innerHTML = `
     <h3>📈 Full Day Coverage Forecast${belowCount ? ` <span style="color:#c62828;font-size:14px">· ⚠️ ${belowCount} interval(s) below minimum</span>` : ''}</h3>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(12,auto);grid-auto-flow:column;gap:10px;margin-top:15px">${cells}</div>`;
+}
+
+/* Lunch Concurrency: how many agents are on lunch (60 min) in each 30-minute interval.
+   An agent counts in every interval their lunch overlaps; leave and Called Off / NCNS shifts are left out. */
+function lunchSlots(date) {
+  const people = estData.map(r => ({
+    r,
+    shifts: shiftsAround(r, date).map(s => ({ ...s, out: coverageGaps(r, s).out }))
+  }));
+  /* Each agent's lunch as minutes on this date's timeline (overnight shifts: after-midnight lunches land in the next day) */
+  const lunches = [];
+  people.forEach(({ r, shifts }) => shifts.forEach(s => {
+    if (s.out) return;
+    const lt = tm(rowFor(r, s.date)['Lunch']);
+    if (lt == null) return;
+    const at = [lt - 1440, lt, lt + 1440].find(x => x >= s.start && x < s.end);
+    if (at != null) lunches.push({ name: r.Name, start: at, end: at + 60 });
+  }));
+  const slots = [];
+  for (let m = 0; m < 1440; m += 30) {
+    const names = lunches.filter(l => l.start < m + 30 && l.end > m).map(l => l.name).sort((a, b) => a.localeCompare(b));
+    slots.push({ time: toHHMM(m), count: names.length, names });
+  }
+  return { slots, total: lunches.filter(l => l.end > 0 && l.start < 1440).length };
+}
+
+function buildLunchConcurrency() {
+  const date = $('lunchDate').value;
+  if (!date) return;
+  const { slots, total } = lunchSlots(date);
+  const peak = Math.max(0, ...slots.map(s => s.count));
+  const peakTimes = peak ? slots.filter(s => s.count === peak).map(s => fmtAMPM(s.time)) : [];
+
+  const cells = slots.map(s => {
+    const cls = !s.count ? 'lc-0' : s.count === peak ? 'lc-peak' : 'lc-1';
+    return `<div class="lc-cell ${cls}" title="${esc(s.names.join(', ') || 'No one on lunch')}">
+      <strong>${fmtAMPM(s.time)}</strong> &nbsp;&nbsp; On lunch: <strong>${s.count}</strong>${s.count === peak && peak ? ' 🔺' : ''}
+      ${s.count ? `<small>${s.names.map(esc).join(', ')}</small>` : ''}</div>`;
+  }).join('');
+
+  $('lunchConcurrencyPanel').innerHTML = `
+    <h3>🍽️ Lunch Concurrency${peak ? ` <span style="color:var(--muted);font-size:14px;font-weight:500">· Peak: ${peak} at ${peakTimes.slice(0, 3).join(', ')}${peakTimes.length > 3 ? '…' : ''} · ${total} lunch${total === 1 ? '' : 'es'} scheduled</span>` : ''}</h3>
+    <div class="lc-grid">${cells}</div>`;
 }
 
 /* =====================================================================
@@ -3558,7 +3505,7 @@ window.addEventListener('load', async () => {
   initMcsMonth();
 
   const today = ymd(estNow());
-  ['selectedDate', 'ptoDate', 'calledOffDate', 'scheduleDate', 'supervisorDate', 'forecastDate']
+  ['selectedDate', 'ptoDate', 'calledOffDate', 'scheduleDate', 'forecastDate', 'lunchDate']
     .forEach(id => $(id).value = today);
   $('trackerMonth').value = today.slice(0, 7);
   $('ssMonth').value = today.slice(0, 7);
@@ -3676,6 +3623,25 @@ window.addEventListener('load', () => setPageHead(activeTab));
   const toggle = () => { const on = !panel.classList.contains('collapsed'); set(on); try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {} };
   h.addEventListener('click', toggle);
   h.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+})();
+/* Hide / show the side menu */
+(function(){
+  const btn = document.getElementById('sideToggle'); if (!btn) return;
+  const KEY = 'ditsc_nav_hidden';
+  const set = hide => {
+    document.body.classList.toggle('nav-hidden', hide);
+    btn.textContent = hide ? '›' : '‹';
+    btn.title = hide ? 'Show menu' : 'Hide menu';
+    btn.setAttribute('aria-label', btn.title);
+    btn.setAttribute('aria-expanded', !hide);
+  };
+  let saved = false; try { saved = localStorage.getItem(KEY) === '1'; } catch (e) {}
+  set(saved);
+  btn.addEventListener('click', () => {
+    const hide = !document.body.classList.contains('nav-hidden');
+    set(hide);
+    try { localStorage.setItem(KEY, hide ? '1' : '0'); } catch (e) {}
+  });
 })();
 </script>
 </body>
