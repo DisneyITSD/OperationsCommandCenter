@@ -437,6 +437,16 @@ td.sc-good::before,td.sc-mid::before,td.sc-low::before{content:"";display:inline
   .schedule-container{height:calc(100vh - 250px)}
 }
 @media(max-width:700px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.panels{grid-template-columns:1fr}}
+
+/* Working list: collapsible */
+#workingList{border-left:0}
+.panels .panel:first-child h3{cursor:pointer;display:flex;align-items:center;gap:8px;user-select:none}
+.panels .panel:first-child h3::after{content:"";margin-left:auto;width:7px;height:7px;border-right:2px solid #6b7280;border-bottom:2px solid #6b7280;transform:rotate(45deg) translateY(-2px);transition:transform .15s}
+.panels .panel.collapsed h3::after{transform:rotate(-45deg)}
+.panels .panel:first-child h3:hover{background:#f9fafb}
+.panels .panel:first-child h3:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.panels .panel.collapsed #workingList{display:none}
+@media(min-width:901px){.panels:has(.panel:first-child.collapsed){grid-template-columns:150px repeat(4,minmax(0,1fr))}}
 </style>
 </head>
 
@@ -3312,6 +3322,18 @@ function setPageHead(id){
   document.body.classList.remove('nav-open');
 }
 window.addEventListener('load', () => setPageHead(activeTab));
+/* Dashboard: collapse / expand the Working list */
+(function(){
+  const list = document.getElementById('workingList'); if (!list) return;
+  const panel = list.closest('.panel'), h = panel.querySelector('h3'), KEY = 'ditsc_working_collapsed';
+  const set = on => { panel.classList.toggle('collapsed', on); h.setAttribute('aria-expanded', !on); h.title = on ? 'Expand Working list' : 'Collapse Working list'; };
+  h.setAttribute('role', 'button'); h.tabIndex = 0;
+  let saved = false; try { saved = localStorage.getItem(KEY) === '1'; } catch (e) {}
+  set(saved);
+  const toggle = () => { const on = !panel.classList.contains('collapsed'); set(on); try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {} };
+  h.addEventListener('click', toggle);
+  h.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+})();
 </script>
 </body>
 </html>
