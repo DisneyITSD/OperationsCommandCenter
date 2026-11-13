@@ -458,6 +458,13 @@ td.sc-good::before,td.sc-mid::before,td.sc-low::before{content:"";display:inline
 .wl-toggle svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .wl-toggle:hover{background:rgba(127,127,127,.12)}
 .wl-toggle:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+#ssCards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin:0 0 18px}
+#ssCards .card .ss-line{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-size:13.5px}
+#ssCards .card .ss-line b{font-weight:700}
+#ssCards .card .ss-sub{font-size:12px;color:var(--muted);margin:0 0 6px}
+#ssTable th{cursor:pointer;user-select:none}
+#ssCards .ss-good{color:#15803d}#ssCards .ss-mid{color:#b45309}#ssCards .ss-low{color:#b91c1c}
+html[data-theme=dark] #ssCards .ss-good{color:#4ade80}html[data-theme=dark] #ssCards .ss-mid{color:#fbbf24}html[data-theme=dark] #ssCards .ss-low{color:#f87171}
 .page-head #refreshBtn{width:36px;height:36px;padding:0;display:grid;place-items:center;font-size:18px;line-height:1}
 
 /* Agent file: single calendar view with an agent summary strip */
@@ -580,6 +587,7 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
     <a class="tab-btn" href="#calledOffTab" data-tab="calledOffTab">Absenteeism</a>
     <a class="tab-btn" href="#lateTab" data-tab="lateTab">Late / Left early</a>
     <div class="nav-label">Scorecard</div>
+    <a class="tab-btn" href="#scoreSumTab" data-tab="scoreSumTab">Summary</a>
     <a class="tab-btn" href="#trackerTab" data-tab="trackerTab">Attendance</a>
     <a class="tab-btn" href="#qaTab" data-tab="qaTab">Quality Assurance</a>
     <a class="tab-btn" href="#metricTab" data-tab="metricTab">Performance Stack Ranking</a>
@@ -862,6 +870,26 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
         </tr></thead>
         <tbody></tbody>
       </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCORECARD: SUMMARY ============ -->
+<section class="tab-panel" id="scoreSumTab" hidden>
+  <div class="view-hint">📋 One-page scorecard for the month: Attendance %, Quality Assurance average and Performance Stack Ranking total, rolled up per team and listed per agent. Click a column title to sort.</div>
+  <div class="controls">
+    <button type="button" onclick="shiftScoreSumMonth(-1)" title="Previous month">‹</button>
+    <input type="month" id="ssMonth" onchange="buildScoreSummary()">
+    <button type="button" onclick="shiftScoreSumMonth(1)" title="Next month">›</button>
+    <select id="ssSupervisor" onchange="buildScoreSummary()"><option>All Supervisors</option></select>
+    <select id="ssAgent" onchange="buildScoreSummary()"><option value="">All Agents</option></select>
+    <input type="text" id="ssSearch" placeholder="🔍 Search Agent..." onkeyup="buildScoreSummary()">
+  </div>
+  <div class="trk-legend" id="ssLegend"></div>
+  <div id="ssCards"></div>
+  <div class="panel">
+    <div class="schedule-container">
+      <table id="ssTable" class="nosort"><thead></thead><tbody></tbody></table>
     </div>
   </div>
 </section>
@@ -1449,6 +1477,7 @@ const TAB_RENDERERS = {
   ptoTab: () => buildRecordTable('pto'),
   calledOffTab: () => buildRecordTable('att'),
   lateTab: buildLateTable,
+  scoreSumTab: buildScoreSummary,
   trackerTab: buildTracker,
   qaTab: buildQA,
   metricTab: buildMetric,
@@ -1467,7 +1496,7 @@ function renderAll() {
 
 function loadSup() {
   const options = `<option>${ALL}</option>` + uniqueSupervisors().map(s => `<option>${esc(s)}</option>`).join('');
-  ['supervisor', 'scheduleSupervisor', 'ptoSupervisor', 'calledOffSupervisor', 'lateSupervisor', 'rosterSupervisor', 'trackerSupervisor', 'teamSupervisor']
+  ['supervisor', 'scheduleSupervisor', 'ptoSupervisor', 'calledOffSupervisor', 'lateSupervisor', 'rosterSupervisor', 'trackerSupervisor', 'teamSupervisor', 'ssSupervisor']
     .forEach(id => {
       const el = $(id), prev = el.value;
       el.innerHTML = options;
@@ -3354,6 +3383,139 @@ function shiftTrackerMonth(delta) {
 }
 
 /* =====================================================================
+   SCORECARD SUMMARY
+   One month, per team (cards) and per agent (table): Attendance %, QA average, Stack Ranking total.
+   ===================================================================== */
+const SS_MON = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+/* Does a Month label from the metric sheet ("October", "Oct 2026", "2026-10", ...) mean the picked yyyy-mm? */
+function ssMonthMatches(label, ym) {
+  const t = String(label || '').trim().toLowerCase();
+  if (!t) return false;
+  const [y, m] = ym.split('-').map(Number);
+  let mm = SS_MON.findIndex(x => t.includes(x)) + 1, yy = (t.match(/\b(20\d{2})\b/) || [])[1];
+  if (!mm) {
+    const iso = t.match(/^(\d{4})[-\/](\d{1,2})/), us = t.match(/^(\d{1,2})[-\/](\d{4})$/);
+    if (iso) { yy = iso[1]; mm = +iso[2]; } else if (us) { mm = +us[1]; yy = us[2]; }
+  }
+  return mm === m && (!yy || +yy === y);
+}
+
+const ssAttBand = v => v == null ? '' : v >= 95 ? ' sc-good' : v >= 91 ? ' sc-mid' : ' sc-low';
+const ssTotBand = v => v == null ? '' : v >= 85 ? ' sc-good' : v >= 60 ? ' sc-mid' : ' sc-low';
+const ssFmt = (v, d = 1, suffix = '%') => v == null ? '—' : v.toFixed(d) + suffix;
+const ssAvg = list => { const n = list.filter(v => v != null); return n.length ? n.reduce((a, b) => a + b, 0) / n.length : null; };
+
+let ssSort = { col: 'name', asc: true };
+function ssSortBy(col) {
+  ssSort = { col, asc: ssSort.col === col ? !ssSort.asc : (col === 'name' || col === 'sup' || col === 'rank') };
+  buildScoreSummary();
+}
+
+function shiftScoreSumMonth(delta) {
+  const [y, m] = ($('ssMonth').value || ymd(estNow()).slice(0, 7)).split('-').map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  $('ssMonth').value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+  buildScoreSummary();
+}
+
+function buildScoreSummary() {
+  const body = $('ssTable').tBodies[0], head = $('ssTable').tHead;
+  const ym = $('ssMonth').value;
+  $('ssLegend').innerHTML =
+    '<span class="trk-chip st-present">Green: on target</span><span class="trk-chip st-partial">Amber: below target</span><span class="trk-chip st-absent">Red: well below</span>' +
+    '<span class="trk-chip info" title="Green >=95% | Amber 91-94.9% | Red below 91%">Attendance: 95% / 91%</span>' +
+    '<span class="trk-chip info" title="Green >=95% | Amber 85-94.9% | Red below 85%">QA: 95% / 85%</span>' +
+    '<span class="trk-chip info" title="Green >=85 pts | Amber 60-84 pts | Red below 60 pts">Stack Ranking total: 85 / 60 pts</span>';
+  if (!ym || !estData.length) {
+    head.innerHTML = '';
+    body.innerHTML = '<tr><td>Pick a month (schedule data must be loaded)</td></tr>';
+    $('ssCards').innerHTML = '';
+    return;
+  }
+
+  /* Attendance: same rules as Scorecard > Attendance (hours worked / hours expected) */
+  const [y, m] = ym.split('-').map(Number);
+  const days = Array.from({ length: new Date(y, m, 0).getDate() }, (_, i) => ymd(new Date(y, m - 1, i + 1)));
+  const today = ymd(estNow());
+  const idx = { pto: indexRecords(ptoList), att: indexAttendance(calledOffList, attTimeList) };
+
+  /* QA: audits whose call date falls in the month */
+  const qaBy = new Map();
+  qaList.forEach(x => {
+    if (normalizeDate(x.CallDate).slice(0, 7) !== ym) return;
+    const sc = qaPct(x.Score), k = normName(x['Analyst Name']);
+    if (!qaBy.has(k)) qaBy.set(k, []);
+    qaBy.get(k).push(sc);
+  });
+
+  /* Performance Stack Ranking: the month's total and rank among everyone listed that month */
+  const I = metricIdx, totalBy = new Map();
+  if (I.month >= 0 && I.total >= 0) {
+    metricRows.filter(r => ssMonthMatches(r[I.month], ym)).forEach(r => {
+      const v = metricVal(r[I.total]);
+      if (typeof v === 'number') totalBy.set(normName(r[I.agent]), v);
+    });
+  }
+  const sorted = [...totalBy.values()].sort((a, b) => b - a);
+  const rankOf = v => v == null ? null : sorted.indexOf(v) + 1;
+
+  const supSel = $('ssSupervisor'), sup = supSel.value, q = up($('ssSearch').value);
+  const bySup = estData.filter(r => sup === ALL || r.Supervisor === sup);
+  const ag = fillAgentSelect('ssAgent', bySup.map(r => r.Name));
+
+  const data = bySup
+    .filter(r => (!ag || normName(r.Name) === normName(ag)) && (!q || up(r.Name).includes(q)))
+    .map(r => {
+      const info = days.map(d => attendanceFor(r, d, today, idx)), c = trackerSummary(info);
+      const qs = qaBy.get(normName(r.Name)) || [], total = totalBy.has(normName(r.Name)) ? totalBy.get(normName(r.Name)) : null;
+      return { name: r.Name, sup: r.Supervisor || 'Unassigned', c, att: c.pct, qa: ssAvg(qs), audits: qs.length, qsList: qs, total, rank: rankOf(total) };
+    });
+
+  /* Roll-up cards: one per supervisor, plus an all-teams card when more than one is shown */
+  const rollup = (list, name, color, sub) => {
+    const hrsExp = list.reduce((t, a) => t + a.c.hoursExp, 0), hrsWk = list.reduce((t, a) => t + a.c.hoursWorked, 0);
+    const att = hrsExp ? hrsWk / hrsExp * 100 : null;
+    const qa = ssAvg(list.flatMap(a => a.qsList)), audits = list.reduce((t, a) => t + a.audits, 0);
+    const tot = ssAvg(list.map(a => a.total)), nTot = list.filter(a => a.total != null).length;
+    const line = (label, val, band) => `<div class="ss-line"><span>${label}</span><b class="${band.trim().replace('sc-', 'ss-')}">${val}</b></div>`;
+    return `<div class="card" style="--c:${color}">
+      <h3>${esc(name)}</h3><div class="ss-sub">${sub}</div>
+      ${line('🗓️ Attendance', ssFmt(att), ssAttBand(att))}
+      ${line('✅ QA average', `${ssFmt(qa)} <small style="font-weight:500;color:var(--muted)">(${audits} audits)</small>`, qaBand(qa))}
+      ${line('🏆 Stack Ranking avg', `${ssFmt(tot, 1, ' pts')} <small style="font-weight:500;color:var(--muted)">(${nTot} agents)</small>`, ssTotBand(tot))}
+    </div>`;
+  };
+  const groups = new Map();
+  data.forEach(a => { if (!groups.has(a.sup)) groups.set(a.sup, []); groups.get(a.sup).push(a); });
+  const cards = [...groups.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([name, list]) => rollup(list, '👔 ' + name, supColor(name) || '#6c757d', `${list.length} agent${list.length === 1 ? '' : 's'}`));
+  if (groups.size > 1) cards.unshift(rollup(data, '👥 All teams', '#0d6efd', `${data.length} agents`));
+  $('ssCards').innerHTML = data.length ? cards.join('') : '';
+
+  /* Agent table */
+  const cols = [['name', '👤 Agent'], ['sup', '🧑‍💼 Supervisor'], ['att', '🗓️ Attendance'], ['qa', '✅ QA avg'], ['audits', '📋 Audits'], ['total', '🏆 Stack Ranking total'], ['rank', '# Rank']];
+  const arrow = c => ssSort.col === c ? (ssSort.asc ? ' ▲' : ' ▼') : '';
+  head.innerHTML = '<tr>' + cols.map(([k, t]) => `<th onclick="ssSortBy('${k}')">${t}${arrow(k)}</th>`).join('') + '</tr>';
+
+  const dir = ssSort.asc ? 1 : -1;
+  data.sort((a, b) => {
+    const x = a[ssSort.col], y = b[ssSort.col];
+    if (x == null && y == null) return a.name.localeCompare(b.name);
+    if (x == null) return 1;                              // blanks always last
+    if (y == null) return -1;
+    return dir * (typeof x === 'string' ? x.localeCompare(y) : x - y) || a.name.localeCompare(b.name);
+  });
+  body.innerHTML = data.length ? data.map(a => `<tr class="${supClass(a.sup)}" style="${supStyle(a.sup)}">
+    <td>${esc(a.name)}</td><td>${esc(a.sup)}</td>
+    <td class="${ssAttBand(a.att).trim()}" title="Hours worked / hours expected">${ssFmt(a.att)}</td>
+    <td class="${qaBand(a.qa).trim()}" title="${QA_TIP}">${ssFmt(a.qa)}</td>
+    <td>${a.audits || '—'}</td>
+    <td class="${ssTotBand(a.total).trim()}" title="Green: >=85 pts | Amber: 60-84 pts | Red: <60 pts">${ssFmt(a.total, 1, '')}</td>
+    <td>${a.rank ? `${a.rank} <small style="color:var(--muted)">of ${sorted.length}</small>` : '—'}</td></tr>`).join('')
+    : '<tr><td colspan="7">No agents found</td></tr>';
+}
+
+/* =====================================================================
    MENUS + TOAST
    ===================================================================== */
 function initMenus() {
@@ -3399,6 +3561,7 @@ window.addEventListener('load', async () => {
   ['selectedDate', 'ptoDate', 'calledOffDate', 'scheduleDate', 'supervisorDate', 'forecastDate']
     .forEach(id => $(id).value = today);
   $('trackerMonth').value = today.slice(0, 7);
+  $('ssMonth').value = today.slice(0, 7);
 
   await Promise.all([loadSchedules(), loadAttendance(), loadDaily(), loadQA(), loadMetric(), loadMcs()]);
   renderAll();
