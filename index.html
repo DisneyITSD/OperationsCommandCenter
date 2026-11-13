@@ -2070,7 +2070,7 @@ function rosterCalendarHtml({ r, cells }, today, ph) {
     const changed = c.shiftChg || c.supChg;
     if (changed) chg++;
     const time = !p ? 'OFF' : ph ? phRange(c.estDate || c.date, p[0], len) + ' PH' : convertShiftRange(c.shift) + ' EST';
-    return `<div class="cal-day st-${a.kind}${changed ? ' chg-out' : ''}${c.date === today ? ' is-today' : ''}" title="${esc(ph && c.estDate ? `PH ${fmtDate(parseYMD(c.date))} · EST shift date ${fmtDate(parseYMD(c.estDate))} · ${a.text}` + (a.missed ? ' · ' + missedText(a) : '') + actualTip(a) : trackerTip(a))}">
+    return `<div class="cal-day st-${a.kind}${changed ? ' chg-out' : ''}${c.date === today ? ' is-today' : ''}" title="${esc(actualTip(a))}">
       <div class="cal-num">${parseYMD(c.date).getDate()}</div>
       <div class="cal-status">${c.shiftChg ? '🔁 ' : ''}${time}</div>
       ${a.kind === 'off' ? '' : `<div class="cal-status" style="font-size:11px">${a.icon} ${esc(a.text)}</div>`}
@@ -2181,10 +2181,7 @@ function buildRosterView() {
       const p = parseShift(c.shift), off = !p;
       const len = p ? (p[1] <= p[0] ? p[1] + 1440 - p[0] : p[1] - p[0]) : 0;
       const text = off ? 'OFF' : ph ? `${short12(phHHMM(c.estDate || c.date, p[0]))}-${short12(phHHMM(c.estDate || c.date, p[1]))}` : `${short12(toHHMM(p[0]))}-${short12(toHHMM(p[1]))}`;
-      const tip = `${ph && c.estDate ? 'PH ' : ''}${fmtDate(parseYMD(c.date))}${ph && c.estDate ? ' (EST shift date ' + fmtDate(parseYMD(c.estDate)) + ')' : ''} · ` + (off ? 'OFF' : `${convertShiftRange(c.shift)} EST · ${phRange(c.estDate || c.date, p[0], len)} PH`) +
-        (c.shiftChg ? ` · CHANGED (weekly roster: ${isOff(c.base) ? 'OFF' : convertShiftRange(c.base)})` : '') +
-        (c.supChg ? ` · supervisor: ${c.sup}` : '') + ` · ${c.att.text}` + (c.att.missed ? ` · ${missedText(c.att)}` : '') +
-        actualTip(c.att);
+      const tip = actualTip(c.att);
       const a = c.att, mark = a.kind === 'present' ? '✔' : a.kind === 'upcoming' ? '○' : a.kind === 'off' ? '' : a.code + (a.estimated ? '*' : '');
       return `<td class="trk-cell rcell st-${a.kind}${c.shiftChg ? ' chg-out' : ''}" title="${esc(tip)}">${text}${mark ? `<small>${esc(mark)}</small>` : ''}</td>`;
     }).join('');
@@ -3293,15 +3290,10 @@ const trackerPct = c => c.pct == null ? '—' : c.pct.toFixed(1) + '%';
 /* "120 min missed" or "330 min missed (est. half shift)" */
 const missedText = x => x.missed ? `${x.missed} min missed${x.estimated ? ' (est. half shift)' : ''}` : '';
 
-/* "Actual log-in 9:01 AM · Actual log-out 8:01 PM" (EST) for the hover text */
-const actualTip = x => (x.inTime ? ` · Actual log-in ${x.inTime}` : '') + (x.outTime ? ` · Actual log-out ${x.outTime}` : '') + (x.inTime || x.outTime ? ' EST' : '');
+/* Hover text: only the actual log-in / log-out times (empty when there is no LOLI data for the day) */
+const actualTip = x => x.inTime || x.outTime ? `Log-in Time: ${x.inTime || '—'}\nLog-out Time: ${x.outTime || '—'}` : '';
 
-const trackerTip = x =>
-  `${fmtDate(parseYMD(x.date))} · ${x.text}` +
-  (x.reason && up(x.reason) !== up(x.text) ? ` (${x.reason})` : '') +
-  (x.shift ? ` · ${convertShiftRange(x.shift)}` : '') +
-  (x.missed ? ` · ${missedText(x)}` : '') +
-  actualTip(x);
+const trackerTip = x => actualTip(x);
 
 /* Team total: adds up every agent shown (counts and hours for the month) */
 const trackerBand = p => p == null ? '' : p >= 95 ? ' st-present' : p >= 91 ? ' st-partial' : ' st-absent';
