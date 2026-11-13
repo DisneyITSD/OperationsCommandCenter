@@ -3140,14 +3140,15 @@ function buildLoliIndex(rows) {
   /* Columns are found from the header row. Current layout of the tab:
      Agent Name | Work Date | Scheduled Shift | Actual First Login | Login Status | Actual Final Logout | Minutes Late | Minutes Early | Attendance Result
      (the older layout, Agent Name | Date | Min of Login | Max of Logout, still works) */
-  let c = { name: 1, date: 2, login: 3, logout: 4, shift: -1, late: -1, early: -1, status: -1, result: -1 };
+  let c = { name: 1, date: 2, login: 3, logout: 4, shift: -1, late: -1, early: -1, status: -1, result: -1, hours: -1, short: -1 };
   loliInfo.workDate = false;
   const h = rows.findIndex(r => r.some(x => /^agent name$/i.test(clean(x))));
   if (h >= 0) {
     const f = (re, not) => rows[h].findIndex(x => re.test(clean(x)) && !(not && not.test(clean(x))));
     const found = { name: f(/^agent name$/i), date: f(/date/i), login: f(/log.?in/i, /status/i), logout: f(/log.?out/i),
                     shift: f(/scheduled shift/i), late: f(/minutes late/i), early: f(/minutes early/i),
-                    status: f(/login status/i), result: f(/attendance result/i) };
+                    status: f(/login status/i), result: f(/attendance result/i),
+                    hours: f(/logged.?in hours/i), short: f(/hours short/i) };
     if (found.name >= 0 && found.date >= 0 && found.login >= 0 && found.logout >= 0) {
       c = found;
       loliInfo.workDate = /work date/i.test(clean(rows[h][found.date]));     // Work Date = the day the shift STARTS
@@ -3155,15 +3156,27 @@ function buildLoliIndex(rows) {
   }
   const num = v => { const n = parseFloat(clean(v)); return Number.isFinite(n) ? n : null; };
   const at = (r, i) => i >= 0 ? clean(r[i]) : '';
+  /* "10:04:37" (h:mm:ss) or a plain number of hours -> decimal hours */
+  const hrs = v => {
+    const s = clean(v), m = s.match(/^(\d+):(\d{2})(?::(\d{2}))?$/);
+    if (m) return +m[1] + +m[2] / 60 + (+(m[3] || 0)) / 3600;
+    const x = parseFloat(s); return Number.isFinite(x) ? x : null;
+  };
+  loliInfo.lastDate = ''; loliInfo.names = new Set();
   let n = 0;
-  rows.forEach(r => {
+  rows.forEach((r, ri) => {
     const name = clean(r[c.name]), date = parseLoliDate(r[c.date]);
+    if (h >= 0 && ri > h && name && /^\d{4}-\d{2}-\d{2}$/.test(date)) {     // every dated row (even a no-login day) tells how far the sheet is updated
+      loliInfo.names.add(normName(name));
+      if (date > loliInfo.lastDate) loliInfo.lastDate = date;
+    }
     const login = parseLoliClock(r[c.login]), logout = parseLoliClock(r[c.logout]);
     if (!name || !date || login == null) return;                      // skips the header row, blanks and NO LOGIN days
     const k = normName(name);
     if (!m.has(k)) m.set(k, []);
     m.get(k).push({ date, login, logout, shift: at(r, c.shift), late: c.late >= 0 ? num(r[c.late]) : null,
-                    early: c.early >= 0 ? num(r[c.early]) : null, status: at(r, c.status), result: at(r, c.result) });
+                    early: c.early >= 0 ? num(r[c.early]) : null, status: at(r, c.status), result: at(r, c.result),
+                    hours: c.hours >= 0 ? hrs(r[c.hours]) : null, short: c.short >= 0 ? hrs(r[c.short]) : null });
     n++;
   });
   loliInfo.rows = n; loliInfo.agents = m.size;
@@ -3264,9 +3277,9 @@ const TRACKER_STATUS = {
   off:      { icon: '–', label: 'OFF' }
 };
 const TRACKER_LEGEND = [
-  ['present', '✔ Present (shift finished, no record)'], ['upcoming', '○ Upcoming (shift not finished yet)'],
+  ['present', '✔ Present (shift finished; stays Present until the LOLI Actual sheet is updated for that date)'], ['upcoming', '○ Upcoming (shift not finished yet)'],
   ['partial', `◐ Late / Left early (actual login / logout from LOLI Actual, more than ${LOLI_GRACE_MIN} min off the shift; * = estimated half shift)`],
-  ['absent', '✖ Called off / NCNS'], ['leave', '🌴 Leave (VL, SL, ...)'], ['off', '– OFF']
+  ['absent', '✖ Called off / NCNS (NCNS is tagged automatically when LOLI Actual already covers the date but has no log-in)'], ['leave', '🌴 Leave (VL, SL, ...)'], ['off', '– OFF']
 ];
 
 function indexRecords(list) {
@@ -3350,6 +3363,10 @@ function attendanceFor(r, date, today, idx) {
     x.inTime = loliClock(act.login);
     x.outTime = ended || dsp?.logout != null ? loliClock(act.logout) : '';
     x.missed = lateC + earlyC;
+    if (ended && sheet) {                                               // Total Logged-in Hours from the LOLI Actual tab
+      const lg = sheet.hours != null ? sheet.hours : sheet.short != null ? exp - sheet.short : null;
+      if (lg != null) x.loggedHrs = Math.max(0, Math.min(exp, lg));
+    }
     if (lateC || earlyC) {
       const code = lateC && earlyC ? 'L/LE' : lateC ? 'LATE' : 'LE';
       Object.assign(x, { kind: 'partial', text: lateC && earlyC ? 'Late / Left early' : lateC ? 'Late' : 'Left early', code, icon: TRACKER_STATUS.partial.icon,
@@ -3374,8 +3391,17 @@ function attendanceFor(r, date, today, idx) {
     }
   }
 
+  /* Auto NCNS: the shift is over, the agent was expected to work (not OFF / leave / called off) and the LOLI Actual sheet
+     already covers this date (it has rows up to it) but holds no log-in for the day. Dates the sheet has not reached yet stay Present. */
+  if (x.kind === 'present' && !act && !rec && p0 && loliInfo.lastDate && date <= loliInfo.lastDate
+      && loliInfo.names && loliInfo.names.has(normName(r.Name)) && !loliFor(r, date, x.shift)) {
+    const t = matchType(ATT_TYPES, 'NCNS', ATT_OTHER);
+    Object.assign(x, { kind: 'absent', text: t.label, code: t.code, icon: t.icon, reason: 'NCNS (no log-in in LOLI Actual)', autoNcns: true });
+  }
+
   x.exp = ['present', 'partial', 'absent'].includes(x.kind) ? exp : 0;      // leave, OFF and upcoming are excluded
-  x.worked = x.kind === 'present' ? exp
+  x.worked = x.loggedHrs != null && ['present', 'partial'].includes(x.kind) ? x.loggedHrs
+           : x.kind === 'present' ? exp
            : x.kind === 'partial' ? Math.max(0, exp - x.missed / 60) : 0;
   return x;
 }
@@ -3395,7 +3421,8 @@ const trackerPct = c => c.pct == null ? '—' : c.pct.toFixed(1) + '%';
 const missedText = x => x.missed ? `${x.missed} min missed${x.estimated ? ' (est. half shift)' : ''}` : '';
 
 /* Hover text: only the actual log-in / log-out times (empty when there is no LOLI data for the day) */
-const actualTip = x => x.inTime || x.outTime ? `Log-in Time: ${x.inTime || '—'}${x.inDisputed ? ' (disputed)' : ''}\nLog-out Time: ${x.outTime || '—'}${x.outDisputed ? ' (disputed)' : ''}` : '';
+const fmtHrs = h => { const m = Math.round(h * 60); return Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0'); };
+const actualTip = x => x.autoNcns ? 'NCNS - no log-in / log-out in LOLI Actual' : x.inTime || x.outTime ? `Log-in Time: ${x.inTime || '—'}${x.inDisputed ? ' (disputed)' : ''}\nLog-out Time: ${x.outTime || '—'}${x.outDisputed ? ' (disputed)' : ''}${x.loggedHrs != null ? `\nTotal logged-in: ${fmtHrs(x.loggedHrs)} hrs` : ''}` : '';
 
 const trackerTip = x => actualTip(x);
 
@@ -3467,7 +3494,7 @@ function buildTracker() {
   const body = $('trackerBody');
   const rosterN = estData.filter(r => loliIdx.has(normName(r.Name))).length;
   $('trackerLegend').innerHTML = TRACKER_LEGEND.map(([k, t]) => `<span class="trk-chip st-${k}">${t}</span>`).join('') +
-    `<span class="trk-chip" title="Log-in / log-out rows read from the LOLI Actual tab">🕘 LOLI Actual: ${loliInfo.rows} rows · ${rosterN} of ${estData.length} agents matched</span>` +
+    `<span class="trk-chip" title="Log-in / log-out rows read from the LOLI Actual tab">🕘 LOLI Actual: ${loliInfo.rows} rows · ${rosterN} of ${estData.length} agents matched${loliInfo.lastDate ? ' · updated through ' + loliInfo.lastDate : ''}</span>` +
     (DISPUTE_GID ? `<span class="trk-chip" title="Log-in / log-out disputes from the dispute form">📝 Disputes: ${disputeInfo.rows} applied${DISPUTE_NEEDS_APPROVAL ? ` · ${disputeInfo.pending} pending approval` : ''}</span>` : '');
 
   const ym = $('trackerMonth').value;
