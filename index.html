@@ -210,6 +210,13 @@ tr.roster-off td{background:#f1f2f4;color:#666;font-style:italic}
 .trk-grid thead th:first-child{z-index:12}
 .trk-grid td.trk-name{cursor:pointer;font-weight:600;color:var(--navy)}
 .trk-grid td.trk-name:hover{text-decoration:underline}
+.trk-grid td.trk-agent{font-weight:600;color:var(--navy)}
+.trk-grid tr.trk-total td{font-weight:700;background:#eef2f7;border-bottom:2px solid var(--line)}
+.trk-grid tr.trk-total td:first-child{background:#eef2f7;color:var(--navy)}
+.trk-grid tr.trk-total td small{font-weight:600;color:var(--muted)}
+.trk-grid tr.trk-total td.st-present{background:#e8f5e9;color:#2e7d32}
+.trk-grid tr.trk-total td.st-partial{background:#fff3e0;color:#e65100}
+.trk-grid tr.trk-total td.st-absent{background:#ffebee;color:#c62828}
 .trk-grid th.today{background:#fff3cd;color:#8a6100}
 .trk-grid td.trk-cell{min-width:34px;font-weight:700}
 .trk-grid .trk-sum{background:#fafbfc;font-weight:600;min-width:46px}
@@ -446,6 +453,10 @@ td.sc-good::before,td.sc-mid::before,td.sc-low::before{content:"";display:inline
 #workingList li.sup-h:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
 #workingList li.sup-h::after{content:"";flex:none;width:6px;height:6px;margin-left:10px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-2px);transition:transform .15s}
 #workingList li.sup-h.collapsed::after{transform:rotate(-45deg)}
+.wl-tools{display:flex;justify-content:flex-end;margin:0 0 6px}
+.wl-toggle{font:inherit;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.wl-toggle:hover{background:rgba(127,127,127,.12)}
+.wl-toggle:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
 .page-head #refreshBtn{width:36px;height:36px;padding:0;display:grid;place-items:center;font-size:18px;line-height:1}
 
 /* Agent file: single calendar view with an agent summary strip */
@@ -517,6 +528,10 @@ html[data-theme=dark] td.sc-mid{color:#fbbf24!important}
 html[data-theme=dark] td.sc-low{color:#f87171!important}
 html[data-theme=dark] .trk-grid th:first-child,html[data-theme=dark] .trk-grid td:first-child,html[data-theme=dark] #mcsTable th:first-child,html[data-theme=dark] #mcsTable td:first-child{background:var(--surface)}
 html[data-theme=dark] .trk-grid .trk-sum{background:#1b2331}
+html[data-theme=dark] .trk-grid tr.trk-total td,html[data-theme=dark] .trk-grid tr.trk-total td:first-child{background:#222c3d}
+html[data-theme=dark] .trk-grid tr.trk-total td.st-present{background:#12301b;color:#86efac}
+html[data-theme=dark] .trk-grid tr.trk-total td.st-partial{background:#3a2a12;color:#fdba74}
+html[data-theme=dark] .trk-grid tr.trk-total td.st-absent{background:#3b1519;color:#fca5a5}
 html[data-theme=dark] .trk-grid th.today{background:#3a2e12;color:#fcd34d}
 html[data-theme=dark] .trk-grid th.sortable:hover{background:#1f2a40;color:#c7d6ff}
 html[data-theme=dark] #metricTable tr.grp-head td:first-child,html[data-theme=dark] #mcsTable tr.grp-head td:first-child,html[data-theme=dark] #qaTable tr.grp-head td:first-child{background:#18233a;color:#c7d6ff}
@@ -614,7 +629,9 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
   </div>
 
   <div class="panels">
-    <div class="panel"><h3>👷 Working</h3><ul id="workingList"></ul></div>
+    <div class="panel"><h3>👷 Working</h3>
+      <div class="wl-tools"><button type="button" class="wl-toggle" id="workingToggleAll" title="Collapse or expand every supervisor group">⊟ Collapse all</button></div>
+      <ul id="workingList"></ul></div>
     <div class="panel">
       <h3>☕ Break</h3>
       <ul id="breakList"></ul>
@@ -850,17 +867,12 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
 
 <!-- ============ SCORECARD: ATTENDANCE ============ -->
 <section class="tab-panel" id="trackerTab" hidden>
-  <div class="view-hint">🗓️ Per-agent attendance for the month: ✔ present (once the shift has finished), ◐ late / left early (counted by hours worked; marked * when no actual time is submitted yet and a half shift is assumed), ✖ called off, leave or OFF. Click an agent's name in the grid to open their calendar.</div>
+  <div class="view-hint">🗓️ Per-agent attendance for the month: ✔ present (once the shift has finished), ◐ late / left early (counted by hours worked; marked * when no actual time is submitted yet and a half shift is assumed), ✖ called off, leave or OFF. The Team total row at the top adds up the agents shown (the daily figures are the team's attendance % for that day).</div>
   <div class="controls">
     <button type="button" onclick="shiftTrackerMonth(-1)" title="Previous month">‹</button>
     <input type="month" id="trackerMonth" onchange="buildTracker()">
     <button type="button" onclick="shiftTrackerMonth(1)" title="Next month">›</button>
-    <select id="trackerView" onchange="buildTracker()">
-      <option value="grid">All agents (grid)</option>
-      <option value="calendar">Agent calendar</option>
-    </select>
     <select id="trackerSupervisor" onchange="buildTracker()"><option>All Supervisors</option></select>
-    <select id="trackerAgent" onchange="buildTracker()"></select>
     <input type="text" id="trackerSearch" placeholder="🔍 Search Agent..." onkeyup="buildTracker()">
     <button type="button" class="blue" id="trackerDownloadBtn" onclick="downloadTracker()">⬇ Download CSV</button>
   </div>
@@ -877,6 +889,7 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
       <div class="msel-panel" id="qaMonthPanel" hidden></div>
     </div>
     <select id="qaSupervisor" onchange="buildQA()"><option>All Supervisors</option></select>
+    <select id="qaAgent" onchange="buildQA()"><option value="">All Agents</option></select>
     <input type="text" id="qaSearch" placeholder="🔍 Search analyst or ticket..." onkeyup="buildQA()" style="width:280px">
     <button class="blue" onclick="refreshAttendanceData(true)">↻ Refresh</button>
   </div>
@@ -906,6 +919,7 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
       <div class="msel-panel" id="metricMonthPanel" hidden></div>
     </div>
     <select id="metricSupervisor" onchange="buildMetric()"><option>All Supervisors</option></select>
+    <select id="metricAgent" onchange="buildMetric()"><option value="">All Agents</option></select>
     <input type="text" id="metricSearch" placeholder="🔍 Search Agent..." onkeyup="buildMetric()">
     <button class="blue" onclick="refreshAttendanceData(true)">↻ Refresh</button>
   </div>
@@ -932,6 +946,7 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
       <div class="msel-panel" id="mcsMonthPanel" hidden></div>
     </div>
     <select id="mcsSupervisor" onchange="buildMcs()"><option>All Supervisors</option></select>
+    <select id="mcsAgent" onchange="buildMcs()"><option value="">All Agents</option></select>
     <input type="text" id="mcsSearch" placeholder="🔍 Search Agent..." onkeyup="buildMcs()">
     <button class="blue" onclick="refreshAttendanceData(true)">↻ Refresh</button>
   </div>
@@ -2386,6 +2401,16 @@ function initQa() {
   });
 }
 
+/* Agent dropdown for the Scorecard pages: lists the agents in the current month / supervisor selection,
+   keeps the pick while it is still valid, and returns the chosen name ('' = all agents) */
+function fillAgentSelect(selId, names) {
+  const sel = $(selId), prev = sel.value;
+  const list = [...new Map(names.filter(Boolean).map(n => [normName(n), String(n).trim()])).values()].sort((a, b) => a.localeCompare(b));
+  sel.innerHTML = '<option value="">All Agents</option>' + list.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  if (list.includes(prev)) sel.value = prev;
+  return sel.value;
+}
+
 /* Quality Assurance: ranked like the Performance Stack Ranking.
    Tick one or more months (or Year to date). Each agent is one row (average score, audits, latest call);
    open it to see the audits, or - with several months ticked - the months, and open a month to see its audits. */
@@ -2411,9 +2436,10 @@ function buildQA() {
   supSel.innerHTML = `<option>${ALL}</option>` + sups.map(s => `<option>${esc(s)}</option>`).join('');
   if (sups.includes(prevSup)) supSel.value = prevSup;
   const sup = supSel.value, q = up($('qaSearch').value);
+  const ag = fillAgentSelect('qaAgent', picked.filter(x => sup === ALL || x.supervisor === sup).map(x => x.analyst));
 
   const rows = picked
-    .filter(x => (sup === ALL || x.supervisor === sup) && (!q || up(`${x.analyst} ${x.ticket}`).includes(q)))
+    .filter(x => (sup === ALL || x.supervisor === sup) && (!ag || normName(x.analyst) === normName(ag)) && (!q || up(`${x.analyst} ${x.ticket}`).includes(q)))
     .sort((a, b) => b.date.localeCompare(a.date) || a.analyst.localeCompare(b.analyst));
 
   const avgOf = list => {
@@ -2645,8 +2671,9 @@ function buildMetric() {
   supSel.innerHTML = `<option>${ALL}</option>` + sups.map(s => `<option>${esc(s)}</option>`).join('');
   if (sups.includes(prevSup)) supSel.value = prevSup;
   const sup = supSel.value, q = up($('metricSearch').value);
+  const ag = fillAgentSelect('metricAgent', data.filter(r => sup === ALL || supOf(r) === sup).map(r => r[I.agent]));
 
-  const rows = data.filter(r => (sup === ALL || supOf(r) === sup) && (!q || up(r[I.agent]).includes(q)));
+  const rows = data.filter(r => (sup === ALL || supOf(r) === sup) && (!ag || normName(r[I.agent]) === normName(ag)) && (!q || up(r[I.agent]).includes(q)));
   const maxOf = metricHeads.map((_, i) => metricMax(i));
 
   /* Top 3 podium (always by TOTAL, whatever column the table is sorted by) */
@@ -2879,8 +2906,9 @@ function buildMcs() {
   supSel.innerHTML = `<option>${ALL}</option>` + sups.map(s => `<option>${esc(s)}</option>`).join('');
   if (sups.includes(prevSup)) supSel.value = prevSup;
   const sup = supSel.value, q = up($('mcsSearch').value);
+  const ag = fillAgentSelect('mcsAgent', (view === 'agent' ? picked : inMonth).filter(r => sup === ALL || supOf(r) === sup).map(r => r[I.agent]));
 
-  const rows = (view === 'agent' ? picked : inMonth).filter(r => (sup === ALL || supOf(r) === sup) && (!q || up(r[I.agent]).includes(q)));
+  const rows = (view === 'agent' ? picked : inMonth).filter(r => (sup === ALL || supOf(r) === sup) && (!ag || normName(r[I.agent]) === normName(ag)) && (!q || up(r[I.agent]).includes(q)));
 
   table.classList.toggle('nosort', view === 'agent');
   if (view === 'agent') {
@@ -3173,16 +3201,18 @@ const trackerTip = x =>
   (x.missed ? ` · ${missedText(x)}` : '') +
   (x.inTime ? ` · login ${x.inTime}` : '') + (x.outTime ? ` · logout ${x.outTime}` : '');
 
-function trackerHeaderHtml(r, info) {
-  const c = trackerSummary(info);
-  const chip = (k, label, n) => `<span class="trk-chip st-${k}">${TRACKER_STATUS[k].icon} ${label}: ${n}</span>`;
-  return `<div class="trk-head">
-    <div class="trk-title">${esc(r.Name)} <small>· ${esc(r.Supervisor || 'Unassigned')}</small></div>
-    <span class="trk-chip info">🗓️ Expected days: ${c.expected}</span>
-    ${chip('present', 'Present', c.present)}${chip('partial', 'Late/LE', c.partial)}${chip('absent', 'Called off', c.absent)}${chip('leave', 'Leave', c.leave)}${chip('off', 'OFF', c.off)}
-    <span class="trk-chip info">📊 Attendance: ${trackerPct(c)}</span>
-    <span class="trk-chip info">⏱ Hours: ${c.hoursWorked.toFixed(1)} / ${c.hoursExp.toFixed(1)}</span>
-  </div>`;
+/* Team total: adds up every agent shown (counts, hours) and gives the team's attendance % per day */
+const trackerBand = p => p == null ? '' : p >= 95 ? ' st-present' : p >= 91 ? ' st-partial' : ' st-absent';
+function trackerTeamTotal(infos, days) {
+  const c = trackerSummary(infos.flat());
+  const perDay = days.map((d, i) => {
+    const col = infos.map(a => a[i]);
+    const exp = col.reduce((t, x) => t + x.exp, 0), worked = col.reduce((t, x) => t + x.worked, 0);
+    const n = k => col.filter(x => x.kind === k).length;
+    return { date: d, pct: exp ? (worked / exp) * 100 : null,
+             tip: `${fmtDate(parseYMD(d))} · team: ${n('present')} present, ${n('partial')} late/left early, ${n('absent')} called off, ${n('leave')} leave, ${n('off')} off` };
+  });
+  return { c, perDay };
 }
 
 /* % column sort: '' = by name, 'asc' = lowest first, 'desc' = highest first */
@@ -3215,11 +3245,22 @@ function trackerGridHtml(rows, monthOf, days, today) {
     return `<th class="${d === today ? 'today' : ''}">${dt.getDate()}<br><small>${dow[dt.getDay()]}</small></th>`;
   }).join('');
 
+  const team = trackerTeamTotal(rows.map(monthOf), days);
+  const totalRow = `<tr class="trk-total">
+      <td>Σ Team total <small>(${rows.length} agent${rows.length === 1 ? '' : 's'})</small></td>
+      <td class="trk-sum" title="Expected days">${team.c.expected}</td>
+      <td class="trk-sum" title="Present">${team.c.present}</td>
+      <td class="trk-sum" title="Late / Left early">${team.c.partial}</td>
+      <td class="trk-sum" title="Called off / NCNS">${team.c.absent}</td>
+      <td class="trk-sum" title="Leave">${team.c.leave}</td>
+      <td class="trk-sum${trackerBand(team.c.pct)}" title="Team hours worked / hours expected">${trackerPct(team.c)}</td>
+      ${team.perDay.map(d => `<td class="${trackerBand(d.pct).trim()}" title="${esc(d.tip)}">${d.pct == null ? '—' : Math.round(d.pct) + '%'}</td>`).join('')}</tr>`;
+
   const body = rows.map(r => {
     const info = monthOf(r), c = trackerSummary(info);
     const cells = info.map(x => `<td class="trk-cell st-${x.kind}" title="${esc(trackerTip(x))}">${esc(x.code)}${x.estimated ? '*' : ''}</td>`).join('');
     return `<tr class="${supClass(r.Supervisor)}" style="${supStyle(r.Supervisor)}">
-      <td class="trk-name" data-agent="${esc(r.Name)}" title="Open calendar">${esc(r.Name)}</td>
+      <td class="trk-agent">${esc(r.Name)}</td>
       <td class="trk-sum" title="Expected days">${c.expected}</td>
       <td class="trk-sum" title="Present">${c.present}</td>
       <td class="trk-sum" title="Late / Left early">${c.partial}</td>
@@ -3231,23 +3272,7 @@ function trackerGridHtml(rows, monthOf, days, today) {
 
   return `<div class="panel"><div class="schedule-container"><table class="nosort trk-grid">
     <thead><tr><th>👤 Agent</th><th title="Expected days">Exp</th><th title="Present">✔</th><th title="Late / Left early">◐</th><th title="Called off / NCNS">✖</th><th title="Leave">🌴</th><th class="sortable" onclick="toggleTrackerPctSort()" title="Click to sort by attendance % (lowest first, highest first, then by name)">%${sortArrow}</th>${head}</tr></thead>
-    <tbody>${body}</tbody></table></div></div>`;
-}
-
-function trackerCalendarHtml(info, today) {
-  const lead = (parseYMD(info[0].date).getDay() + 6) % 7;
-  const dows = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => `<div class="cal-dow">${d}</div>`).join('');
-  const cells = info.map(x => {
-    const showText = ['absent', 'leave', 'partial'].includes(x.kind) ? x.text : TRACKER_STATUS[x.kind].label;
-    const note = x.missed
-      ? `<div class="cal-note">${missedText(x)}</div>`
-      : (x.reason && up(x.reason) !== up(x.text) ? `<div class="cal-note">${esc(x.reason)}</div>` : '');
-    return `<div class="cal-day st-${x.kind}${x.date === today ? ' is-today' : ''}" title="${esc(trackerTip(x))}">
-      <div class="cal-num">${parseYMD(x.date).getDate()}</div>
-      <div class="cal-status">${x.icon} ${esc(showText)}</div>
-      ${x.shift ? `<div class="cal-shift">${convertShiftRange(x.shift)}</div>` : ''}${note}</div>`;
-  }).join('');
-  return `<div class="panel"><div class="cal">${dows}${'<div></div>'.repeat(lead)}${cells}</div></div>`;
+    <tbody>${totalRow}${body}</tbody></table></div></div>`;
 }
 
 function buildTracker() {
@@ -3262,8 +3287,6 @@ function buildTracker() {
   const [y, m] = ym.split('-').map(Number);
   const days = Array.from({ length: new Date(y, m, 0).getDate() }, (_, i) => ymd(new Date(y, m - 1, i + 1)));
   const today = ymd(estNow());
-  const view = $('trackerView').value;
-  $('trackerDownloadBtn').hidden = view !== 'grid';      // Download CSV is for the grid view only
   const sup = $('trackerSupervisor').value;
   const q = up($('trackerSearch').value);
 
@@ -3271,23 +3294,10 @@ function buildTracker() {
     .filter(r => sup === ALL || r.Supervisor === sup)
     .sort((a, b) => a.Name.localeCompare(b.Name));
 
-  const sel = $('trackerAgent'), prev = sel.value;
-  sel.innerHTML = roster.map(r => `<option value="${esc(r.Name)}">${esc(r.Name)}</option>`).join('');
-  if (roster.some(r => r.Name === prev)) sel.value = prev;
-  sel.disabled = view === 'grid';
-  $('trackerSearch').disabled = view !== 'grid';
-
   const idx = { pto: indexRecords(ptoList), att: indexAttendance(calledOffList, attTimeList) };
   const monthOf = r => days.map(date => attendanceFor(r, date, today, idx));
 
-  if (view === 'grid') {
-    body.innerHTML = trackerGridHtml(roster.filter(r => !q || up(r.Name).includes(q)), monthOf, days, today);
-    return;
-  }
-  const agent = roster.find(r => r.Name === sel.value) || roster[0];
-  if (!agent) { body.innerHTML = '<div class="empty" style="--c:#6c757d">No agents found</div>'; return; }
-  const info = monthOf(agent);
-  body.innerHTML = trackerHeaderHtml(agent, info) + trackerCalendarHtml(info, today);
+  body.innerHTML = trackerGridHtml(roster.filter(r => !q || up(r.Name).includes(q)), monthOf, days, today);
 }
 
 /* Download the attendance grid as CSV (respects month, supervisor and search filters) */
@@ -3318,11 +3328,18 @@ function downloadTracker() {
     ...days.map(d => { const dt = parseYMD(d); return `${dt.getDate()} (${DAYS[dt.getDay()].slice(0, 3)})`; })
   ]];
 
+  const infos = [];
   roster.forEach(r => {
     const info = days.map(d => attendanceFor(r, d, today, idx)), c = trackerSummary(info);
+    infos.push(info);
     rows.push([r.Name, r.Supervisor, c.expected, c.present, c.partial, c.absent, c.leave,
                trackerPct(c), c.hoursWorked.toFixed(1), c.hoursExp.toFixed(1), ...info.map(cellText)]);
   });
+  if (infos.length) {
+    const t = trackerTeamTotal(infos, days), c = t.c;
+    rows.push(['Team total (' + infos.length + ' agents)', '', c.expected, c.present, c.partial, c.absent, c.leave,
+               trackerPct(c), c.hoursWorked.toFixed(1), c.hoursExp.toFixed(1), ...t.perDay.map(d => d.pct == null ? '' : Math.round(d.pct) + '%')]);
+  }
   rows.push([]);
   rows.push(['P = Present, U = Upcoming, LATE / LE = Late / Left early (* = estimated half shift), NCNS / CO = Called off, VL / SL / ML / BRV = Leave, OFF = Off']);
 
@@ -3343,16 +3360,6 @@ function shiftTrackerMonth(delta) {
   const d = new Date(y, m - 1 + delta, 1);
   $('trackerMonth').value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
   buildTracker();
-}
-
-function initTracker() {
-  $('trackerBody').addEventListener('click', e => {
-    const cell = e.target.closest('[data-agent]');
-    if (!cell) return;
-    $('trackerView').value = 'calendar';
-    $('trackerAgent').value = cell.dataset.agent;
-    buildTracker();
-  });
 }
 
 /* =====================================================================
@@ -3392,7 +3399,6 @@ window.addEventListener('load', async () => {
   buildIntervalOptions();
   initMinTarget();
   initMenus();
-  initTracker();
   initMetricMonth();
   initGroupToggle();
   initQa();
@@ -3457,12 +3463,29 @@ window.addEventListener('load', () => setPageHead(activeTab));
         li.title = c ? 'Show agents' : 'Hide agents';
       } else li.hidden = cur != null && closed.has(cur);
     });
+    syncAllBtn();
+  }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify([...closed])); } catch (e) {} };
+  const names = () => [...list.querySelectorAll('li.sup-h')].map(nameOf);
+  const allBtn = document.getElementById('workingToggleAll');
+  function syncAllBtn() {
+    if (!allBtn) return;
+    const n = names(), allClosed = n.length > 0 && n.every(x => closed.has(x));
+    allBtn.textContent = allClosed ? '⊞ Expand all' : '⊟ Collapse all';
+    allBtn.title = allClosed ? 'Show the agents under every supervisor' : 'Show only each supervisor and their agent count';
+    allBtn.disabled = !n.length;
   }
   function toggle(h) {
     const n = nameOf(h); closed.has(n) ? closed.delete(n) : closed.add(n);
-    try { localStorage.setItem(KEY, JSON.stringify([...closed])); } catch (e) {}
+    save();
     apply();
   }
+  allBtn?.addEventListener('click', () => {
+    const n = names();
+    if (n.length && n.every(x => closed.has(x))) closed.clear(); else n.forEach(x => closed.add(x));
+    save();
+    apply();
+  });
   list.addEventListener('click', e => { const h = e.target.closest('li.sup-h'); if (h) toggle(h); });
   list.addEventListener('keydown', e => { const h = e.target.closest('li.sup-h'); if (h && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggle(h); } });
   new MutationObserver(apply).observe(list, { childList: true });
