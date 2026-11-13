@@ -1925,15 +1925,15 @@ function buildCoverageTimeline() {
     const flag = short || below;               /* highlight only problem intervals */
     if (flag) { belowCount++; flagged.push(`<strong>${fmtAMPM(s.time)}</strong> (${reasons.join(' + ')})`); }
     const style = flag
-      ? 'background:#ffebee;color:#c62828;border-left:4px solid #c62828'
-      : 'background:transparent;border-left:4px solid transparent';
+      ? 'background:#ffebee;color:#c62828;border:1px solid #e57373;border-left:4px solid #c62828'
+      : 'background:transparent;border:1px solid #cbd5e1;border-left:4px solid #cbd5e1';
     return `<div style="padding:8px 10px;border-radius:8px;${style};font-size:13px">
       <strong>${fmtAMPM(s.time)}</strong> &nbsp;&nbsp; Expected: <strong>${s.expected}</strong> &nbsp;|&nbsp; Actual: <strong>${s.available}</strong></div>`;
   }).join('');
 
   $('coverageTimelinePanel').innerHTML = `
     <h3>📈 Full Day Coverage Forecast${belowCount ? ` <span style="color:#c62828;font-size:14px">· ⚠️ ${belowCount} interval(s) flagged red</span>` : ''}</h3>
-    ${belowCount ? `<div style="color:#c62828;font-size:13px;margin-top:6px;line-height:1.7">Turns red when Actual is ${fcGap()}+ below Expected, or below the minimum of ${fcMin()}: ${flagged.join(' &nbsp;·&nbsp; ')}</div>` : ''}
+    ${belowCount ? `<div style="color:#c62828;font-size:13px;margin-top:6px;line-height:1.7">Note: an interval turns red when Actual is ${fcGap()} or more below Expected, or when Actual is below the minimum of ${fcMin()} agents.</div>` : ''}
     <div style="display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(12,auto);grid-auto-flow:column;gap:10px;margin-top:15px">${cells}</div>`;
 }
 
