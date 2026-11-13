@@ -210,6 +210,9 @@ tr.roster-off td{background:#f1f2f4;color:#666;font-style:italic}
 .trk-grid td.trk-name{cursor:pointer;font-weight:600;color:var(--navy)}
 .trk-grid td.trk-name:hover{text-decoration:underline}
 .trk-grid td.trk-agent{font-weight:600;color:var(--navy)}
+.trk-grid td.trk-sum.st-present{background:#e8f5e9;color:#2e7d32}
+.trk-grid td.trk-sum.st-partial{background:#fff3e0;color:#e65100}
+.trk-grid td.trk-sum.st-absent{background:#ffebee;color:#c62828}
 .trk-grid tr.trk-total td{font-weight:700;background:#eef2f7;border-bottom:2px solid var(--line)}
 .trk-grid tr.trk-total td:first-child{background:#eef2f7;color:var(--navy)}
 .trk-grid tr.trk-total td small{font-weight:600;color:var(--muted)}
@@ -552,6 +555,9 @@ html[data-theme=dark] td.sc-low{color:#f87171!important}
 html[data-theme=dark] .trk-grid th:first-child,html[data-theme=dark] .trk-grid td:first-child,html[data-theme=dark] #mcsTable th:first-child,html[data-theme=dark] #mcsTable td:first-child{background:var(--surface)}
 html[data-theme=dark] .trk-grid .trk-sum{background:#1b2331}
 html[data-theme=dark] .trk-grid tr.trk-total td,html[data-theme=dark] .trk-grid tr.trk-total td:first-child{background:#222c3d}
+html[data-theme=dark] .trk-grid td.trk-sum.st-present{background:#12301b;color:#86efac}
+html[data-theme=dark] .trk-grid td.trk-sum.st-partial{background:#3a2a12;color:#fdba74}
+html[data-theme=dark] .trk-grid td.trk-sum.st-absent{background:#3b1519;color:#fca5a5}
 html[data-theme=dark] .trk-grid tr.trk-total td.st-present{background:#12301b;color:#86efac}
 html[data-theme=dark] .trk-grid tr.trk-total td.st-partial{background:#3a2a12;color:#fdba74}
 html[data-theme=dark] .trk-grid tr.trk-total td.st-absent{background:#3b1519;color:#fca5a5}
@@ -3232,7 +3238,7 @@ function trackerGridHtml(rows, monthOf, days, today) {
       <td class="trk-sum" title="Late / Left early">${c.partial}</td>
       <td class="trk-sum" title="Called off / NCNS">${c.absent}</td>
       <td class="trk-sum" title="Leave">${c.leave}</td>
-      <td class="trk-sum" title="Hours worked / hours expected">${trackerPct(c)}</td>
+      <td class="trk-sum${trackerBand(c.pct)}" title="Hours worked / hours expected (green 95%+, amber 91-94.9%, red below 91%)">${trackerPct(c)}</td>
       ${cells}</tr>`;
   }).join('');
 
