@@ -868,7 +868,7 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
 
 <!-- ============ SCORECARD: ATTENDANCE ============ -->
 <section class="tab-panel" id="trackerTab" hidden>
-  <div class="view-hint">🗓️ Per-agent attendance for the month: ✔ present (once the shift has finished), ◐ late / left early (counted by hours worked; marked * when no actual time is submitted yet and a half shift is assumed), ✖ called off, leave or OFF. The Team total row at the top adds up the agents shown (the daily figures are the team's attendance % for that day).</div>
+  <div class="view-hint">🗓️ Per-agent attendance for the month: ✔ present (once the shift has finished), ◐ late / left early (counted by hours worked; marked * when no actual time is submitted yet and a half shift is assumed), ✖ called off, leave or OFF. The Team total row at the top adds up the agents shown for the month.</div>
   <div class="controls">
     <button type="button" onclick="shiftTrackerMonth(-1)" title="Previous month">‹</button>
     <input type="month" id="trackerMonth" onchange="buildTracker()">
@@ -3202,19 +3202,9 @@ const trackerTip = x =>
   (x.missed ? ` · ${missedText(x)}` : '') +
   (x.inTime ? ` · login ${x.inTime}` : '') + (x.outTime ? ` · logout ${x.outTime}` : '');
 
-/* Team total: adds up every agent shown (counts, hours) and gives the team's attendance % per day */
+/* Team total: adds up every agent shown (counts and hours for the month) */
 const trackerBand = p => p == null ? '' : p >= 95 ? ' st-present' : p >= 91 ? ' st-partial' : ' st-absent';
-function trackerTeamTotal(infos, days) {
-  const c = trackerSummary(infos.flat());
-  const perDay = days.map((d, i) => {
-    const col = infos.map(a => a[i]);
-    const exp = col.reduce((t, x) => t + x.exp, 0), worked = col.reduce((t, x) => t + x.worked, 0);
-    const n = k => col.filter(x => x.kind === k).length;
-    return { date: d, pct: exp ? (worked / exp) * 100 : null,
-             tip: `${fmtDate(parseYMD(d))} · team: ${n('present')} present, ${n('partial')} late/left early, ${n('absent')} called off, ${n('leave')} leave, ${n('off')} off` };
-  });
-  return { c, perDay };
-}
+const trackerTeamTotal = infos => ({ c: trackerSummary(infos.flat()) });
 
 /* % column sort: '' = by name, 'asc' = lowest first, 'desc' = highest first */
 let trackerPctSort = '';
@@ -3246,7 +3236,7 @@ function trackerGridHtml(rows, monthOf, days, today) {
     return `<th class="${d === today ? 'today' : ''}">${dt.getDate()}<br><small>${dow[dt.getDay()]}</small></th>`;
   }).join('');
 
-  const team = trackerTeamTotal(rows.map(monthOf), days);
+  const team = trackerTeamTotal(rows.map(monthOf));
   const totalRow = `<tr class="trk-total">
       <td>Σ Team total <small>(${rows.length} agent${rows.length === 1 ? '' : 's'})</small></td>
       <td class="trk-sum" title="Expected days">${team.c.expected}</td>
@@ -3255,7 +3245,7 @@ function trackerGridHtml(rows, monthOf, days, today) {
       <td class="trk-sum" title="Called off / NCNS">${team.c.absent}</td>
       <td class="trk-sum" title="Leave">${team.c.leave}</td>
       <td class="trk-sum${trackerBand(team.c.pct)}" title="Team hours worked / hours expected">${trackerPct(team.c)}</td>
-      ${team.perDay.map(d => `<td class="${trackerBand(d.pct).trim()}" title="${esc(d.tip)}">${d.pct == null ? '—' : Math.round(d.pct) + '%'}</td>`).join('')}</tr>`;
+      <td colspan="${days.length}"></td></tr>`;
 
   const body = rows.map(r => {
     const info = monthOf(r), c = trackerSummary(info);
@@ -3337,9 +3327,9 @@ function downloadTracker() {
                trackerPct(c), c.hoursWorked.toFixed(1), c.hoursExp.toFixed(1), ...info.map(cellText)]);
   });
   if (infos.length) {
-    const t = trackerTeamTotal(infos, days), c = t.c;
+    const c = trackerTeamTotal(infos).c;
     rows.push(['Team total (' + infos.length + ' agents)', '', c.expected, c.present, c.partial, c.absent, c.leave,
-               trackerPct(c), c.hoursWorked.toFixed(1), c.hoursExp.toFixed(1), ...t.perDay.map(d => d.pct == null ? '' : Math.round(d.pct) + '%')]);
+               trackerPct(c), c.hoursWorked.toFixed(1), c.hoursExp.toFixed(1)]);
   }
   rows.push([]);
   rows.push(['P = Present, U = Upcoming, LATE / LE = Late / Left early (* = estimated half shift), NCNS / CO = Called off, VL / SL / ML / BRV = Leave, OFF = Off']);
