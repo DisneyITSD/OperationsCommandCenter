@@ -453,9 +453,9 @@ td.sc-good::before,td.sc-mid::before,td.sc-low::before{content:"";display:inline
 #workingList li.sup-h:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
 #workingList li.sup-h::after{content:"";flex:none;width:6px;height:6px;margin-left:10px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-2px);transition:transform .15s}
 #workingList li.sup-h.collapsed::after{transform:rotate(-45deg)}
-.panels .panel h3.wl-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.wl-toggle{flex:none;display:grid;place-items:center;width:28px;height:28px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;line-height:0}
-.wl-toggle svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.panels .panel h3.wl-head{display:flex;align-items:center;justify-content:space-between;gap:8px;line-height:inherit}
+.wl-toggle{flex:none;display:grid;place-items:center;width:22px;height:22px;margin:-4px 0;padding:0;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;line-height:0}
+.wl-toggle svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .wl-toggle:hover{background:rgba(127,127,127,.12)}
 .wl-toggle:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
 .page-head #refreshBtn{width:36px;height:36px;padding:0;display:grid;place-items:center;font-size:18px;line-height:1}
