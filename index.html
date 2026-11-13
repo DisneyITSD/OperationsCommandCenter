@@ -1956,9 +1956,8 @@ function buildLunchConcurrency() {
 
   const cells = slots.map(s => {
     const cls = !s.count ? 'lc-0' : s.count === peak ? 'lc-peak' : 'lc-1';
-    return `<div class="lc-cell ${cls}" title="${esc(s.names.join(', ') || 'No one on lunch')}">
-      <strong>${fmtAMPM(s.time)}</strong> &nbsp;&nbsp; On lunch: <strong>${s.count}</strong>${s.count === peak && peak ? ' 🔺' : ''}
-      ${s.count ? `<small>${s.names.map(esc).join(', ')}</small>` : ''}</div>`;
+    return `<div class="lc-cell ${cls}">
+      <strong>${fmtAMPM(s.time)}</strong> &nbsp;&nbsp; On lunch: <strong>${s.count}</strong>${s.count === peak && peak ? ' 🔺' : ''}</div>`;
   }).join('');
 
   $('lunchConcurrencyPanel').innerHTML = `
