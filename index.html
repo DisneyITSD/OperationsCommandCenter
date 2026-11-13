@@ -1108,6 +1108,7 @@ const scheduleUrl = gid => sheetUrl(gid) + '&headers=1';
 const URLS = {
   pto: sheetUrl(1297010746),
   calledOff: sheetUrl(2139820898),
+  loli: `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent('LOLI Actual')}`,   // "LOLI Actual" tab: Agent Name (ID) | Agent Name | Date | Min of Login | Max of Logout
   attTime: sheetUrl(417537234),            // "ATTENDANCE TIME" tab: Name | EST Date | Type | Actual Time
   announcements: sheetUrl(6259028),
   qa: scheduleUrl(337356668),              // "QA" tab (&headers=1 forces row 1 to be read as the header)
@@ -1150,6 +1151,7 @@ const ATT_OTHER = { code: 'CO', icon: '🚫', color: '#dc3545', label: 'Called O
    ===================================================================== */
 let estData = [], phData = [];
 let ptoList = [], calledOffList = [], announcementList = [], attTimeList = [], qaList = [];
+let loliIdx = new Map();     // normalized agent name -> [{date, login, logout}] from the "LOLI Actual" tab
 let dailyMap = new Map();
 let currentWorkingAgents = [];
 let realtimeMode = false, realtimeTimer = null;
@@ -1367,12 +1369,15 @@ const loadSheet = async url =>
 
 async function loadAttendance() {
   try {
-    [ptoList, calledOffList, announcementList, attTimeList] = await Promise.all([
+    let loliRows;
+    [ptoList, calledOffList, announcementList, attTimeList, loliRows] = await Promise.all([
       loadSheet(URLS.pto),
       loadSheet(URLS.calledOff),
       fetchCSV(URLS.announcements),
-      loadSheet(URLS.attTime).catch(() => [])      // if this tab fails, everything else keeps working
+      loadSheet(URLS.attTime).catch(() => []),      // if this tab fails, everything else keeps working
+      fetchCSV(URLS.loli, { raw: true }).catch(() => [])
     ]);
+    loliIdx = buildLoliIndex(loliRows);
     loadErrors.attendance = '';
     lastUpdated = new Date();
   } catch (err) {
@@ -2172,7 +2177,8 @@ function buildRosterView() {
       const text = off ? 'OFF' : ph ? `${short12(phHHMM(c.estDate || c.date, p[0]))}-${short12(phHHMM(c.estDate || c.date, p[1]))}` : `${short12(toHHMM(p[0]))}-${short12(toHHMM(p[1]))}`;
       const tip = `${ph && c.estDate ? 'PH ' : ''}${fmtDate(parseYMD(c.date))}${ph && c.estDate ? ' (EST shift date ' + fmtDate(parseYMD(c.estDate)) + ')' : ''} · ` + (off ? 'OFF' : `${convertShiftRange(c.shift)} EST · ${phRange(c.estDate || c.date, p[0], len)} PH`) +
         (c.shiftChg ? ` · CHANGED (weekly roster: ${isOff(c.base) ? 'OFF' : convertShiftRange(c.base)})` : '') +
-        (c.supChg ? ` · supervisor: ${c.sup}` : '') + ` · ${c.att.text}` + (c.att.missed ? ` · ${missedText(c.att)}` : '');
+        (c.supChg ? ` · supervisor: ${c.sup}` : '') + ` · ${c.att.text}` + (c.att.missed ? ` · ${missedText(c.att)}` : '') +
+        (c.att.inTime ? ` · login ${c.att.inTime}` : '') + (c.att.outTime ? ` · logout ${c.att.outTime}` : '');
       const a = c.att, mark = a.kind === 'present' ? '✔' : a.kind === 'upcoming' ? '○' : a.kind === 'off' ? '' : a.code + (a.estimated ? '*' : '');
       return `<td class="trk-cell rcell st-${a.kind}${c.shiftChg ? ' chg-out' : ''}" title="${esc(tip)}">${text}${mark ? `<small>${esc(mark)}</small>` : ''}</td>`;
     }).join('');
@@ -3075,6 +3081,43 @@ function buildShiftChanges(date, mins, supFilter) {
    missed (estimated, marked *) until the actual times are submitted.
    ===================================================================== */
 const SHIFT_HOURS_DEFAULT = 11;
+
+/* ---------- LOLI Actual tab: actual log-in / log-out per agent per day ----------
+   Times are read as EST clock times (same as the schedule). Up to LOLI_GRACE_MIN minutes
+   late / early is ignored; beyond that the day is counted as Late / Left early and the
+   minutes are deducted from the hours worked. */
+const LOLI_GRACE_MIN = 10;
+function parseLoliDate(v) {
+  const s = clean(v);
+  const m = s.match(/^(\d{1,2})\D+(\d{1,2})\D+(\d{4})$/);          // "11 6 2026" = month day year
+  return m ? `${m[3]}-${pad(+m[1])}-${pad(+m[2])}` : normalizeDate(s);
+}
+function buildLoliIndex(rows) {
+  const m = new Map();
+  rows.forEach(r => {
+    const name = clean(r[1]), date = parseLoliDate(r[2]);
+    const login = parseClock(clean(r[3])), logout = parseClock(clean(r[4]));
+    if (!name || !date || login == null) return;                      // skips the header row and blanks
+    const k = normName(name);
+    if (!m.has(k)) m.set(k, []);
+    m.get(k).push({ date, login, logout });
+  });
+  return m;
+}
+/* The agent's LOLI record that belongs to this scheduled shift: the one whose login is closest to the shift start
+   (so a 11:57 PM login for a 12:00 AM shift still belongs to the next day's shift) */
+function loliFor(r, date, shift) {
+  const recs = loliIdx.get(normName(r.Name)), p = parseShift(shift);
+  if (!recs || !p) return null;
+  const start = parseYMD(date).getTime() + p[0] * 60000;
+  let best = null, bestD = Infinity;
+  recs.forEach(x => {
+    const d = Math.abs(parseYMD(x.date).getTime() + x.login * 60000 - start) / 60000;
+    if (d < bestD) { bestD = d; best = x; }
+  });
+  return bestD <= 600 ? best : null;
+}
+const loliClock = m => m == null ? '' : fmtAMPM(toHHMM(m));
 function shiftHours(shift) {
   const p = parseShift(shift);
   if (!p) return SHIFT_HOURS_DEFAULT;
@@ -3103,7 +3146,7 @@ const TRACKER_STATUS = {
 };
 const TRACKER_LEGEND = [
   ['present', '✔ Present (shift finished, no record)'], ['upcoming', '○ Upcoming (shift not finished yet)'],
-  ['partial', '◐ Late / Left early (worked, partial shift; * = estimated half shift)'],
+  ['partial', `◐ Late / Left early (actual login / logout from LOLI Actual, more than ${LOLI_GRACE_MIN} min off the shift; * = estimated half shift)`],
   ['absent', '✖ Called off / NCNS'], ['leave', '🌴 Leave (VL, SL, ...)'], ['off', '– OFF']
 ];
 
@@ -3166,7 +3209,26 @@ function attendanceFor(r, date, today, idx) {
   x.estimated = false;
   x.inTime = rec?.loginTime || '';
   x.outTime = rec?.logoutTime || '';
-  if (x.kind === 'partial') {
+
+  /* Actual log-in / log-out from the LOLI Actual tab (a supervisor-submitted time entry still takes priority) */
+  const p0 = parseShift(x.shift);
+  const act = !x.inTime && !x.outTime && p0 && ['present', 'upcoming', 'partial'].includes(x.kind) ? loliFor(r, date, x.shift) : null;
+  if (act) {
+    const ended = shiftEnded(x.shift, date, today);
+    const late = Math.max(0, clockDiff(act.login, p0[0]));
+    const early = ended && act.logout != null ? Math.max(0, clockDiff(p0[1], act.logout)) : 0;
+    const lateC = late > LOLI_GRACE_MIN ? late : 0, earlyC = early > LOLI_GRACE_MIN ? early : 0;
+    x.actual = true;
+    x.inTime = loliClock(act.login);
+    x.outTime = ended ? loliClock(act.logout) : '';
+    x.missed = lateC + earlyC;
+    if (lateC || earlyC) {
+      const code = lateC && earlyC ? 'L/LE' : lateC ? 'LATE' : 'LE';
+      Object.assign(x, { kind: 'partial', text: 'Late / Left early', code, icon: TRACKER_STATUS.partial.icon,
+        reason: [lateC ? `Late ${lateC} min` : '', earlyC ? `Left early ${earlyC} min` : ''].filter(Boolean).join(' + ') });
+    }
+  }
+  if (x.kind === 'partial' && !x.actual) {
     const p = parseShift(x.shift);
     const inT = parseClock(x.inTime), outT = parseClock(x.outTime);
     if (inT == null && outT == null) {
