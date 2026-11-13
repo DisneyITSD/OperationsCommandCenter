@@ -794,7 +794,7 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
 
 <!-- ============ MONTHLY ROSTER ============ -->
 <section class="tab-panel" id="rosterTab" hidden>
-  <div class="view-hint">📊 Monthly schedule per agent, built from the weekly roster plus the "Schedule By Date" tab. Colours show each day's attendance (same rules as Scorecard › Attendance). A purple outline 🔁 marks days changed from the weekly roster. Hover a cell for details.</div>
+  <div class="view-hint">📊 Monthly schedule per agent, built from the weekly roster plus the "Schedule By Date" tab. Colours show each day's attendance (same rules as Scorecard › Attendance). A purple outline 🔁 marks days changed from the weekly roster. Log-in / log-out times show in each calendar box; hover a grid cell for details.</div>
   <div class="controls">
     <button type="button" onclick="shiftRosterMonth(-1)" title="Previous month">‹</button>
     <input type="month" id="rosterMonth" onchange="buildRosterView()">
@@ -2135,11 +2135,12 @@ function rosterCalendarHtml({ r, cells }, today, ph) {
     const changed = c.shiftChg || c.supChg;
     if (changed) chg++;
     const time = !p ? 'OFF' : ph ? phRange(c.estDate || c.date, p[0], len) + ' PH' : convertShiftRange(c.shift) + ' EST';
-    return `<div class="cal-day st-${a.kind}${changed ? ' chg-out' : ''}${c.date === today ? ' is-today' : ''}" title="${esc(actualTip(a))}">
+    return `<div class="cal-day st-${a.kind}${changed ? ' chg-out' : ''}${c.date === today ? ' is-today' : ''}">
       <div class="cal-num">${parseYMD(c.date).getDate()}</div>
       <div class="cal-status">${c.shiftChg ? '🔁 ' : ''}${time}</div>
       ${a.kind === 'off' ? '' : `<div class="cal-status" style="font-size:11px">${a.icon} ${esc(a.text)}</div>`}
       ${a.missed ? `<div class="cal-note">${esc(missedText(a))}</div>` : ''}
+      ${a.inTime || a.outTime ? `<div class="cal-note">⏰ In: ${esc(a.inTime || '—')}${a.inDisputed ? ' (disputed)' : ''}</div><div class="cal-note">↘️ Out: ${esc(a.outTime || '—')}${a.outDisputed ? ' (disputed)' : ''}</div>` : ''}
       ${a.loggedHrs != null ? `<div class="cal-note">⏱ ${fmtHrs(a.loggedHrs)} hrs logged</div>` : ''}
       ${c.shiftChg ? `<div class="cal-note">Was ${isOff(c.base) ? 'OFF' : convertShiftRange(c.base)}</div>` : ''}
       ${c.supChg ? `<div class="cal-note">Supervisor: ${esc(c.sup)}</div>` : ''}</div>`;
