@@ -700,7 +700,6 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
     <input type="date" id="forecastDate">
     <label style="display:flex;align-items:center;gap:6px;font-weight:600">🎯 Min agents <input type="number" min="0" class="minTargetInput" id="fcMinInput"></label>
     <label style="display:flex;align-items:center;gap:6px;font-weight:600">⚠️ Alert when below expected by <input type="number" min="1" class="minTargetInput" id="fcGapInput"></label>
-    <button onclick="refreshForecast()">Show Forecast</button>
   </div>
   <div id="dailyOverviewCards" class="cards" style="margin:15px 0"></div>
   <div id="coverageTimelinePanel" class="panel"></div>
@@ -1915,21 +1914,26 @@ function buildCoverageTimeline() {
   if (!date) return;
 
   let belowCount = 0;
+  const flagged = [];
   const cells = coverageSlots(date).map(s => {
     const target = fcMin();
     const below = target > 0 && s.available < target;
-    if (below) belowCount++;
     const short = s.expected - s.available >= fcGap();   /* actual lower than expected by the set gap */
+    const reasons = [];
+    if (short) reasons.push(`${s.expected - s.available} below expected`);
+    if (below) reasons.push(`below minimum of ${target}`);
     const flag = short || below;               /* highlight only problem intervals */
+    if (flag) { belowCount++; flagged.push(`<strong>${fmtAMPM(s.time)}</strong> (${reasons.join(' + ')})`); }
     const style = flag
       ? 'background:#ffebee;color:#c62828;border-left:4px solid #c62828'
       : 'background:transparent;border-left:4px solid transparent';
     return `<div style="padding:8px 10px;border-radius:8px;${style};font-size:13px">
-      <strong>${fmtAMPM(s.time)}</strong> &nbsp;&nbsp; Expected: <strong>${s.expected}</strong> &nbsp;|&nbsp; Actual: <strong>${s.available}</strong>${target > 0 ? ` &nbsp;|&nbsp; Min: <strong>${target}</strong>${below ? ' ⚠️' : ''}` : ''}</div>`;
+      <strong>${fmtAMPM(s.time)}</strong> &nbsp;&nbsp; Expected: <strong>${s.expected}</strong> &nbsp;|&nbsp; Actual: <strong>${s.available}</strong></div>`;
   }).join('');
 
   $('coverageTimelinePanel').innerHTML = `
-    <h3>📈 Full Day Coverage Forecast${belowCount ? ` <span style="color:#c62828;font-size:14px">· ⚠️ ${belowCount} interval(s) below minimum</span>` : ''}</h3>
+    <h3>📈 Full Day Coverage Forecast${belowCount ? ` <span style="color:#c62828;font-size:14px">· ⚠️ ${belowCount} interval(s) flagged red</span>` : ''}</h3>
+    ${belowCount ? `<div style="color:#c62828;font-size:13px;margin-top:6px;line-height:1.7">Turns red when Actual is ${fcGap()}+ below Expected, or below the minimum of ${fcMin()}: ${flagged.join(' &nbsp;·&nbsp; ')}</div>` : ''}
     <div style="display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(12,auto);grid-auto-flow:column;gap:10px;margin-top:15px">${cells}</div>`;
 }
 
@@ -2980,6 +2984,7 @@ const fcNum = (id, def) => { const v = parseInt($(id)?.value); return isNaN(v) ?
 const fcMin = () => fcNum('fcMinInput', 7);
 const fcGap = () => Math.max(1, fcNum('fcGapInput', 5));
 function initForecastSettings() {
+  $('forecastDate')?.addEventListener('change', refreshForecast);
   [['fcMinInput', FC_MIN_KEY, 7], ['fcGapInput', FC_GAP_KEY, 5]].forEach(([id, key, def]) => {
     const el = $(id); if (!el) return;
     let saved = null; try { saved = localStorage.getItem(key); } catch (e) {}
