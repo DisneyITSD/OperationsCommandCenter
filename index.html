@@ -710,7 +710,6 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
   <div class="view-hint">🍽️ Lunch Concurrency: how many agents are on lunch (60 minutes) in each 30-minute interval. Leave and called-off shifts are not counted.</div>
   <div class="controls">
     <input type="date" id="lunchDate" onchange="buildLunchConcurrency()">
-    <button onclick="buildLunchConcurrency()">Show Lunches</button>
   </div>
   <div id="lunchConcurrencyPanel" class="panel"></div>
 </section>
@@ -867,7 +866,6 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
   <div class="controls">
     <input type="date" id="lateDate" onchange="buildLateTable()">
     <select id="lateSupervisor" onchange="buildLateTable()"><option>All Supervisors</option></select>
-    <button onclick="buildLateTable()">Show</button>
     <button onclick="$('lateDate').value='';buildLateTable()">All Dates</button>
     <input type="text" id="lateSearch" placeholder="🔍 Search Agent..." onkeyup="buildLateTable()">
     <button class="blue" data-tab="attendanceTimeFormTab">+ Submit Time</button>
@@ -1926,7 +1924,7 @@ function buildCoverageTimeline() {
     if (flag) { belowCount++; flagged.push(`<strong>${fmtAMPM(s.time)}</strong> (${reasons.join(' + ')})`); }
     const style = flag
       ? 'background:#ffebee;color:#c62828;border:1px solid #e57373;border-left:4px solid #c62828'
-      : 'background:transparent;border:1px solid #cbd5e1;border-left:4px solid #cbd5e1';
+      : 'background:transparent;border:1px solid var(--border);border-left:4px solid var(--border)';
     return `<div style="padding:8px 10px;border-radius:8px;${style};font-size:13px">
       <strong>${fmtAMPM(s.time)}</strong> &nbsp;&nbsp; Expected: <strong>${s.expected}</strong> &nbsp;|&nbsp; Actual: <strong>${s.available}</strong></div>`;
   }).join('');
