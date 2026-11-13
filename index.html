@@ -597,6 +597,30 @@ html[data-theme=dark] .panels .panel h3{background:var(--surface);color:var(--in
 html[data-theme=dark] .break{background:#2b2111;color:#fbbf24}
 html[data-theme=dark] .lunch{background:#2c1517;color:#f87171}
 html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
+/* Month colour coding: each month gets its own colour on the month label cell */
+tr.mo-0{--mc:#3b82f6}
+tr.mo-1{--mc:#06b6d4}
+tr.mo-2{--mc:#10b981}
+tr.mo-3{--mc:#84cc16}
+tr.mo-4{--mc:#eab308}
+tr.mo-5{--mc:#f97316}
+tr.mo-6{--mc:#ef4444}
+tr.mo-7{--mc:#ec4899}
+tr.mo-8{--mc:#a855f7}
+tr.mo-9{--mc:#6366f1}
+tr.mo-10{--mc:#14b8a6}
+tr.mo-11{--mc:#64748b}
+#mcsTable tr[class*="mo-"] td:first-child,#metricTable tr[class*="mo-"] td:first-child,#qaTable tr[class*="mo-"] td:first-child{background:color-mix(in srgb,var(--mc) 14%,#fff);box-shadow:inset 5px 0 0 var(--mc),1px 0 0 var(--line);color:inherit}
+html[data-theme=dark] #mcsTable tr[class*="mo-"] td:first-child,html[data-theme=dark] #metricTable tr[class*="mo-"] td:first-child,html[data-theme=dark] #qaTable tr[class*="mo-"] td:first-child{background:color-mix(in srgb,var(--mc) 22%,var(--surface))}
+/* Month colour coding: tint the whole row (score-band cells keep their own colour) */
+#mcsTable tr[class*="mo-"] td:not(.sc-good):not(.sc-mid):not(.sc-low):not(.nodata),#metricTable tr[class*="mo-"] td:not(.sc-good):not(.sc-mid):not(.sc-low):not(.nodata),#qaTable tr[class*="mo-"] td:not(.sc-good):not(.sc-mid):not(.sc-low):not(.nodata){background:color-mix(in srgb,var(--mc) 14%,#fff)}
+html[data-theme=dark] #mcsTable tr[class*="mo-"] td:not(.sc-good):not(.sc-mid):not(.sc-low):not(.nodata),html[data-theme=dark] #metricTable tr[class*="mo-"] td:not(.sc-good):not(.sc-mid):not(.sc-low):not(.nodata),html[data-theme=dark] #qaTable tr[class*="mo-"] td:not(.sc-good):not(.sc-mid):not(.sc-low):not(.nodata){background:color-mix(in srgb,var(--mc) 22%,var(--surface))}
+/* QA table: also tint the Avg Score cell (its band shows in the text colour and dot) */
+#qaTable tr[class*="mo-"] td.qa-score{background:color-mix(in srgb,var(--mc) 14%,#fff)!important}
+html[data-theme=dark] #qaTable tr[class*="mo-"] td.qa-score{background:color-mix(in srgb,var(--mc) 22%,var(--surface))!important}
+/* Performance Stack Ranking: also tint the score cells (band shows in text colour and dot); No Data cells keep their dark style */
+#metricTable tr[class*="mo-"] td:not(.nodata){background:color-mix(in srgb,var(--mc) 14%,#fff)!important}
+html[data-theme=dark] #metricTable tr[class*="mo-"] td:not(.nodata){background:color-mix(in srgb,var(--mc) 22%,var(--surface))!important}
 </style>
 </head>
 
@@ -1142,7 +1166,7 @@ const DISPUTE_NEEDS_APPROVAL = true;
 const URLS = {
   pto: sheetUrl(1297010746),
   calledOff: sheetUrl(2139820898),
-  loli: LOLI_GID ? sheetUrl(LOLI_GID) : `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent('LOLI Actual')}`,   // "LOLI Actual" tab: Agent Name | Work Date | Scheduled Shift | Actual First Login | Login Status | Actual Final Logout | Minutes Late | Minutes Early | Attendance Result
+  loli: LOLI_GID ? sheetUrl(LOLI_GID) : `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent('LOLI Actual')}`,   // "LOLI Actual" tab: Agent Name | Work Date | Scheduled Shift | Actual First Login | Actual Final Logout | Total Logged-in Hours | Hours Short
   attTime: sheetUrl(417537234),            // "ATTENDANCE TIME" tab: Name | EST Date | Type | Actual Time
   announcements: sheetUrl(6259028),
   qa: scheduleUrl(337356668),              // "QA" tab (&headers=1 forces row 1 to be read as the header)
@@ -1307,6 +1331,10 @@ function supColor(name) {
 }
 const supClass = name => supColor(name) ? 'sup-row' : '';
 const supStyle = name => supColor(name) ? `--sc:${supColor(name)}` : '';
+
+/* Month colour coding helpers: returns ' mo-0'..' mo-11' for a month label ("January", "Jan", "2026-01") */
+const moIdx = s => { const m = String(s || '').trim(); if (/^\d{4}-\d{2}/.test(m)) return +m.slice(5, 7) - 1; const t = Date.parse(m + ' 1, 2000'); return isNaN(t) ? -1 : new Date(t).getMonth(); };
+const moClass = s => { const i = moIdx(s); return i < 0 ? '' : ' mo-' + i; };
 const recFor = (list, name, date) =>
   list.find(x => normName(x.Name) === normName(name) && normalizeDate(x['EST Date']) === date);
 const findAgent = (name, list = estData) => list.find(a => normName(a.Name) === normName(name));
@@ -2573,7 +2601,7 @@ function buildQA() {
     g.items.forEach(x => { if (!byMonth.has(x.ym)) byMonth.set(x.ym, []); byMonth.get(x.ym).push(x); });
     [...byMonth.keys()].sort().forEach(ym => {
       const items = byMonth.get(ym), mKey = 'm|' + g.key + '|' + ym, mOpen = qaOpen.has(mKey);
-      html += `<tr class="grp-head qa-month${mOpen ? ' open' : ''}" data-k="${esc(mKey)}" style="${st}">
+      html += `<tr class="grp-head qa-month${moClass(ym)}${mOpen ? ' open' : ''}" data-k="${esc(mKey)}" style="${st}">
         <td><span class="caret"></span>${esc(qaYmLabel(ym))}</td>${scoreTd(avgOf(items))}<td>${items.length}</td>
         <td>${dateOf(items[0].date)}</td><td>${esc(g.supervisor)}</td></tr>`;
       if (mOpen) html += items.map(x => auditRow(x, st)).join('');
@@ -2828,7 +2856,7 @@ function buildMetric() {
       const list = (byAgent.get(g) || []).slice().sort((a, b) => rankM(a[I.month]) - rankM(b[I.month]));
       return `<tr class="grp-head mt-agent sup-row${open ? ' open' : ''}" data-g="${esc(g)}" style="${st}" title="Click to show / hide the monthly scores">` +
           cols.map(i => cell(r, i, `<span class="caret"></span><span class="rank">${n + 1}.</span> ${esc(r[I.agent])}${tagOf(r)}`)).join('') + '</tr>' +
-        list.map(m => `<tr class="mt-month" data-g="${esc(g)}" style="${st}"${open ? '' : ' hidden'}>` + cols.map(i => cell(m, i, esc(m[I.month] || '—'))).join('') + '</tr>').join('');
+        list.map(m => `<tr class="mt-month${moClass(m[I.month])}" data-g="${esc(g)}" style="${st}"${open ? '' : ' hidden'}>` + cols.map(i => cell(m, i, esc(m[I.month] || '—'))).join('') + '</tr>').join('');
     }).join('');
   } else {
     table.tBodies[0].innerHTML = rows.map((r, n) => {
@@ -2994,7 +3022,7 @@ function buildMcs() {
       if (list.length < 2) return row(list[0], `${esc(list[0][I.agent])} <small>· ${esc(list[0][I.month] || '')}</small>`, 'mcs-single sup-row', false);
       /* collapsible agent row = Total for the ticked months; click it to show / hide the monthly rows */
       return row(mcsAggregate(list)[0], `<span class="caret"></span>${esc(list[0][I.agent])}`, `grp-head mcs-agent sup-row${open ? ' open' : ''}`, false) +
-        list.map(r => row(r, esc(r[I.month] || '—'), 'mcs-month', !open)).join('');
+        list.map(r => row(r, esc(r[I.month] || '—'), 'mcs-month' + moClass(r[I.month]), !open)).join('');
     }).join('') : `<tr><td colspan="${mcsCols.length || 1}">No agents found</td></tr>`;
     $('mcsCount').textContent = groups.length;
     return;
@@ -3180,8 +3208,10 @@ function parseLoliClock(v) {
 function buildLoliIndex(rows) {
   const m = new Map();
   /* Columns are found from the header row. Current layout of the tab:
-     Agent Name | Work Date | Scheduled Shift | Actual First Login | Login Status | Actual Final Logout | Minutes Late | Minutes Early | Attendance Result
-     (the older layout, Agent Name | Date | Min of Login | Max of Logout, still works) */
+     Agent Name | Work Date | Scheduled Shift | Actual First Login | Actual Final Logout | Total Logged-in Hours | Hours Short
+     Login Status / Minutes Late / Minutes Early / Attendance Result are optional: when they are missing, late / early minutes
+     are worked out from the actual times vs the scheduled shift.
+     (older layouts, incl. Agent Name | Date | Min of Login | Max of Logout, still work) */
   let c = { name: 1, date: 2, login: 3, logout: 4, shift: -1, late: -1, early: -1, status: -1, result: -1, hours: -1, short: -1 };
   loliInfo.workDate = false;
   const h = rows.findIndex(r => r.some(x => /^agent name$/i.test(clean(x))));
