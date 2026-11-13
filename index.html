@@ -439,15 +439,14 @@ td.sc-good::before,td.sc-mid::before,td.sc-low::before{content:"";display:inline
 }
 @media(max-width:700px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.panels{grid-template-columns:1fr}}
 
-/* Working list: collapsible */
+/* Working list: collapsible supervisor groups */
 #workingList{border-left:0}
-.panels .panel:first-child h3{cursor:pointer;display:flex;align-items:center;gap:8px;user-select:none}
-.panels .panel:first-child h3::after{content:"";margin-left:auto;width:7px;height:7px;border-right:2px solid #6b7280;border-bottom:2px solid #6b7280;transform:rotate(45deg) translateY(-2px);transition:transform .15s}
-.panels .panel.collapsed h3::after{transform:rotate(-45deg)}
-.panels .panel:first-child h3:hover{background:#f9fafb}
-.panels .panel:first-child h3:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
-.panels .panel.collapsed #workingList{display:none}
-@media(min-width:901px){.panels:has(.panel:first-child.collapsed){grid-template-columns:150px repeat(4,minmax(0,1fr))}}
+#workingList li.sup-h{cursor:pointer;user-select:none;border-radius:6px 6px 0 0}
+#workingList li.sup-h:hover{background:rgba(127,127,127,.1)}
+#workingList li.sup-h:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+#workingList li.sup-h::after{content:"";flex:none;width:6px;height:6px;margin-left:10px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-2px);transition:transform .15s}
+#workingList li.sup-h.collapsed::after{transform:rotate(-45deg)}
+.page-head #refreshBtn{width:36px;height:36px;padding:0;display:grid;place-items:center;font-size:18px;line-height:1}
 
 /* Agent file: single calendar view with an agent summary strip */
 #rosterView,#rosterTab .daily-summary,#rosterLegend{display:none}
@@ -509,7 +508,6 @@ html[data-theme=dark] #workingList li.lunch{color:#f87171}
 html[data-theme=dark] #upcomingBreakList li,html[data-theme=dark] #upcomingLunchList li{background:#1b2331;color:var(--ink)}
 html[data-theme=dark] #upcomingBreakList li small,html[data-theme=dark] #upcomingLunchList li small{color:var(--muted)}
 html[data-theme=dark] .panels li small.ph-time,html[data-theme=dark] .shift-panel li small.ph-time{color:#4ade80!important}
-html[data-theme=dark] .panels .panel:first-child h3:hover{background:#1b2331}
 html[data-theme=dark] .chip{background:#1b2740;border-color:#2c3c5c;color:#bcd0f5}
 html[data-theme=dark] .chip.bad{background:#2c1517;border-color:#7f1d1d;color:#fca5a5}
 html[data-theme=dark] tbody tr:hover{background:#1b2331}
@@ -537,6 +535,10 @@ html[data-theme=dark] #coverageTimelinePanel [style*="background:#e8f5e9"]{backg
 html[data-theme=dark] #coverageTimelinePanel [style*="background:#ffebee"]{background:#2c1517!important;color:#fca5a5!important;border-left-color:#f87171!important}
 html[data-theme=dark] [style*="color:#333"]{color:var(--ink)!important}
 html[data-theme=dark] [style*="color:#6c757d"]{color:var(--muted)!important}
+html[data-theme=dark] .panels .panel h3{background:var(--surface);color:var(--ink)}
+html[data-theme=dark] .break{background:#2b2111;color:#fbbf24}
+html[data-theme=dark] .lunch{background:#2c1517;color:#f87171}
+html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
 </style>
 </head>
 
@@ -582,10 +584,10 @@ html[data-theme=dark] [style*="color:#6c757d"]{color:var(--muted)!important}
   <button class="menu-btn" aria-label="Open menu" onclick="document.body.classList.add('nav-open')">☰</button>
   <div><div class="crumb" id="pageCrumb"></div><h1 id="pageTitle"></h1></div>
   <div class="head-tools">
-    <div class="theme-seg" role="group" aria-label="Color theme"><button data-mode="light">Light</button><button data-mode="dark">Dark</button><button data-mode="system">System</button></div>
-    <button id="refreshBtn" onclick="refreshAttendanceData(true)">↻ Refresh</button>
+    <button id="refreshBtn" onclick="refreshAttendanceData(true)" title="Refresh data" aria-label="Refresh data">↻</button>
     <button id="realtimeBtn" onclick="toggleRealtime()">Live Mode</button>
     <div class="head-clock"><span id="liveClock">--:--:--</span><span id="lastUpdated"></span></div>
+    <div class="theme-seg" role="group" aria-label="Color theme"><button data-mode="light">Light</button><button data-mode="dark">Dark</button><button data-mode="system">System</button></div>
   </div>
 </header>
 
@@ -2067,7 +2069,7 @@ function rosterCalendarHtml({ r, cells }, today, ph) {
   };
   const head = `<div class="agent-sum">
     <div><div class="as-name">${esc(r.Name)}</div><div class="as-sup">${esc(r.Supervisor || 'Unassigned')}</div></div>
-    <div><div class="as-pct" style="color:${BAND_COL[bandOf('att', sm.pct)] || 'inherit'}">${trackerPct(sm)}</div><div class="as-lbl">Attendance this month</div>
+    <div><div class="as-pct" style="color:${sm.pct == null ? 'inherit' : sm.pct >= 95 ? '#16a34a' : sm.pct >= 91 ? '#d97706' : '#dc2626'}">${trackerPct(sm)}</div><div class="as-lbl">Attendance this month</div>
       <div class="as-sub">${sm.hoursWorked.toFixed(1)} / ${sm.hoursExp.toFixed(1)} hrs · ✔ ${sm.present} · ◐ ${sm.partial} · ✖ ${sm.absent} · 🌴 ${sm.leave}${chg ? ' · 🔁 ' + chg + ' changed' : ''}</div></div>
     <div class="as-brk">${tile('Break 1', r['Break 1'], 15, '')}${tile('Lunch', r['Lunch'], 60, 'lunch')}${tile('Break 2', r['Break 2'], 15, '')}${tile('Break 3', r['Break 3'], 15, '')}</div>
   </div>`;
@@ -3423,6 +3425,49 @@ function setPageHead(id){
   document.body.classList.remove('nav-open');
 }
 window.addEventListener('load', () => setPageHead(activeTab));
+/* Theme: light / dark / follow the system */
+(function(){
+  const KEY = 'ditsc_theme', mq = matchMedia('(prefers-color-scheme: dark)'), root = document.documentElement;
+  const get = () => { try { return localStorage.getItem(KEY) || 'system'; } catch (e) { return 'system'; } };
+  const apply = m => {
+    root.dataset.theme = (m === 'dark' || (m === 'system' && mq.matches)) ? 'dark' : 'light';
+    document.querySelectorAll('.theme-seg button').forEach(b => { const on = b.dataset.mode === m; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+  };
+  document.querySelectorAll('.theme-seg button').forEach(b => b.addEventListener('click', () => {
+    try { localStorage.setItem(KEY, b.dataset.mode); } catch (e) {}
+    apply(b.dataset.mode);
+  }));
+  mq.addEventListener('change', () => { if (get() === 'system') apply('system'); });
+  apply(get());
+})();
+/* Dashboard: collapse / expand each supervisor group in the Working list */
+(function(){
+  const list = document.getElementById('workingList'); if (!list) return;
+  const KEY = 'ditsc_working_groups';
+  let closed = new Set(); try { closed = new Set(JSON.parse(localStorage.getItem(KEY) || '[]')); } catch (e) {}
+  const nameOf = h => (h.querySelector('span')?.textContent || '').trim();
+  function apply() {
+    let cur = null;
+    [...list.children].forEach(li => {
+      if (li.classList.contains('sup-h')) {
+        cur = nameOf(li);
+        const c = closed.has(cur);
+        li.classList.toggle('collapsed', c);
+        li.setAttribute('role', 'button'); li.tabIndex = 0; li.setAttribute('aria-expanded', !c);
+        li.title = c ? 'Show agents' : 'Hide agents';
+      } else li.hidden = cur != null && closed.has(cur);
+    });
+  }
+  function toggle(h) {
+    const n = nameOf(h); closed.has(n) ? closed.delete(n) : closed.add(n);
+    try { localStorage.setItem(KEY, JSON.stringify([...closed])); } catch (e) {}
+    apply();
+  }
+  list.addEventListener('click', e => { const h = e.target.closest('li.sup-h'); if (h) toggle(h); });
+  list.addEventListener('keydown', e => { const h = e.target.closest('li.sup-h'); if (h && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggle(h); } });
+  new MutationObserver(apply).observe(list, { childList: true });
+  apply();
+})();
 /* Theme: light / dark / follow the system */
 (function(){
   const KEY = 'ditsc_theme', mq = matchMedia('(prefers-color-scheme: dark)'), root = document.documentElement;
