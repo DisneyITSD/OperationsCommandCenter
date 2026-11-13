@@ -3623,6 +3623,29 @@ window.addEventListener('load', () => setPageHead(activeTab));
   h.addEventListener('click', toggle);
   h.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
 })();
+/* Previous / next day buttons next to every date picker */
+(function(){
+  /* Pickers with no onchange handler are refreshed by their own button, so do that instead */
+  const ACTION = { selectedDate: () => runLookup(), forecastDate: () => refreshForecast() };
+  document.querySelectorAll('input[type="date"]').forEach(inp => {
+    const mk = (dir, glyph, title) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = glyph; b.title = title; b.setAttribute('aria-label', title);
+      b.addEventListener('click', () => {
+        if (inp.disabled) return;
+        inp.value = addDays(inp.value || ymd(estNow()), dir);
+        if (ACTION[inp.id]) ACTION[inp.id]();
+        else inp.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      return b;
+    };
+    const prev = mk(-1, '‹', 'Previous day'), next = mk(1, '›', 'Next day');
+    inp.before(prev); inp.after(next);
+    const sync = () => { prev.disabled = next.disabled = inp.disabled; };
+    new MutationObserver(sync).observe(inp, { attributes: true, attributeFilter: ['disabled'] });
+    sync();
+  });
+})();
 /* Hide / show the side menu */
 (function(){
   const btn = document.getElementById('sideToggle'); if (!btn) return;
