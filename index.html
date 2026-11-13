@@ -2979,13 +2979,13 @@ const getMinTarget = () => {
 const targetFor = getMinTarget;
 
 /* Daily Intervals has its own settings (separate from the dashboard) */
-const FC_MIN_KEY = 'ditsc_fc_min_agents', FC_GAP_KEY = 'ditsc_fc_gap_v2';
+const FC_MIN_KEY = 'ditsc_fc_min_agents', FC_GAP_KEY = 'ditsc_fc_gap_v3';
 const fcNum = (id, def) => { const v = parseInt($(id)?.value); return isNaN(v) ? def : Math.max(0, v); };
 const fcMin = () => fcNum('fcMinInput', 7);
-const fcGap = () => Math.max(1, fcNum('fcGapInput', 6));
+const fcGap = () => Math.max(1, fcNum('fcGapInput', 5));
 function initForecastSettings() {
   $('forecastDate')?.addEventListener('change', refreshForecast);
-  [['fcMinInput', FC_MIN_KEY, 7], ['fcGapInput', FC_GAP_KEY, 6]].forEach(([id, key, def]) => {
+  [['fcMinInput', FC_MIN_KEY, 7], ['fcGapInput', FC_GAP_KEY, 5]].forEach(([id, key, def]) => {
     const el = $(id); if (!el) return;
     let saved = null; try { saved = localStorage.getItem(key); } catch (e) {}
     el.value = saved ?? def;
