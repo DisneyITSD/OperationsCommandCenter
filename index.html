@@ -624,6 +624,7 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
     <div class="nav-label">Submit</div>
     <a class="tab-btn" href="#attendanceFormTab" data-tab="attendanceFormTab">Attendance form</a>
     <a class="tab-btn" href="#attendanceTimeFormTab" data-tab="attendanceTimeFormTab">Late / Left early time form</a>
+    <a class="tab-btn" href="#disputeFormTab" data-tab="disputeFormTab">Log-in / Log-out dispute form</a>
     <a class="tab-btn" href="#ptoFormTab" data-tab="ptoFormTab">PTO update form</a>
     <a class="tab-btn" href="#announcementFormTab" data-tab="announcementFormTab">Announcement form</a>
   </nav>
@@ -1069,6 +1070,19 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
   </div>
 </section>
 
+<section class="tab-panel" id="disputeFormTab" hidden>
+  <div class="view-hint">🛠️ Supervisors: dispute a late log-in or early log-out (e.g. computer / system issues). Once a manager marks it <b>Approved</b>, the disputed time replaces the actual time in Scorecard › Attendance and Schedule › Monthly view.</div>
+  <div class="note amber" style="padding:15px;box-shadow:var(--shadow)">
+    <h3 style="color:#b26a00">⚠️ Before submitting</h3>
+    <p style="margin:0">
+      Use the <b>shift start date</b> (EST) and enter times in <b>EST</b> with the correct <b>AM/PM</b>.
+      Fill in only the time you are disputing: the <b>log-in</b> time, the <b>log-out</b> time, or both. Always add a short reason.
+      Submitting again for the same agent and date replaces the earlier dispute. A dispute stays <b>pending</b> until it is approved.
+    </p>
+  </div>
+  <div class="panel" id="disputeFormBox"></div>
+</section>
+
 <section class="tab-panel" id="ptoFormTab" hidden>
   <div class="view-hint">🏖️ Submit PTO updates directly from the dashboard.</div>
   <div class="note green" style="padding:15px;box-shadow:var(--shadow)">
@@ -1107,6 +1121,12 @@ const sheetUrl = gid => `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz
 const scheduleUrl = gid => sheetUrl(gid) + '&headers=1';
 /* Paste the number after "gid=" from the LOLI Actual tab's address bar here (most reliable). Empty = find the tab by its name. */
 const LOLI_GID = '74611449';
+/* Log-in / log-out dispute form: paste the Google Form's "embedded" link (…/viewform?embedded=true) and the gid of the
+   form's response tab here (see the setup steps shown on the Dispute form page). Empty = feature stays off. */
+const DISPUTE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeOJQdLCQ_J3s3BkxfyMYpLzJrx3krf24jFzWXZUwxF0RCSUQ/viewform?embedded=true';
+const DISPUTE_GID = '1843274746';
+/* true = a dispute only counts once the manager types "Approved" in the response tab's "Approval Status" column */
+const DISPUTE_NEEDS_APPROVAL = true;
 const URLS = {
   pto: sheetUrl(1297010746),
   calledOff: sheetUrl(2139820898),
@@ -1153,6 +1173,8 @@ const ATT_OTHER = { code: 'CO', icon: '🚫', color: '#dc3545', label: 'Called O
    ===================================================================== */
 let estData = [], phData = [];
 let ptoList = [], calledOffList = [], announcementList = [], attTimeList = [], qaList = [];
+let disputeIdx = new Map();   // normalized agent + '|' + EST shift date -> { login, logout, reason }
+let disputeInfo = { rows: 0, pending: 0, rejected: 0, noStatus: false, error: '' };
 let loliInfo = { rows: 0, agents: 0, error: '', sample: '' };
 let loliIdx = new Map();     // normalized agent name -> [{date, login, logout}] from the "LOLI Actual" tab
 let dailyMap = new Map();
@@ -1372,15 +1394,20 @@ const loadSheet = async url =>
 
 async function loadAttendance() {
   try {
-    let loliRows;
+    let loliRows, disputeRows;
+    disputeInfo = { rows: 0, pending: 0, rejected: 0, noStatus: false, error: '' };
     loliInfo = { rows: 0, agents: 0, error: '', sample: '' };
-    [ptoList, calledOffList, announcementList, attTimeList, loliRows] = await Promise.all([
+    [ptoList, calledOffList, announcementList, attTimeList, loliRows, disputeRows] = await Promise.all([
       loadSheet(URLS.pto),
       loadSheet(URLS.calledOff),
       fetchCSV(URLS.announcements),
       loadSheet(URLS.attTime).catch(() => []),      // if this tab fails, everything else keeps working
-      fetchCSV(URLS.loli, { raw: true }).catch(e => { loliInfo.error = e.message; return []; })
+      fetchCSV(URLS.loli, { raw: true }).catch(e => { loliInfo.error = e.message; return []; }),
+      DISPUTE_GID ? fetchCSV(sheetUrl(DISPUTE_GID), { raw: true }).catch(e => { disputeInfo.error = e.message; return []; }) : Promise.resolve([])
     ]);
+    disputeIdx = buildDisputeIndex(disputeRows);
+    loadErrors.dispute = disputeInfo.error ? `Couldn't load the dispute form responses (${disputeInfo.error}) - check DISPUTE_GID and sharing`
+                       : disputeInfo.noStatus ? 'Disputes need approval but the response tab has no "Approval Status" column - add it next to the form columns' : '';
     loliIdx = buildLoliIndex(loliRows);
     loadErrors.loli = loliInfo.error ? `Couldn't load the "LOLI Actual" tab (${loliInfo.error}) - check the tab name and sharing`
                     : !loliInfo.rows ? 'The "LOLI Actual" tab was read but no log-in rows were found (' + loliInfo.sample + ') - the tab name may not be matching; set LOLI_GID in the code' : '';
@@ -3132,6 +3159,53 @@ function buildLoliIndex(rows) {
   loliInfo.sample = rows.length ? `${rows.length} rows read; first row: ${(rows[0] || []).slice(0, 5).map(x => clean(x).slice(0, 25)).join(' | ')}` : 'the tab came back empty';
   return m;
 }
+/* Dispute form responses: Timestamp | Supervisor | Agent Name | Shift Date (EST) | Disputed Log-in Time (EST) | Disputed Log-out Time (EST) | Reason.
+   Columns are found by their header words. The latest submission per agent + date wins, field by field. */
+function buildDisputeIndex(rows) {
+  const m = new Map();
+  const h = rows.findIndex(r => r.some(x => /agent/i.test(clean(x))) && r.some(x => /log.?in/i.test(clean(x)) || /log.?out/i.test(clean(x))));
+  if (h < 0) { disputeInfo.rows = 0; return m; }
+  const f = re => rows[h].findIndex(x => re.test(clean(x)));
+  const c = { name: f(/agent/i), date: f(/date/i), login: f(/log.?in/i), logout: f(/log.?out/i), reason: f(/reason/i), status: f(/status|approv/i) };
+  if (DISPUTE_NEEDS_APPROVAL && c.status < 0) disputeInfo.noStatus = true;
+  if (c.name < 0 || c.date < 0) return m;
+  let n = 0;
+  rows.slice(h + 1).forEach(r => {
+    const name = clean(r[c.name]), date = parseLoliDate(r[c.date]);
+    if (!name || !date) return;
+    const login = c.login >= 0 ? parseLoliClock(r[c.login]) : null;
+    const logout = c.logout >= 0 ? parseLoliClock(r[c.logout]) : null;
+    if (login == null && logout == null) return;
+    if (DISPUTE_NEEDS_APPROVAL) {                                     // only rows the manager marked Approved count
+      const st = c.status >= 0 ? up(r[c.status]) : '';
+      if (st !== 'APPROVED') { if (st === 'REJECTED' || st === 'DENIED') disputeInfo.rejected++; else disputeInfo.pending++; return; }
+    }
+    const k = normName(name) + '|' + date, o = m.get(k) || { login: null, logout: null, reason: '' };
+    if (login != null) o.login = login;
+    if (logout != null) o.logout = logout;
+    if (c.reason >= 0 && clean(r[c.reason])) o.reason = clean(r[c.reason]);
+    m.set(k, o);
+    n++;
+  });
+  disputeInfo.rows = n;
+  return m;
+}
+
+/* Dispute form page: the embedded Google Form, or setup steps until its link is pasted into DISPUTE_FORM_URL */
+function renderDisputeForm() {
+  const box = $('disputeFormBox');
+  if (!box) return;
+  box.innerHTML = DISPUTE_FORM_URL
+    ? `<iframe src="${esc(DISPUTE_FORM_URL)}" width="100%" height="1200"></iframe>`
+    : `<div style="padding:8px 4px;line-height:1.7">
+        <h3>🛠️ Set-up needed (one time)</h3>
+        <ol>
+          <li>Create a Google Form with these questions: <b>Supervisor</b>, <b>Agent Name</b> (dropdown), <b>Shift Date (EST)</b> (date), <b>Disputed Log-in Time (EST)</b> (time, optional), <b>Disputed Log-out Time (EST)</b> (time, optional) and <b>Reason</b> (paragraph).</li>
+          <li>In the form's <i>Responses</i> tab, link it to the <b>Dashboard Live Updates</b> sheet. A new tab is created; open it and copy the number after <code>gid=</code> in the address bar.</li>
+          <li>Paste that number into <code>DISPUTE_GID</code> and the form's embed link (Send › &lt;/&gt; Embed) into <code>DISPUTE_FORM_URL</code> at the top of this file's script.</li>
+        </ol></div>`;
+}
+
 /* The agent's LOLI record that belongs to this scheduled shift: the one whose login is closest to the shift start
    (so a 11:57 PM login for a 12:00 AM shift still belongs to the next day's shift) */
 function loliFor(r, date, shift) {
@@ -3240,20 +3314,30 @@ function attendanceFor(r, date, today, idx) {
 
   /* Actual log-in / log-out from the LOLI Actual tab (a supervisor-submitted time entry still takes priority) */
   const p0 = parseShift(x.shift);
-  const act = !x.inTime && !x.outTime && p0 && ['present', 'upcoming', 'partial'].includes(x.kind) ? loliFor(r, date, x.shift) : null;
+  const eligible = !x.inTime && !x.outTime && p0 && ['present', 'upcoming', 'partial'].includes(x.kind);
+  const loli = eligible ? loliFor(r, date, x.shift) : null;
+  const dsp = eligible ? disputeIdx.get(normName(r.Name) + '|' + date) : null;    // supervisor dispute replaces the actual time
+  const act = loli || dsp ? { login: dsp?.login ?? loli?.login ?? null, logout: dsp?.logout ?? loli?.logout ?? null } : null;
   if (act) {
     const ended = shiftEnded(x.shift, date, today);
-    const late = Math.max(0, clockDiff(act.login, p0[0]));
-    const early = ended && act.logout != null ? Math.max(0, clockDiff(p0[1], act.logout)) : 0;
+    const late = act.login != null ? Math.max(0, clockDiff(act.login, p0[0])) : 0;
+    const early = (ended || dsp?.logout != null) && act.logout != null ? Math.max(0, clockDiff(p0[1], act.logout)) : 0;
     const lateC = late > LOLI_GRACE_MIN ? late : 0, earlyC = early > LOLI_GRACE_MIN ? early : 0;
     x.actual = true;
+    x.inDisputed = dsp?.login != null;
+    x.outDisputed = dsp?.logout != null;
+    x.disputeReason = dsp?.reason || '';
     x.inTime = loliClock(act.login);
-    x.outTime = ended ? loliClock(act.logout) : '';
+    x.outTime = ended || dsp?.logout != null ? loliClock(act.logout) : '';
     x.missed = lateC + earlyC;
     if (lateC || earlyC) {
       const code = lateC && earlyC ? 'L/LE' : lateC ? 'LATE' : 'LE';
       Object.assign(x, { kind: 'partial', text: lateC && earlyC ? 'Late / Left early' : lateC ? 'Late' : 'Left early', code, icon: TRACKER_STATUS.partial.icon,
         reason: [lateC ? `Late ${lateC} min` : '', earlyC ? `Left early ${earlyC} min` : ''].filter(Boolean).join(' + ') });
+    } else if (dsp && x.kind === 'partial') {
+      /* A dispute cleared the lateness: count the day as present */
+      const t = TRACKER_STATUS[ended ? 'present' : 'upcoming'];
+      Object.assign(x, { kind: ended ? 'present' : 'upcoming', text: t.label, code: t.icon, icon: t.icon, reason: '' });
     }
   }
   if (x.kind === 'partial' && !x.actual) {
@@ -3291,7 +3375,7 @@ const trackerPct = c => c.pct == null ? '—' : c.pct.toFixed(1) + '%';
 const missedText = x => x.missed ? `${x.missed} min missed${x.estimated ? ' (est. half shift)' : ''}` : '';
 
 /* Hover text: only the actual log-in / log-out times (empty when there is no LOLI data for the day) */
-const actualTip = x => x.inTime || x.outTime ? `Log-in Time: ${x.inTime || '—'}\nLog-out Time: ${x.outTime || '—'}` : '';
+const actualTip = x => x.inTime || x.outTime ? `Log-in Time: ${x.inTime || '—'}${x.inDisputed ? ' (disputed)' : ''}\nLog-out Time: ${x.outTime || '—'}${x.outDisputed ? ' (disputed)' : ''}` : '';
 
 const trackerTip = x => actualTip(x);
 
@@ -3363,7 +3447,8 @@ function buildTracker() {
   const body = $('trackerBody');
   const rosterN = estData.filter(r => loliIdx.has(normName(r.Name))).length;
   $('trackerLegend').innerHTML = TRACKER_LEGEND.map(([k, t]) => `<span class="trk-chip st-${k}">${t}</span>`).join('') +
-    `<span class="trk-chip" title="Log-in / log-out rows read from the LOLI Actual tab">🕘 LOLI Actual: ${loliInfo.rows} rows · ${rosterN} of ${estData.length} agents matched</span>`;
+    `<span class="trk-chip" title="Log-in / log-out rows read from the LOLI Actual tab">🕘 LOLI Actual: ${loliInfo.rows} rows · ${rosterN} of ${estData.length} agents matched</span>` +
+    (DISPUTE_GID ? `<span class="trk-chip" title="Log-in / log-out disputes from the dispute form">📝 Disputes: ${disputeInfo.rows} applied${DISPUTE_NEEDS_APPROVAL ? ` · ${disputeInfo.pending} pending approval` : ''}</span>` : '');
 
   const ym = $('trackerMonth').value;
   if (!ym || !estData.length) {
@@ -3628,6 +3713,7 @@ window.addEventListener('load', async () => {
     .forEach(id => $(id).value = today);
   $('trackerMonth').value = today.slice(0, 7);
   $('ssMonth').value = today.slice(0, 7);
+  renderDisputeForm();
 
   await Promise.all([loadSchedules(), loadAttendance(), loadDaily(), loadQA(), loadMetric(), loadMcs()]);
   renderAll();
