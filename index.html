@@ -185,6 +185,30 @@ tr.roster-off td{background:#f1f2f4;color:#666;font-style:italic}
 .missing-results .panel{flex:1}
 #agentPaste{width:100%;height:180px;resize:vertical;border:1px solid var(--border);border-radius:8px;padding:10px}
 
+/* ---------- QA audit details pop-up (click a ticket under an analyst) ---------- */
+#qaTable tr.qa-audit{cursor:pointer}
+#qaTable tr.qa-audit:hover td{filter:brightness(.97)}
+#qaTable tr.qa-audit td:first-child{text-decoration:underline dotted;text-underline-offset:3px}
+.qd-back{position:fixed;inset:0;z-index:300;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.qd-back[hidden]{display:none}
+.qd-card{background:var(--surface,#fff);color:var(--ink,#111827);border:1px solid var(--line,#e5e7eb);border-radius:14px;width:100%;max-width:540px;max-height:86vh;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.qd-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line,#e5e7eb);position:sticky;top:0;background:var(--surface,#fff)}
+.qd-head b{font-size:15px}
+.qd-x{border:0;background:transparent;color:var(--muted,#6b7280);font-size:20px;line-height:1;cursor:pointer;padding:4px 8px;border-radius:8px}
+.qd-x:hover{background:var(--paper,#f6f7f9)}
+.qd-body{padding:16px 20px 20px;font-size:14px;line-height:1.6}
+.qd-grp{margin:0 0 16px}
+.qd-grp:last-child{margin-bottom:0}
+.qd-line{margin:2px 0;overflow-wrap:anywhere}
+.qd-line b{font-weight:700}
+.qd-line .v{white-space:pre-wrap}
+.qd-line .none{color:var(--muted,#6b7280)}
+.qd-notes{margin-top:4px;padding:10px 12px;border-radius:8px;background:var(--paper,#f6f7f9);white-space:pre-wrap;overflow-wrap:anywhere}
+.qd-score{font-weight:700}
+.qd-score.sc-good{color:var(--green,#16a34a)}
+.qd-score.sc-mid{color:var(--orange,#d97706)}
+.qd-score.sc-low{color:var(--red,#dc2626)}
+
 /* ---------- Toast ---------- */
 .panels li small.ph-time,.shift-panel li small.ph-time{color:#14532d!important;font-weight:600;opacity:1}
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f2a4d;color:#fff;padding:9px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:99}
@@ -621,6 +645,34 @@ html[data-theme=dark] #qaTable tr[class*="mo-"] td.qa-score{background:color-mix
 /* Performance Stack Ranking: also tint the score cells (band shows in text colour and dot); No Data cells keep their dark style */
 #metricTable tr[class*="mo-"] td:not(.nodata){background:color-mix(in srgb,var(--mc) 14%,#fff)!important}
 html[data-theme=dark] #metricTable tr[class*="mo-"] td:not(.nodata){background:color-mix(in srgb,var(--mc) 22%,var(--surface))!important}
+/* ---------- Summary: eye-catching top performers (gold podium + green star panels) ---------- */
+.sum-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+.sum-grid3 .panel h3{font-size:13px;margin:0 0 8px}
+@media(max-width:900px){.sum-grid3{grid-template-columns:1fr}}
+.attn{list-style:none;margin:0;padding:0}
+.attn li{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
+.attn li small{color:var(--muted);display:block}
+.attn li strong{white-space:nowrap}
+.podium .pod:first-child{background:linear-gradient(135deg,#fff6d6,var(--surface,#fff) 72%);box-shadow:0 0 0 2px rgba(245,179,1,.45),0 8px 22px rgba(245,179,1,.28)}
+.podium .pod .medal{font-size:36px}
+.podium .pod:first-child .medal{filter:drop-shadow(0 2px 5px rgba(245,179,1,.7))}
+.podium .pod .ps{font-size:30px;font-weight:800}
+.podium .pod .pn{font-size:16px}
+.pod-note{margin:-8px 0 14px;font-size:12px;color:var(--muted)}
+.panel.star{border:1px solid #bbf7d0;border-top:4px solid #16a34a;background:linear-gradient(180deg,#ecfdf3,var(--surface,#fff) 110px)}
+.panel.star h3{color:#166534}
+.stars li{align-items:center}
+.stars li .rk{display:inline-block;min-width:30px;font-style:normal;font-weight:700;color:var(--muted)}
+.stars li.r1{background:#fff8dc;border-radius:8px;padding-left:8px;padding-right:8px;font-weight:700}
+.stars li strong{color:#15803d;background:#dcfce7;border-radius:999px;padding:2px 11px;font-weight:800}
+.stars li.r1 strong{background:#fde68a;color:#92400e}
+.stars li.more{justify-content:center;border-bottom:0;color:var(--muted);font-size:12px}
+html[data-theme=dark] .podium .pod:first-child{background:linear-gradient(135deg,#2e2710,var(--surface) 72%)}
+html[data-theme=dark] .panel.star{border-color:#1f5135;background:linear-gradient(180deg,#10291c,var(--surface) 110px)}
+html[data-theme=dark] .panel.star h3{color:#86efac}
+html[data-theme=dark] .stars li.r1{background:#33290c}
+html[data-theme=dark] .stars li strong{background:#14532d;color:#86efac}
+html[data-theme=dark] .stars li.r1 strong{background:#5b4a0c;color:#fde68a}
 </style>
 </head>
 
@@ -941,6 +993,12 @@ html[data-theme=dark] #metricTable tr[class*="mo-"] td:not(.nodata){background:c
   </div>
   <div class="trk-legend" id="ssLegend"></div>
   <div id="ssCards"></div>
+  <div id="ssTopWrap" hidden>
+    <h3 class="sum-h">Top performers</h3>
+    <div class="podium" id="ssPodium"></div>
+    <div class="pod-note" id="ssPodiumNote" hidden></div>
+    <div class="sum-grid3" id="ssStars"></div>
+  </div>
   <div class="panel">
     <div class="schedule-container">
       <table id="ssTable" class="nosort"><thead></thead><tbody></tbody></table>
@@ -2489,6 +2547,8 @@ function initQa() {
     buildQA();
   });
   $('qaTable').addEventListener('click', e => {                 // open / close an agent or month row
+    const a = e.target.closest('tr.qa-audit');
+    if (a) { openQaDetail(+a.dataset.qa); return; }               // ticket row: show the audit details
     const h = e.target.closest('tr.grp-head');
     if (!h) return;
     const k = h.dataset.k;
@@ -2511,10 +2571,10 @@ function fillAgentSelect(selId, names) {
    Tick one or more months (or Year to date). Each agent is one row (average score, audits, latest call);
    open it to see the audits, or - with several months ticked - the months, and open a month to see its audits. */
 function buildQA() {
-  const all = qaList.map(x => {
+  const all = qaList.map((x, qid) => {
     const date = normalizeDate(x.CallDate);
     return { analyst: String(x['Analyst Name'] ?? '').trim(), supervisor: String(x.Supervisor ?? '').trim(), date, ym: date.slice(0, 7),
-             ticket: String(x.TicketNumber ?? '').trim(), score: qaPct(x.Score) };
+             ticket: String(x.TicketNumber ?? '').trim(), score: qaPct(x.Score), id: qid };
   }).filter(x => x.ym);
 
   qaMonths = [...new Set(all.map(x => x.ym))].sort();
@@ -2577,7 +2637,7 @@ function buildQA() {
     '<span class="trk-chip st-present">Green: 95% or higher</span>' +
     '<span class="trk-chip st-partial">Amber: 85% - 94.9%</span>' +
     '<span class="trk-chip st-absent">Red: below 85%</span>' +
-    '<span class="trk-chip info">Click an agent (▸) to open their audits</span>';
+    '<span class="trk-chip info">Click an agent (▸) to open their audits, then a ticket 🎫 for the full details</span>';
 
   const table = $('qaTable');
   table.tHead.innerHTML = `<tr>
@@ -2587,7 +2647,7 @@ function buildQA() {
 
   const dateOf = d => d ? fmtDate(parseYMD(d)) : '—';
   const scoreTd = v => `<td class="qa-score${qaBand(v)}" title="${QA_TIP}">${fmtScore(v)}</td>`;
-  const auditRow = (x, st) => `<tr class="qa-audit" style="${st}"><td>🎫 ${esc(x.ticket) || '—'}</td>${scoreTd(x.score)}<td></td><td>${dateOf(x.date)}</td><td>${esc(x.supervisor)}</td></tr>`;
+  const auditRow = (x, st) => `<tr class="qa-audit" data-qa="${x.id}" title="Click to see the audit details" style="${st}"><td>🎫 ${esc(x.ticket) || '—'}</td>${scoreTd(x.score)}<td></td><td>${dateOf(x.date)}</td><td>${esc(x.supervisor)}</td></tr>`;
 
   table.tBodies[0].innerHTML = list.length ? list.map((g, n) => {
     const st = supStyle(g.supervisor), aKey = 'a|' + g.key, open = qaOpen.has(aKey);
@@ -2612,6 +2672,57 @@ function buildQA() {
   $('qaAgents').textContent = list.length;
   $('qaCount').textContent = rows.length;
   $('qaAvg').textContent = fmtScore(avgOf(rows));
+}
+
+/* ---------- QA audit details: click a ticket to see the whole audit as a simple Label: value list ---------- */
+function qaDetailFields(raw) {
+  const heads = Object.keys(raw);
+  const used = new Set(['Analyst Name', 'Supervisor', 'CallDate', 'TicketNumber', 'Score', 'Notes']);
+  const pick = re => heads.find(h => !used.has(h) && re.test(h.trim()));
+  const typeH = pick(/qa.?type|audit.?type|evaluation.?type|^type$/i);        if (typeH) used.add(typeH);
+  const byH = pick(/submitted|submitter|evaluator|auditor|reviewer|created.?by|email|username/i); if (byH) used.add(byH);
+  let qs = heads.filter(h => !used.has(h) && /^\s*(qaq|q|question)\s*[#.\-:]?\s*\d+\s*$/i.test(h));   // QAQ1, QAQ2, ... / Q1 / Question 1
+  qs.forEach(h => used.add(h));
+  let last = qs.length - 1;
+  while (last >= 0 && !String(raw[qs[last]] ?? '').trim()) last--;       // unused trailing questions (the form has up to 25) are hidden
+  if (qs.length) qs = qs.slice(0, last + 1);
+  if (!qs.length && !heads.some(h => /^\s*(qaq|q|question)\s*[#.\-:]?\s*\d+\s*$/i.test(h))) qs = heads.filter(h => !used.has(h) && h.trim() && !/^(timestamp|date)$/i.test(h.trim()) && !/^_\d+$/.test(h.trim()));   // question columns not named Q1, Q2...
+  const label = h => /^\s*(qaq|q|question)\s*[#.\-:]?\s*\d+\s*$/i.test(h) ? 'Q' + h.match(/\d+/)[0] : h.trim();
+  return { typeH, byH, qs: qs.map(h => ({ label: label(h), value: raw[h] })) };
+}
+function openQaDetail(id) {
+  const raw = qaList[id];
+  if (!raw) return;
+  const f = qaDetailFields(raw), txt = v => String(v ?? '').trim();
+  const line = (l, v, cls = '') => `<div class="qd-line"><b>${esc(l)}:</b> ${txt(v) ? `<span class="v ${cls}">${esc(txt(v))}</span>` : '<span class="none">—</span>'}</div>`;
+  const sc = qaPct(raw.Score), date = normalizeDate(raw.CallDate);
+  const scoreHtml = sc == null ? esc(txt(raw.Score) || '—') : `<span class="qd-score${qaBand(sc)}" title="${QA_TIP}">${sc.toFixed(1)}%</span>`;
+  const notes = txt(raw.Notes);
+  let back = document.getElementById('qdBack');
+  if (!back) {
+    back = document.createElement('div');
+    back.id = 'qdBack'; back.className = 'qd-back'; back.hidden = true;
+    back.addEventListener('click', e => { if (e.target === back || e.target.closest('.qd-x')) back.hidden = true; });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') back.hidden = true; });
+    document.body.appendChild(back);
+  }
+  back.innerHTML = `<div class="qd-card" role="dialog" aria-modal="true" aria-label="QA audit details">
+    <div class="qd-head"><b>🎫 QA Audit Details</b><button class="qd-x" type="button" title="Close (Esc)">✕</button></div>
+    <div class="qd-body">
+      <div class="qd-grp">
+        ${line('Analyst Name', raw['Analyst Name'])}
+        ${line('Supervisor', raw.Supervisor)}
+        ${line('Call Date', date ? fmtDate(parseYMD(date)) : txt(raw.CallDate))}
+        ${line('Ticket Number', raw.TicketNumber)}
+        ${f.typeH ? line('QA Type', raw[f.typeH]) : ''}
+        <div class="qd-line"><b>Score:</b> ${scoreHtml}</div>
+      </div>
+      ${f.qs.length ? `<div class="qd-grp">${f.qs.map(q => line(q.label, q.value)).join('')}</div>` : ''}
+      <div class="qd-grp"><div class="qd-line"><b>Notes:</b> ${notes ? '' : '<span class="none">—</span>'}</div>${notes ? `<div class="qd-notes">${esc(notes)}</div>` : ''}</div>
+      ${f.byH ? `<div class="qd-grp">${line('Submitted By', raw[f.byH])}</div>` : ''}
+    </div></div>`;
+  back.hidden = false;
+  back.querySelector('.qd-card').scrollTop = 0;
 }
 
 /* =====================================================================
@@ -3700,6 +3811,7 @@ function buildScoreSummary() {
     head.innerHTML = '';
     body.innerHTML = '<tr><td>Pick a month (schedule data must be loaded)</td></tr>';
     $('ssCards').innerHTML = '';
+    $('ssTopWrap').hidden = true;
     return;
   }
 
@@ -3761,6 +3873,30 @@ function buildScoreSummary() {
     .map(([name, list]) => rollup(list, '👔 ' + name, supColor(name) || '#6c757d', `${list.length} agent${list.length === 1 ? '' : 's'}`));
   if (groups.size > 1) cards.unshift(rollup(data, '👥 All teams', '#0d6efd', `${data.length} agents`));
   $('ssCards').innerHTML = data.length ? cards.join('') : '';
+
+  /* Top performers: podium (Stack Ranking total; QA when the month has no totals) + top-5 star panels, same filters as the table */
+  const medals = [['🥇', '#f5b301'], ['🥈', '#94a3b8'], ['🥉', '#cd7f32']];
+  const byTotal = data.some(a => a.total != null);
+  const rankDesc = (rows, key, tie) => rows.slice().sort((a, b) => b[key] - a[key] || (tie ? b[tie] - a[tie] : 0) || a.name.localeCompare(b.name));
+  const top3 = (byTotal ? rankDesc(data.filter(a => a.total != null), 'total') : rankDesc(data.filter(a => a.qa != null), 'qa', 'audits')).slice(0, 3);
+  $('ssTopWrap').hidden = !data.length;
+  $('ssPodium').innerHTML = top3.length ? top3.map((a, n) => `<div class="pod" style="--c:${medals[n][1]}"><div class="medal">${medals[n][0]}</div>
+    <div class="pn">${esc(a.name)}</div><div class="ps">${byTotal ? ssFmt(a.total, 1, ' pts') : ssFmt(a.qa)}</div><small>${esc(a.sup)}</small></div>`).join('')
+    : '<div class="empty" style="--c:#6c757d">No scores for this month yet</div>';
+  $('ssPodiumNote').hidden = byTotal || !top3.length;
+  $('ssPodiumNote').textContent = 'No Stack Ranking total for this month yet, so the top 3 are ranked by QA average.';
+  const star = (title, rows, key, tie, fmt) => {
+    const all = rankDesc(rows, key, tie), shown = all.slice(0, 5), last = shown[shown.length - 1];
+    const tied = last ? all.filter(a => a[key] === last[key]).length - shown.filter(a => a[key] === last[key]).length : 0;
+    return `<div class="panel star"><h3>${title}</h3><ul class="attn stars">` + (shown.length
+      ? shown.map((a, n) => `<li class="r${n + 1}"><span><i class="rk">${medals[n] ? medals[n][0] : (n + 1) + '.'}</i>${esc(a.name)}<small>${esc(a.sup)}</small></span><strong>${fmt(a)}</strong></li>`).join('')
+        + (tied > 0 ? `<li class="more">+${tied} more with the same score</li>` : '')
+      : '<li class="empty" style="--c:#6c757d">No data for this month yet</li>') + '</ul></div>';
+  };
+  $('ssStars').innerHTML =
+    star('⭐ Highest QA', data.filter(a => a.qa != null), 'qa', 'audits', a => ssFmt(a.qa)) +
+    star('📊 Best attendance', data.filter(a => a.att != null).map(a => ({ ...a, hw: a.c.hoursWorked })), 'att', 'hw', a => ssFmt(a.att)) +
+    star('🏆 Highest Stack Ranking total', data.filter(a => a.total != null), 'total', null, a => ssFmt(a.total, 1, ' pts'));
 
   /* Agent table */
   const cols = [['name', '👤 Agent'], ['sup', '🧑‍💼 Supervisor'], ['att', '🗓️ Attendance'], ['qa', '✅ QA avg'], ['audits', '📋 Audits'], ['total', '🏆 Stack Ranking total'], ['rank', '# Rank']];
