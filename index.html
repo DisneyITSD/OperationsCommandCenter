@@ -581,6 +581,57 @@ iframe{background:#fff;border:1px solid var(--line);border-radius:12px}
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
 
+
+/* ===== Premium workspace shell ===== */
+:root{--shell-bg:#f4f6fa;--sidebar-bg:#101b31;--sidebar-muted:#9eacc3;--sidebar-text:#eaf0fa;--sidebar-active:#263c60;--accent:#78a8ff}
+html,body{min-height:100%;background:var(--shell-bg)}
+body{display:block!important;padding:0!important}
+.app-sidebar{position:fixed;inset:0 auto 0 0;width:258px;background:linear-gradient(180deg,#14213a 0%,#0e192d 100%);color:var(--sidebar-text);z-index:1000;display:flex;flex-direction:column;padding:20px 14px 16px;box-shadow:8px 0 28px rgba(18,31,54,.10);transition:transform .25s ease,width .25s ease;overflow-y:auto}
+.app-sidebar .brand{display:flex;align-items:center;gap:12px;padding:4px 8px 22px;margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,.10);min-width:0}
+.app-sidebar .logo{width:42px;height:42px;object-fit:contain;border-radius:12px;background:#fff;padding:3px}
+.app-sidebar .title{font-size:13px;font-weight:800;line-height:1.35;color:#fff;letter-spacing:.1px}
+.app-sidebar .subtitle{font-size:10px;color:#a9b8d0;margin-top:4px}
+.app-sidebar .tabs{display:flex;flex-direction:column;gap:5px;flex:1;margin:0;overflow:visible}
+.app-sidebar .dropdown{position:relative;width:100%;display:flex;flex-direction:column}
+.app-sidebar .tab-btn{width:100%;min-height:42px;display:flex;align-items:center;gap:11px;text-align:left;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:#c8d3e5;font-size:13px;font-weight:650;text-decoration:none;cursor:pointer;transition:background .18s,color .18s}
+.app-sidebar .tab-btn:hover,.app-sidebar .dropdown.open>.tab-btn{background:rgba(255,255,255,.08);color:#fff}
+.app-sidebar .tab-btn.active{background:linear-gradient(100deg,#294b7b,#233b60);color:#fff;box-shadow:inset 3px 0 0 #8ab5ff}
+.app-sidebar .nav-icon{width:20px;flex:0 0 20px;text-align:center;font-size:15px;opacity:.95}
+.app-sidebar .dropdown-content{position:static;display:none;opacity:1;visibility:visible;transform:none;box-shadow:none;border:0;background:rgba(3,10,22,.24);border-radius:10px;margin:3px 0 6px 12px;padding:5px;width:calc(100% - 12px)}
+.app-sidebar .dropdown.open>.dropdown-content{display:block}
+.app-sidebar .dropdown-content a{display:flex;align-items:center;min-height:36px;padding:8px 10px 8px 15px;color:#b9c7dc;border-radius:8px;font-size:12px;text-decoration:none}
+.app-sidebar .dropdown-content a:hover{background:rgba(255,255,255,.08);color:#fff}
+.app-sidebar .dropdown-content a.active{background:rgba(112,160,232,.18);color:#fff}
+.nav-group-label{padding:15px 12px 5px;color:#71839f;font-size:9px;font-weight:800;letter-spacing:1.25px;text-transform:uppercase}
+.app-sidebar .sidebar-foot{border-top:1px solid rgba(255,255,255,.10);padding:14px 10px 0;color:#8091ab;font-size:10px;line-height:1.5}
+.app-main{margin-left:258px;min-width:0;min-height:100vh;transition:margin-left .25s ease}
+.bar{position:sticky!important;top:0!important;z-index:900!important;min-height:68px!important;padding:12px 25px!important;background:rgba(255,255,255,.91)!important;border-bottom:1px solid #e5eaf2!important;backdrop-filter:blur(16px)!important;box-shadow:0 4px 18px rgba(26,43,70,.035)!important;display:flex!important;align-items:center!important;gap:14px!important}
+.bar>.brand,.bar>.tabs{display:none!important}
+.bar:before{content:'Team workspace';font-size:15px;font-weight:800;color:#1a2941;letter-spacing:-.2px;margin-right:auto}
+.bar #realtimeBtn{margin-left:auto}
+.bar #liveClock{font-size:13px;font-weight:750;color:#334967;font-variant-numeric:tabular-nums}
+.bar .live{font-size:11px;color:#7c899d}
+#statusBanner,#highAnnouncements{margin-left:24px!important;margin-right:24px!important;border-radius:12px!important}
+.tab-panel{padding:25px 26px 36px!important;max-width:1600px!important;margin:0 auto!important}
+.view-hint{border-radius:12px!important;margin-bottom:18px!important}
+.controls{padding:15px!important;border:1px solid #e6ebf3!important;border-radius:14px!important;background:#fff!important;box-shadow:0 3px 12px rgba(24,42,70,.035)!important}
+.cards .card,.panel,.summary-box{border:1px solid #e7ecf3!important;box-shadow:0 5px 18px rgba(25,43,70,.045)!important;border-radius:15px!important}
+.panel{padding:18px!important}
+.stats .card{min-height:120px!important}
+.app-topline{display:flex;align-items:center;gap:12px;min-width:0}
+.sidebar-toggle{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid #e4eaf2;border-radius:11px;background:#fff;color:#263a58;font-size:18px;cursor:pointer}
+.sidebar-toggle:hover{background:#f2f6fc}
+.workspace-caption{display:none;color:#8290a4;font-size:11px;margin-top:2px}
+@media(min-width:1100px){.workspace-caption{display:block}}
+body.sidebar-collapsed .app-sidebar{width:78px;padding-left:10px;padding-right:10px}
+body.sidebar-collapsed .app-main{margin-left:78px}
+body.sidebar-collapsed .app-sidebar .brand{justify-content:center;padding-left:0;padding-right:0}
+body.sidebar-collapsed .app-sidebar .brand>div,body.sidebar-collapsed .app-sidebar .tab-label,body.sidebar-collapsed .app-sidebar .nav-group-label,body.sidebar-collapsed .app-sidebar .dropdown-content,body.sidebar-collapsed .app-sidebar .sidebar-foot{display:none!important}
+body.sidebar-collapsed .app-sidebar .tab-btn{justify-content:center;padding:10px 4px;font-size:0}
+body.sidebar-collapsed .app-sidebar .nav-icon{font-size:17px}
+@media(max-width:900px){.app-sidebar{transform:translateX(-105%);width:270px}body.sidebar-open .app-sidebar{transform:translateX(0)}.app-main{margin-left:0!important}.bar{padding:10px 14px!important}.tab-panel{padding:18px 14px 28px!important}body.sidebar-open:after{content:'';position:fixed;inset:0;background:rgba(10,20,36,.42);z-index:950}}
+@media(max-width:520px){.bar{gap:8px!important;min-height:60px!important}.bar:before{font-size:13px}.bar #realtimeBtn{font-size:11px;padding:8px 10px}.bar #liveClock{font-size:11px}.bar .live{display:none!important}#statusBanner,#highAnnouncements{margin-left:12px!important;margin-right:12px!important}}
+
 </style>
 </head>
 
@@ -3444,5 +3495,38 @@ window.addEventListener('load', async () => {
   setInterval(() => refreshAttendanceData(false), REFRESH_MS);
 });
 </script>
+
+<script>
+/* Premium sidebar shell: moves existing navigation and content without changing app logic. */
+(function(){
+  const body=document.body, bar=document.querySelector('.bar'), nav=bar&&bar.querySelector('.tabs'), brand=bar&&bar.querySelector('.brand');
+  if(!bar||!nav||!brand||document.querySelector('.app-sidebar')) return;
+  const sidebar=document.createElement('aside'); sidebar.className='app-sidebar'; sidebar.setAttribute('aria-label','Main navigation');
+  const foot=document.createElement('div'); foot.className='sidebar-foot'; foot.innerHTML='DITSC L1 English – Phone<br>Operations workspace';
+  sidebar.append(brand,nav,foot);
+  const main=document.createElement('div'); main.className='app-main';
+  const topLine=document.createElement('div'); topLine.className='app-topline';
+  const toggle=document.createElement('button'); toggle.className='sidebar-toggle'; toggle.type='button'; toggle.setAttribute('aria-label','Toggle navigation'); toggle.setAttribute('aria-expanded','true'); toggle.innerHTML='☰';
+  toggle.addEventListener('click',()=>{const mobile=matchMedia('(max-width: 900px)').matches;body.classList.toggle(mobile?'sidebar-open':'sidebar-collapsed');toggle.setAttribute('aria-expanded',String(mobile?body.classList.contains('sidebar-open'):!body.classList.contains('sidebar-collapsed')))});
+  topLine.append(toggle); bar.prepend(topLine);
+  const children=[...body.children];
+  children.forEach(node=>{if(node!==bar){main.append(node)}});
+  body.append(sidebar,main);
+  const groups=[...nav.children];
+  const labels=['OVERVIEW','PLANNING','ATTENDANCE','PERFORMANCE','REPORTING','TOOLS'];
+  const starts=[0,1,2,3,4,6];
+  starts.map((index,i)=>({index,label:labels[i]})).reverse().forEach(({index,label:textLabel})=>{if(groups[index]){const label=document.createElement('div');label.className='nav-group-label';label.textContent=textLabel;nav.insertBefore(label,groups[index])}});
+  const icons={'Dashboard':'⌂','Schedule':'▦','Attendance':'◷','Scorecard':'▤','Reports':'▥','Announcements':'✧','Missing Agent Checker':'⌕','+ Submit':'＋'};
+  nav.querySelectorAll('.dropdown>.tab-btn').forEach(btn=>{
+    const raw=btn.textContent.trim();const key=Object.keys(icons).find(k=>raw.startsWith(k));
+    if(key){const icon=document.createElement('span');icon.className='nav-icon';icon.setAttribute('aria-hidden','true');icon.textContent=icons[key];const label=document.createElement('span');label.className='tab-label';label.textContent=raw.replace(/\s*▾$/,'');btn.textContent='';btn.append(icon,label)}
+  });
+  nav.querySelectorAll('.dropdown-content a').forEach(a=>{const label=a.textContent.trim();const icon=document.createElement('span');icon.className='nav-icon';icon.style.width='8px';icon.style.flexBasis='8px';icon.style.fontSize='8px';icon.textContent='•';a.prepend(icon)});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')body.classList.remove('sidebar-open')});
+  document.addEventListener('click',e=>{if(body.classList.contains('sidebar-open')&&!sidebar.contains(e.target)&&!toggle.contains(e.target))body.classList.remove('sidebar-open')});
+  nav.addEventListener('click',e=>{if(e.target.closest('a[data-tab]')&&matchMedia('(max-width: 900px)').matches)body.classList.remove('sidebar-open')});
+})();
+</script>
+
 </body>
 </html>
