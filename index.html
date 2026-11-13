@@ -632,6 +632,21 @@ body.sidebar-collapsed .app-sidebar .nav-icon{font-size:17px}
 @media(max-width:900px){.app-sidebar{transform:translateX(-105%);width:270px}body.sidebar-open .app-sidebar{transform:translateX(0)}.app-main{margin-left:0!important}.bar{padding:10px 14px!important}.tab-panel{padding:18px 14px 28px!important}body.sidebar-open:after{content:'';position:fixed;inset:0;background:rgba(10,20,36,.42);z-index:950}}
 @media(max-width:520px){.bar{gap:8px!important;min-height:60px!important}.bar:before{font-size:13px}.bar #realtimeBtn{font-size:11px;padding:8px 10px}.bar #liveClock{font-size:11px}.bar .live{display:none!important}#statusBanner,#highAnnouncements{margin-left:12px!important;margin-right:12px!important}}
 
+
+/* Visibility fix: keep Live Mode prominent in the light premium top bar. */
+.bar #realtimeBtn{
+  display:inline-flex!important;align-items:center;justify-content:center;
+  min-height:40px!important;padding:9px 16px!important;margin-left:auto!important;
+  background:#2457a6!important;color:#fff!important;border:1px solid #2457a6!important;
+  border-radius:11px!important;font-size:13px!important;font-weight:750!important;
+  line-height:1.2!important;box-shadow:0 3px 9px rgba(36,87,166,.18)!important;
+  opacity:1!important;visibility:visible!important;position:relative!important;z-index:2!important;
+}
+.bar #realtimeBtn:hover{background:#1b478d!important;border-color:#1b478d!important}
+.bar #realtimeBtn.on{background:#16834a!important;border-color:#16834a!important;color:#fff!important}
+.bar #liveClock{display:inline-block!important;color:#334967!important;border:1px solid #e0e7f0!important;background:#f7f9fc!important;border-radius:10px!important;padding:9px 12px!important;font-weight:700!important;}
+@media(max-width:520px){.bar #realtimeBtn{margin-left:auto!important;min-height:36px!important;padding:8px 10px!important;font-size:11px!important}.bar #liveClock{padding:8px!important}}
+
 </style>
 </head>
 
