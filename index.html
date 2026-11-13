@@ -1151,6 +1151,7 @@ const ATT_OTHER = { code: 'CO', icon: '🚫', color: '#dc3545', label: 'Called O
    ===================================================================== */
 let estData = [], phData = [];
 let ptoList = [], calledOffList = [], announcementList = [], attTimeList = [], qaList = [];
+let loliInfo = { rows: 0, agents: 0, error: '' };
 let loliIdx = new Map();     // normalized agent name -> [{date, login, logout}] from the "LOLI Actual" tab
 let dailyMap = new Map();
 let currentWorkingAgents = [];
@@ -1370,14 +1371,17 @@ const loadSheet = async url =>
 async function loadAttendance() {
   try {
     let loliRows;
+    loliInfo = { rows: 0, agents: 0, error: '' };
     [ptoList, calledOffList, announcementList, attTimeList, loliRows] = await Promise.all([
       loadSheet(URLS.pto),
       loadSheet(URLS.calledOff),
       fetchCSV(URLS.announcements),
       loadSheet(URLS.attTime).catch(() => []),      // if this tab fails, everything else keeps working
-      fetchCSV(URLS.loli, { raw: true }).catch(() => [])
+      fetchCSV(URLS.loli, { raw: true }).catch(e => { loliInfo.error = e.message; return []; })
     ]);
     loliIdx = buildLoliIndex(loliRows);
+    loadErrors.loli = loliInfo.error ? `Couldn't load the "LOLI Actual" tab (${loliInfo.error}) - check the tab name and sharing`
+                    : !loliInfo.rows ? 'The "LOLI Actual" tab was read but no log-in rows were found - check its columns (Agent Name | Date | Min of Login | Max of Logout)' : '';
     loadErrors.attendance = '';
     lastUpdated = new Date();
   } catch (err) {
@@ -3089,19 +3093,43 @@ const SHIFT_HOURS_DEFAULT = 11;
 const LOLI_GRACE_MIN = 10;
 function parseLoliDate(v) {
   const s = clean(v);
-  const m = s.match(/^(\d{1,2})\D+(\d{1,2})\D+(\d{4})$/);          // "11 6 2026" = month day year
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+  const m = s.match(/^(\d{1,2})\D+(\d{1,2})\D+(\d{4})$/);          // "11 6 2026" or "11/6/2026" = month day year
   return m ? `${m[3]}-${pad(+m[1])}-${pad(+m[2])}` : normalizeDate(s);
+}
+function parseLoliClock(v) {
+  const s = clean(v);
+  const a = parseClock(s);
+  if (a != null) return a;
+  const m = s.match(/(\d{1,2}):(\d{2})(?::\d{2})?\s*([AaPp])?/);     // time buried inside a date-time text
+  if (!m) return null;
+  let h = +m[1];
+  const ap = (m[3] || '').toUpperCase();
+  if (ap === 'P' && h < 12) h += 12;
+  if (ap === 'A' && h === 12) h = 0;
+  return h * 60 + +m[2];
 }
 function buildLoliIndex(rows) {
   const m = new Map();
+  /* Find the columns from the header row; fall back to B, C, D, E */
+  let c = { name: 1, date: 2, login: 3, logout: 4 };
+  const h = rows.findIndex(r => r.some(x => /^agent name$/i.test(clean(x))));
+  if (h >= 0) {
+    const f = re => rows[h].findIndex(x => re.test(clean(x)));
+    c = { name: f(/^agent name$/i), date: f(/^date$/i), login: f(/log.?in/i), logout: f(/log.?out/i) };
+    if (Object.values(c).some(i => i < 0)) c = { name: 1, date: 2, login: 3, logout: 4 };
+  }
+  let n = 0;
   rows.forEach(r => {
-    const name = clean(r[1]), date = parseLoliDate(r[2]);
-    const login = parseClock(clean(r[3])), logout = parseClock(clean(r[4]));
+    const name = clean(r[c.name]), date = parseLoliDate(r[c.date]);
+    const login = parseLoliClock(r[c.login]), logout = parseLoliClock(r[c.logout]);
     if (!name || !date || login == null) return;                      // skips the header row and blanks
     const k = normName(name);
     if (!m.has(k)) m.set(k, []);
     m.get(k).push({ date, login, logout });
+    n++;
   });
+  loliInfo.rows = n; loliInfo.agents = m.size;
   return m;
 }
 /* The agent's LOLI record that belongs to this scheduled shift: the one whose login is closest to the shift start
@@ -3338,7 +3366,9 @@ function trackerGridHtml(rows, monthOf, days, today) {
 
 function buildTracker() {
   const body = $('trackerBody');
-  $('trackerLegend').innerHTML = TRACKER_LEGEND.map(([k, t]) => `<span class="trk-chip st-${k}">${t}</span>`).join('');
+  const rosterN = estData.filter(r => loliIdx.has(normName(r.Name))).length;
+  $('trackerLegend').innerHTML = TRACKER_LEGEND.map(([k, t]) => `<span class="trk-chip st-${k}">${t}</span>`).join('') +
+    `<span class="trk-chip" title="Log-in / log-out rows read from the LOLI Actual tab">🕘 LOLI Actual: ${loliInfo.rows} rows · ${rosterN} of ${estData.length} agents matched</span>`;
 
   const ym = $('trackerMonth').value;
   if (!ym || !estData.length) {
