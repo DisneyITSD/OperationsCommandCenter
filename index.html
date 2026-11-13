@@ -453,8 +453,9 @@ td.sc-good::before,td.sc-mid::before,td.sc-low::before{content:"";display:inline
 #workingList li.sup-h:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
 #workingList li.sup-h::after{content:"";flex:none;width:6px;height:6px;margin-left:10px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-2px);transition:transform .15s}
 #workingList li.sup-h.collapsed::after{transform:rotate(-45deg)}
-.wl-tools{display:flex;justify-content:flex-end;margin:0 0 6px}
-.wl-toggle{font:inherit;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.panels .panel h3.wl-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.wl-toggle{flex:none;display:grid;place-items:center;width:28px;height:28px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;line-height:0}
+.wl-toggle svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .wl-toggle:hover{background:rgba(127,127,127,.12)}
 .wl-toggle:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
 .page-head #refreshBtn{width:36px;height:36px;padding:0;display:grid;place-items:center;font-size:18px;line-height:1}
@@ -629,8 +630,7 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
   </div>
 
   <div class="panels">
-    <div class="panel"><h3>👷 Working</h3>
-      <div class="wl-tools"><button type="button" class="wl-toggle" id="workingToggleAll" title="Collapse or expand every supervisor group">⊟ Collapse all</button></div>
+    <div class="panel"><h3 class="wl-head"><span>👷 Working</span><button type="button" class="wl-toggle" id="workingToggleAll" aria-label="Collapse all" title="Collapse all"></button></h3>
       <ul id="workingList"></ul></div>
     <div class="panel">
       <h3>☕ Break</h3>
@@ -3471,8 +3471,11 @@ window.addEventListener('load', () => setPageHead(activeTab));
   function syncAllBtn() {
     if (!allBtn) return;
     const n = names(), allClosed = n.length > 0 && n.every(x => closed.has(x));
-    allBtn.textContent = allClosed ? '⊞ Expand all' : '⊟ Collapse all';
-    allBtn.title = allClosed ? 'Show the agents under every supervisor' : 'Show only each supervisor and their agent count';
+    const ICON_EXPAND = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9l5-5 5 5"/><path d="M7 15l5 5 5-5"/></svg>';
+    const ICON_COLLAPSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l5 5 5-5"/><path d="M7 20l5-5 5 5"/></svg>';
+    allBtn.innerHTML = allClosed ? ICON_EXPAND : ICON_COLLAPSE;
+    allBtn.title = allClosed ? 'Expand all: show the agents under every supervisor' : 'Collapse all: show only each supervisor and their agent count';
+    allBtn.setAttribute('aria-label', allClosed ? 'Expand all' : 'Collapse all');
     allBtn.disabled = !n.length;
   }
   function toggle(h) {
@@ -3480,7 +3483,9 @@ window.addEventListener('load', () => setPageHead(activeTab));
     save();
     apply();
   }
-  allBtn?.addEventListener('click', () => {
+  allBtn?.addEventListener('keydown', e => e.stopPropagation());   // keep Enter / Space on the button itself
+  allBtn?.addEventListener('click', e => {
+    e.stopPropagation();
     const n = names();
     if (n.length && n.every(x => closed.has(x))) closed.clear(); else n.forEach(x => closed.add(x));
     save();
