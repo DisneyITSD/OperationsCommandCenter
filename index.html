@@ -1105,10 +1105,12 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
 const SHEET_ID = '13whMJorFWHuylEfFDwbB30yobPtQ_G3EfAZtv040kQE';
 const sheetUrl = gid => `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}`;
 const scheduleUrl = gid => sheetUrl(gid) + '&headers=1';
+/* Paste the number after "gid=" from the LOLI Actual tab's address bar here (most reliable). Empty = find the tab by its name. */
+const LOLI_GID = '74611449';
 const URLS = {
   pto: sheetUrl(1297010746),
   calledOff: sheetUrl(2139820898),
-  loli: `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent('LOLI Actual')}`,   // "LOLI Actual" tab: Agent Name (ID) | Agent Name | Date | Min of Login | Max of Logout
+  loli: LOLI_GID ? sheetUrl(LOLI_GID) : `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent('LOLI Actual')}`,   // "LOLI Actual" tab: Agent Name (ID) | Agent Name | Date | Min of Login | Max of Logout
   attTime: sheetUrl(417537234),            // "ATTENDANCE TIME" tab: Name | EST Date | Type | Actual Time
   announcements: sheetUrl(6259028),
   qa: scheduleUrl(337356668),              // "QA" tab (&headers=1 forces row 1 to be read as the header)
@@ -1151,7 +1153,7 @@ const ATT_OTHER = { code: 'CO', icon: '🚫', color: '#dc3545', label: 'Called O
    ===================================================================== */
 let estData = [], phData = [];
 let ptoList = [], calledOffList = [], announcementList = [], attTimeList = [], qaList = [];
-let loliInfo = { rows: 0, agents: 0, error: '' };
+let loliInfo = { rows: 0, agents: 0, error: '', sample: '' };
 let loliIdx = new Map();     // normalized agent name -> [{date, login, logout}] from the "LOLI Actual" tab
 let dailyMap = new Map();
 let currentWorkingAgents = [];
@@ -1371,7 +1373,7 @@ const loadSheet = async url =>
 async function loadAttendance() {
   try {
     let loliRows;
-    loliInfo = { rows: 0, agents: 0, error: '' };
+    loliInfo = { rows: 0, agents: 0, error: '', sample: '' };
     [ptoList, calledOffList, announcementList, attTimeList, loliRows] = await Promise.all([
       loadSheet(URLS.pto),
       loadSheet(URLS.calledOff),
@@ -1381,7 +1383,7 @@ async function loadAttendance() {
     ]);
     loliIdx = buildLoliIndex(loliRows);
     loadErrors.loli = loliInfo.error ? `Couldn't load the "LOLI Actual" tab (${loliInfo.error}) - check the tab name and sharing`
-                    : !loliInfo.rows ? 'The "LOLI Actual" tab was read but no log-in rows were found - check its columns (Agent Name | Date | Min of Login | Max of Logout)' : '';
+                    : !loliInfo.rows ? 'The "LOLI Actual" tab was read but no log-in rows were found (' + loliInfo.sample + ') - the tab name may not be matching; set LOLI_GID in the code' : '';
     loadErrors.attendance = '';
     lastUpdated = new Date();
   } catch (err) {
@@ -3130,6 +3132,7 @@ function buildLoliIndex(rows) {
     n++;
   });
   loliInfo.rows = n; loliInfo.agents = m.size;
+  loliInfo.sample = rows.length ? `${rows.length} rows read; first row: ${(rows[0] || []).slice(0, 5).map(x => clean(x).slice(0, 25)).join(' | ')}` : 'the tab came back empty';
   return m;
 }
 /* The agent's LOLI record that belongs to this scheduled shift: the one whose login is closest to the shift start
