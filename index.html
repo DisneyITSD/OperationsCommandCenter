@@ -447,6 +447,25 @@ td.sc-good::before,td.sc-mid::before,td.sc-low::before{content:"";display:inline
 .panels .panel:first-child h3:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
 .panels .panel.collapsed #workingList{display:none}
 @media(min-width:901px){.panels:has(.panel:first-child.collapsed){grid-template-columns:150px repeat(4,minmax(0,1fr))}}
+
+/* Agent file: single calendar view with an agent summary strip */
+#rosterView,#rosterTab .daily-summary,#rosterLegend{display:none}
+.agent-sum{display:grid;grid-template-columns:minmax(210px,auto) minmax(210px,auto) 1fr;background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:18px;overflow:hidden}
+.agent-sum>div{padding:18px 22px;border-right:1px solid var(--line)}
+.agent-sum>div:last-child{border-right:0}
+.as-name{font-size:20px;font-weight:600;line-height:1.2}
+.as-sup{margin-top:5px;font-size:13px;color:var(--muted)}
+.as-pct{font-size:40px;font-weight:600;line-height:1;letter-spacing:-.02em}
+.as-lbl{margin-top:6px;font-size:13px;font-weight:500;color:var(--muted)}
+.as-sub{margin-top:6px;font-size:12.5px;color:var(--muted)}
+.as-brk{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.brk-tile{padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#f6f8fc}
+.brk-tile.lunch{background:#fff7ed;border-color:#fde3c4}
+.brk-name{font-size:13px;font-weight:600;color:var(--muted)}
+.brk-main{margin-top:5px;font-size:16px;font-weight:600;line-height:1.3}
+.brk-alt{margin-top:4px;font-size:12px;color:var(--muted)}
+@media(max-width:1250px){.agent-sum{grid-template-columns:1fr 1fr}.as-brk{grid-column:1/-1;border-top:1px solid var(--line)}.agent-sum>div:nth-child(2){border-right:0}}
+@media(max-width:600px){.agent-sum{grid-template-columns:1fr}.agent-sum>div{border-right:0}.as-brk{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 
@@ -1968,8 +1987,18 @@ function rosterCalendarHtml({ r, cells }, today, ph) {
       ${c.shiftChg ? `<div class="cal-note">Was ${isOff(c.base) ? 'OFF' : convertShiftRange(c.base)}</div>` : ''}
       ${c.supChg ? `<div class="cal-note">Supervisor: ${esc(c.sup)}</div>` : ''}</div>`;
   }).join('');
-  const head = trackerHeaderHtml(r, cells.map(c => c.att))
-    .replace(/<\/div>\s*$/, `<span class="trk-chip info" style="box-shadow:inset 0 0 0 2px #7c4dff">🔁 Changed: ${chg}</span></div>`);
+  const sm = trackerSummary(cells.map(c => c.att)), nowD = ymd(estNow());
+  const tile = (label, v, dur, cls) => {
+    const s = tm(v); if (s == null) return '';
+    const est = formatTimeRange(v, dur), phr = phRange(nowD, s, dur);
+    return `<div class="brk-tile ${cls}"><div class="brk-name">${label} · ${dur} min</div><div class="brk-main">${ph ? phr : est}</div><div class="brk-alt">${ph ? est + ' EST' : phr + ' PH'}</div></div>`;
+  };
+  const head = `<div class="agent-sum">
+    <div><div class="as-name">${esc(r.Name)}</div><div class="as-sup">${esc(r.Supervisor || 'Unassigned')}</div></div>
+    <div><div class="as-pct" style="color:${BAND_COL[bandOf('att', sm.pct)] || 'inherit'}">${trackerPct(sm)}</div><div class="as-lbl">Attendance this month</div>
+      <div class="as-sub">${sm.hoursWorked.toFixed(1)} / ${sm.hoursExp.toFixed(1)} hrs · ✔ ${sm.present} · ◐ ${sm.partial} · ✖ ${sm.absent} · 🌴 ${sm.leave}${chg ? ' · 🔁 ' + chg + ' changed' : ''}</div></div>
+    <div class="as-brk">${tile('Break 1', r['Break 1'], 15, '')}${tile('Lunch', r['Lunch'], 60, 'lunch')}${tile('Break 2', r['Break 2'], 15, '')}${tile('Break 3', r['Break 3'], 15, '')}</div>
+  </div>`;
   return `${head}<div class="panel"><div class="cal">${dows}${'<div></div>'.repeat(lead)}${days}</div></div>`;
 }
 
