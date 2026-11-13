@@ -3252,7 +3252,7 @@ function attendanceFor(r, date, today, idx) {
     x.missed = lateC + earlyC;
     if (lateC || earlyC) {
       const code = lateC && earlyC ? 'L/LE' : lateC ? 'LATE' : 'LE';
-      Object.assign(x, { kind: 'partial', text: 'Late / Left early', code, icon: TRACKER_STATUS.partial.icon,
+      Object.assign(x, { kind: 'partial', text: lateC && earlyC ? 'Late / Left early' : lateC ? 'Late' : 'Left early', code, icon: TRACKER_STATUS.partial.icon,
         reason: [lateC ? `Late ${lateC} min` : '', earlyC ? `Left early ${earlyC} min` : ''].filter(Boolean).join(' + ') });
     }
   }
