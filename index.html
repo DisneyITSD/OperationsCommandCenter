@@ -698,7 +698,8 @@ html[data-theme=dark] #workingList li.sup-h{color:var(--ink)}
   <div class="view-hint">📊 Full-day staffing coverage by 30-minute interval.</div>
   <div class="controls">
     <input type="date" id="forecastDate">
-    <label style="display:flex;align-items:center;gap:6px;font-weight:600">🎯 Min agents <input type="number" min="0" class="minTargetInput"></label>
+    <label style="display:flex;align-items:center;gap:6px;font-weight:600">🎯 Min agents <input type="number" min="0" class="minTargetInput" id="fcMinInput"></label>
+    <label style="display:flex;align-items:center;gap:6px;font-weight:600">⚠️ Alert when below expected by <input type="number" min="1" class="minTargetInput" id="fcGapInput"></label>
     <button onclick="refreshForecast()">Show Forecast</button>
   </div>
   <div id="dailyOverviewCards" class="cards" style="margin:15px 0"></div>
@@ -1905,7 +1906,7 @@ function buildDailyOverview() {
     card('✅ Present', sets.present.length, '#28a745', bySup(sets.present)) +
     card('📋 Leave', sets.leave.length, '#17a2b8', bySup(sets.leave)) +
     card('🚫 Absenteeism', sets.absent.length, '#dc3545', bySup(sets.absent)) +
-    card('📉 Lowest Coverage', slotText(low), (targetFor(low.time) > 0 && low.available < targetFor(low.time)) ? '#dc3545' : '#ff9800').replace('class="value"', '') +
+    card('📉 Lowest Coverage', slotText(low), (fcMin() > 0 && low.available < fcMin()) ? '#dc3545' : '#ff9800').replace('class="value"', '') +
     card('📈 Highest Coverage', slotText(high), '#6f42c1').replace('class="value"', '');
 }
 
@@ -1915,12 +1916,15 @@ function buildCoverageTimeline() {
 
   let belowCount = 0;
   const cells = coverageSlots(date).map(s => {
-    const target = targetFor(s.time);
+    const target = fcMin();
     const below = target > 0 && s.available < target;
     if (below) belowCount++;
-    const ok = s.available >= s.expected && !below;
-    const color = ok ? '#2e7d32' : '#c62828';
-    return `<div style="padding:8px 10px;border-radius:8px;background:${ok ? '#e8f5e9' : '#ffebee'};color:${color};border-left:4px solid ${color};font-size:13px">
+    const short = s.expected - s.available >= fcGap();   /* actual lower than expected by the set gap */
+    const flag = short || below;               /* highlight only problem intervals */
+    const style = flag
+      ? 'background:#ffebee;color:#c62828;border-left:4px solid #c62828'
+      : 'background:transparent;border-left:4px solid transparent';
+    return `<div style="padding:8px 10px;border-radius:8px;${style};font-size:13px">
       <strong>${fmtAMPM(s.time)}</strong> &nbsp;&nbsp; Expected: <strong>${s.expected}</strong> &nbsp;|&nbsp; Actual: <strong>${s.available}</strong>${target > 0 ? ` &nbsp;|&nbsp; Min: <strong>${target}</strong>${below ? ' ⚠️' : ''}` : ''}</div>`;
   }).join('');
 
@@ -2965,15 +2969,29 @@ function checkMissingAgents() {
    STAFFING TARGETS + SHIFT CHANGES
    ===================================================================== */
 const getMinTarget = () => {
-  const v = parseInt(document.querySelector('.minTargetInput')?.value);
+  const v = parseInt(document.querySelector('.minTargetInput:not(#fcMinInput):not(#fcGapInput)')?.value);
   return isNaN(v) ? 0 : Math.max(0, v);
 };
 const targetFor = getMinTarget;
 
+/* Daily Intervals has its own settings (separate from the dashboard) */
+const FC_MIN_KEY = 'ditsc_fc_min_agents', FC_GAP_KEY = 'ditsc_fc_gap';
+const fcNum = (id, def) => { const v = parseInt($(id)?.value); return isNaN(v) ? def : Math.max(0, v); };
+const fcMin = () => fcNum('fcMinInput', 7);
+const fcGap = () => Math.max(1, fcNum('fcGapInput', 5));
+function initForecastSettings() {
+  [['fcMinInput', FC_MIN_KEY, 7], ['fcGapInput', FC_GAP_KEY, 5]].forEach(([id, key, def]) => {
+    const el = $(id); if (!el) return;
+    let saved = null; try { saved = localStorage.getItem(key); } catch (e) {}
+    el.value = saved ?? def;
+    el.addEventListener('input', () => { try { localStorage.setItem(key, el.value); } catch (e) {} refreshForecast(); });
+  });
+}
+
 function initMinTarget() {
   let saved = null;
   try { saved = localStorage.getItem(TARGET_KEY); } catch (e) {}
-  const inputs = document.querySelectorAll('.minTargetInput');
+  const inputs = document.querySelectorAll('.minTargetInput:not(#fcMinInput):not(#fcGapInput)');
   inputs.forEach(i => {
     i.value = saved ?? 0;
     i.addEventListener('input', () => {
@@ -3502,7 +3520,7 @@ function buildIntervalOptions() {
 
 window.addEventListener('load', async () => {
   buildIntervalOptions();
-  initMinTarget();
+  initMinTarget(); initForecastSettings();
   initMenus();
   initMetricMonth();
   initGroupToggle();
