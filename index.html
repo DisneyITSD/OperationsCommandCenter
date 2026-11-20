@@ -601,7 +601,8 @@ details.ag-sec>summary:focus-visible{outline:2px solid var(--blue);outline-offse
 #loginGate[hidden]{display:none}
 #loginGate .lg-card{width:100%;max-width:380px;padding:28px 26px;background:var(--surface,#fff);border:1px solid var(--line,#e5e7eb);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.12);text-align:center}
 #loginGate .lg-title{font-size:20px;font-weight:700;color:var(--ink,#111827);margin:0 0 4px}
-#loginGate .lg-sub{font-size:13px;color:var(--muted,#6b7280);margin:0 0 18px}
+#loginGate .lg-sub{font-size:13px;color:var(--muted,#6b7280);margin:0 0 10px}
+#loginGate .lg-note{font-size:13px;color:var(--ink,#111827);background:rgba(37,99,235,.08);border-radius:8px;padding:8px 10px;margin:0 0 14px}
 #loginGate input{width:100%;padding:11px 12px;font-size:15px;text-align:center;border:1px solid var(--line,#d1d5db);border-radius:8px;background:var(--surface,#fff);color:var(--ink,#111827)}
 #loginGate button{width:100%;margin-top:12px;padding:11px 12px;font-size:15px;font-weight:600;border:0;border-radius:8px;background:var(--blue,#2563eb);color:#fff;cursor:pointer}
 #loginGate .lg-msg{min-height:18px;margin-top:12px;font-size:13px;color:#b91c1c}
@@ -943,7 +944,8 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
   <form class="lg-card" id="loginForm" autocomplete="off">
     <h2 class="lg-title">DITSC L1 English</h2>
     <p class="lg-sub">Enter your username to see your scores.</p>
-    <input type="text" id="loginUser" placeholder="Username" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Username" autofocus>
+    <p class="lg-note">📌 Please use your <b>Disney Hub ID</b> as your username.</p>
+    <input type="text" id="loginUser" placeholder="Username (Disney Hub ID)" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Username" autofocus>
     <button type="submit" id="loginBtn">Continue</button>
     <div class="lg-msg" id="loginMsg" role="alert"></div>
   </form>
@@ -1661,7 +1663,7 @@ async function authBoot() {
     gateMsg('');
     if (!USERS.length) { $('loginBtn').disabled = true; await loadUsers(); $('loginBtn').disabled = false; }
     if (!USERS.length) return gateMsg(usersError ? `Couldn’t load the user list (${usersError}). Please try again.` : 'No users have been set up yet.');
-    if (!trySignIn($('loginUser').value)) gateMsg('That username wasn’t found. Please check it and try again.');
+    if (!trySignIn($('loginUser').value)) gateMsg('That username wasn’t found. Please check your Disney Hub ID and try again.');
   });
   await loadUsers();
   let saved = ''; try { saved = localStorage.getItem(AUTH_KEY) || ''; } catch (e) {}
