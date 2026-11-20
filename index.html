@@ -316,6 +316,9 @@ html[data-theme=dark] .cal-ut b.ut-red{background:#7f1d1d;color:#fecaca}
 #agSumMcs td,#agSumStack td{text-align:center;white-space:nowrap}
 #agSumMcs td:first-child,#agSumStack td:first-child{text-align:left;font-weight:600}
 #agSumBody tr.agsum-total td{background:#eef6ff;font-weight:700}
+#agSumBody tr.agsum-me td{background:#eef6ff;font-weight:700}
+#agSumBody tr.agsum-gap td{text-align:center;color:var(--muted);padding:2px}
+html[data-theme=dark] #agSumBody tr.agsum-me td{background:#1b2a44}
 html[data-theme=dark] #agSumBody tr.agsum-total td{background:#1b2a44}
 #agSumBody .schedule-container{height:auto;max-height:none;overflow-x:auto;overflow-y:visible}
 #agSumBody td.nodata{background:#4a4a4a;color:#fff;font-weight:600}
@@ -1054,6 +1057,7 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
 <!-- ============ SUPERVISOR SUMMARY ============ -->
 <!-- ============ AGENT SUMMARY (one agent: attendance, stack ranking, actual scores) ============ -->
 <section class="tab-panel" id="agentSumTab" hidden>
+  <div id="agLatestAnnouncement" hidden></div>
   <div class="view-hint">👤 One agent at a glance: attendance, QA, points, the Overall Metric Scorecard and the stack ranking.<br>Pick the agent in the schedule at the top, then tick one or more months (or Year to date) in the Month box under “How attendance is calculated”; everything below is calculated automatically.</div>
   <div id="agSumSchedule">
     <h3 class="sum-h" style="margin-top:4px">📅 Schedule</h3>
@@ -2076,18 +2080,20 @@ function buildPictureAnnouncements() {
 }
 /* Newest active announcement, shown at the top of the Summary page */
 function renderLatestAnnouncement() {
-  const el = $('latestAnnouncement'); if (!el) return;
   const a = pictureAnnouncements(false)[0];
-  if (!a) { el.hidden = true; el.innerHTML = ''; return; }
-  el.hidden = false;
-  el.innerHTML = `<div class="pa-strip" role="button" tabindex="0">
+  ['latestAnnouncement', 'agLatestAnnouncement'].forEach(id => {       // the Summary page and the Agent Summary page (the only page agents land on)
+    const el = $(id); if (!el) return;
+    if (!a) { el.hidden = true; el.innerHTML = ''; return; }
+    el.hidden = false;
+    el.innerHTML = `<div class="pa-strip" role="button" tabindex="0">
     <img src="${esc(a.image)}" alt="" onerror="this.style.display='none'">
     <div><div class="pa-s-l">📢 Latest announcement</div><div class="pa-s-t">${esc(a.title)}</div></div>
     <span class="pa-s-go">View →</span></div>`;
-  const go = () => { document.querySelector('.tab-btn[data-tab="announcementsTab"]')?.click(); };
-  const strip = el.firstElementChild;
-  strip.addEventListener('click', go);
-  strip.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+    const go = () => { document.querySelector('.tab-btn[data-tab="announcementsTab"]')?.click(); };
+    const strip = el.firstElementChild;
+    strip.addEventListener('click', go);
+    strip.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
 }
 
 function renderHighAnnouncements() {
@@ -4425,6 +4431,21 @@ function buildAgentSummary() {
   }</tbody></table>`
     : '<div class="my-lbl">No stack ranking data for this agent in the selected period.</div>';
 
+  /* Top 10 on the stack ranking (same points as the Stack rank card); the signed-in agent's own row is highlighted, and shown below the list when outside the top 10 */
+  const board = D.agents.map(x => ({ name: x.name, t: sumRoll(x, selYm).total })).filter(x => x.t != null)
+    .sort((p, q) => q.t - p.t || p.name.localeCompare(q.name));
+  const rankOf = x => board.findIndex(y => y.t <= x.t) + 1;
+  const isMe = x => normName(x.name) === normName(a.name);
+  const medal = ['🥇', '🥈', '🥉'];
+  const topRow = x => { const rk = rankOf(x); return `<tr${isMe(x) ? ' class="agsum-me"' : ''}><td>${medal[rk - 1] || '#' + rk}</td><td>${esc(x.name)}${isMe(x) ? ' (you)' : ''}</td><td>${x.t.toFixed(1)}</td></tr>`; };
+  const mine = board.find(isMe);
+  const top10 = board.length
+    ? `<table class="nosort"><thead><tr><th>Rank</th><th>Agent</th><th>Points</th></tr></thead><tbody>${
+        board.slice(0, 10).map(topRow).join('') +
+        (mine && rankOf(mine) > 10 ? `<tr class="agsum-gap"><td colspan="3">…</td></tr>` + topRow(mine) : '')
+      }</tbody></table>`
+    : '<div class="my-lbl">No stack ranking data for the selected period.</div>';
+
   agQaLast = { a, selYm, multi };
   box.innerHTML = `
     <div class="trk-head"><div class="trk-title">${esc(a.name)} <small>· ${esc(a.sup)} · ${esc(periodLabel)}</small></div></div>
@@ -4432,6 +4453,7 @@ function buildAgentSummary() {
     <details class="ag-sec" data-k="stack"${agSecOpen.has('stack') ? ' open' : ''}>
       <summary class="sum-h">Performance stack ranking</summary>
       <div class="panel"><div class="schedule-container">${stack}</div></div>
+      <div class="panel" style="margin-top:12px"><h3>🏆 Top 10 performers</h3><div class="schedule-container">${top10}</div></div>
     </details>
     <details class="ag-sec" data-k="mcs"${agSecOpen.has('mcs') ? ' open' : ''}>
       <summary class="sum-h">Overall Metric Scorecard</summary>
