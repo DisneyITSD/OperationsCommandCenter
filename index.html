@@ -1054,7 +1054,7 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
 <!-- ============ SUPERVISOR SUMMARY ============ -->
 <!-- ============ AGENT SUMMARY (one agent: attendance, stack ranking, actual scores) ============ -->
 <section class="tab-panel" id="agentSumTab" hidden>
-  <div id="agLatestAnnouncement" hidden></div>
+  <div id="agAnnouncements"></div>
   <div class="view-hint">👤 One agent at a glance: attendance, QA, points, the Overall Metric Scorecard and the stack ranking.<br>Pick the agent in the schedule at the top, then tick one or more months (or Year to date) in the Month box under “How attendance is calculated”; everything below is calculated automatically.</div>
   <div id="agSumSchedule">
     <h3 class="sum-h" style="margin-top:4px">📅 Schedule</h3>
@@ -1929,6 +1929,7 @@ function renderAll() {
   loadSup();
   renderHighAnnouncements();
   renderLatestAnnouncement();
+  renderAgentAnnouncements();
   TAB_RENDERERS[activeTab]?.();
 }
 
@@ -2063,24 +2064,35 @@ function openPictureBox(src) {
   document.addEventListener('keydown', onKey);
   document.body.appendChild(box);
 }
-function buildPictureAnnouncements() {
-  const rows = pictureAnnouncements($('annScope').value === 'all');
-  if (!rows.length) { $('announcementsList').innerHTML = '<div class="pa-empty">📢 No announcements right now</div>'; return; }
-  $('announcementsList').innerHTML = '<div class="pa-grid">' + rows.map((a, i) => {
-    return `<div class="pa-card${a.expired ? ' pa-expired' : ''}">
+/* The picture cards (shared by the Announcements page and the Agent Summary page) */
+function picGridHtml(rows) {
+  return '<div class="pa-grid">' + rows.map(a => `<div class="pa-card${a.expired ? ' pa-expired' : ''}">
       <img src="${esc(a.image)}" alt="${esc(a.title)}" loading="lazy" data-src="${esc(a.image)}"
            onerror="this.outerHTML='<div class=&quot;pa-missing&quot;>Picture not found:<br>${esc(a.image)}</div>'">
       <div class="pa-body">
         <div class="pa-title">${esc(a.title)}${a.expired ? ' <span style="font-weight:400;font-size:12px;color:var(--muted)">(expired)</span>' : ''}</div>
         ${a.message ? `<div class="pa-msg">${esc(a.message)}</div>` : ''}
-      </div></div>`;
-  }).join('') + '</div>';
-  $('announcementsList').querySelectorAll('img[data-src]').forEach(img => img.addEventListener('click', () => openPictureBox(img.dataset.src)));
+      </div></div>`).join('') + '</div>';
+}
+const picBindClicks = el => el.querySelectorAll('img[data-src]').forEach(img => img.addEventListener('click', () => openPictureBox(img.dataset.src)));
+function buildPictureAnnouncements() {
+  const rows = pictureAnnouncements($('annScope').value === 'all');
+  if (!rows.length) { $('announcementsList').innerHTML = '<div class="pa-empty">📢 No announcements right now</div>'; return; }
+  $('announcementsList').innerHTML = picGridHtml(rows);
+  picBindClicks($('announcementsList'));
+}
+/* Agent Summary: the active announcements are shown right at the top, so agents don't have to look for them */
+function renderAgentAnnouncements() {
+  const el = $('agAnnouncements'); if (!el) return;
+  const rows = pictureAnnouncements(false);
+  el.innerHTML = '<h3 class="sum-h" style="margin-top:4px">📢 Announcements</h3>' +
+    (rows.length ? picGridHtml(rows) : '<div class="pa-empty">📢 No announcements right now</div>');
+  picBindClicks(el);
 }
 /* Newest active announcement, shown at the top of the Summary page */
 function renderLatestAnnouncement() {
   const a = pictureAnnouncements(false)[0];
-  ['latestAnnouncement', 'agLatestAnnouncement'].forEach(id => {       // the Summary page and the Agent Summary page (the only page agents land on)
+  ['latestAnnouncement'].forEach(id => {
     const el = $(id); if (!el) return;
     if (!a) { el.hidden = true; el.innerHTML = ''; return; }
     el.hidden = false;
