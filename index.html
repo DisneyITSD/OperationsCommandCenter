@@ -316,9 +316,6 @@ html[data-theme=dark] .cal-ut b.ut-red{background:#7f1d1d;color:#fecaca}
 #agSumMcs td,#agSumStack td{text-align:center;white-space:nowrap}
 #agSumMcs td:first-child,#agSumStack td:first-child{text-align:left;font-weight:600}
 #agSumBody tr.agsum-total td{background:#eef6ff;font-weight:700}
-#agSumBody tr.agsum-me td{background:#eef6ff;font-weight:700}
-#agSumBody tr.agsum-gap td{text-align:center;color:var(--muted);padding:2px}
-html[data-theme=dark] #agSumBody tr.agsum-me td{background:#1b2a44}
 html[data-theme=dark] #agSumBody tr.agsum-total td{background:#1b2a44}
 #agSumBody .schedule-container{height:auto;max-height:none;overflow-x:auto;overflow-y:visible}
 #agSumBody td.nodata{background:#4a4a4a;color:#fff;font-weight:600}
@@ -1609,7 +1606,7 @@ const USERS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tq
 /* Optional: more users typed here instead of in the sheet, e.g. { u: 'AG-7K2Q', n: 'Dela Cruz, Juan', role: 'agent' } */
 const LOCAL_USERS = [];
 const AUTH_KEY = 'ditsc_username';
-const AGENT_TABS = ['announcementsTab', 'agentSumTab'];     // the only pages an agent can open
+const AGENT_TABS = ['announcementsTab', 'agentSumTab', 'metricTab'];     // the only pages an agent can open (Performance Stack Ranking shows the top 10 only)
 let AUTH = null, USERS = [], usersError = '';
 const tabAllowed = id => !AUTH || !AUTH.restricted || AGENT_TABS.includes(id);
 
@@ -1648,6 +1645,8 @@ function applyAccess() {
   document.querySelectorAll('.tabs .tab-btn').forEach(b => b.style.display = r && !AGENT_TABS.includes(b.dataset.tab) ? 'none' : '');
   document.querySelectorAll('.tabs .nav-group').forEach(g => g.style.display = [...g.querySelectorAll('.tab-btn')].some(b => b.style.display !== 'none') ? '' : 'none');
   $('agSumAgent').style.display = r ? 'none' : '';
+  ['metricSupervisor', 'metricSearch'].forEach(id => $(id).style.display = r ? 'none' : '');          // an agent can't filter or search the ranking
+  document.querySelector('#metricTab .daily-summary').style.display = r ? 'none' : '';
   const hint = document.querySelector('#agentSumTab > .view-hint'); if (hint) hint.style.display = r ? 'none' : '';
   if (r) { showTab('agentSumTab'); history.replaceState(null, '', '#agentSumTab'); }
   else TAB_RENDERERS[activeTab]?.();
@@ -3511,7 +3510,10 @@ function buildMetric() {
   if (sups.includes(prevSup)) supSel.value = prevSup;
   const sup = supSel.value, q = up($('metricSearch').value);
 
-  const rows = data.filter(r => (sup === ALL || supOf(r) === sup) && (!q || up(r[I.agent]).includes(q)));
+  const restricted = AUTH && AUTH.restricted;      // agents only see the top 10 of the whole team
+  const rows = restricted
+    ? (I.total >= 0 ? data.filter(r => typeof metricVal(r[I.total]) === 'number').sort((a, b) => metricVal(b[I.total]) - metricVal(a[I.total])).slice(0, 10) : [])
+    : data.filter(r => (sup === ALL || supOf(r) === sup) && (!q || up(r[I.agent]).includes(q)));
   const maxOf = metricHeads.map((_, i) => metricMax(i));
 
   /* Top 3 podium (always by TOTAL, whatever column the table is sorted by) */
@@ -4431,21 +4433,6 @@ function buildAgentSummary() {
   }</tbody></table>`
     : '<div class="my-lbl">No stack ranking data for this agent in the selected period.</div>';
 
-  /* Top 10 on the stack ranking (same points as the Stack rank card); the signed-in agent's own row is highlighted, and shown below the list when outside the top 10 */
-  const board = D.agents.map(x => ({ name: x.name, t: sumRoll(x, selYm).total })).filter(x => x.t != null)
-    .sort((p, q) => q.t - p.t || p.name.localeCompare(q.name));
-  const rankOf = x => board.findIndex(y => y.t <= x.t) + 1;
-  const isMe = x => normName(x.name) === normName(a.name);
-  const medal = ['🥇', '🥈', '🥉'];
-  const topRow = x => { const rk = rankOf(x); return `<tr${isMe(x) ? ' class="agsum-me"' : ''}><td>${medal[rk - 1] || '#' + rk}</td><td>${esc(x.name)}${isMe(x) ? ' (you)' : ''}</td><td>${x.t.toFixed(1)}</td></tr>`; };
-  const mine = board.find(isMe);
-  const top10 = board.length
-    ? `<table class="nosort"><thead><tr><th>Rank</th><th>Agent</th><th>Points</th></tr></thead><tbody>${
-        board.slice(0, 10).map(topRow).join('') +
-        (mine && rankOf(mine) > 10 ? `<tr class="agsum-gap"><td colspan="3">…</td></tr>` + topRow(mine) : '')
-      }</tbody></table>`
-    : '<div class="my-lbl">No stack ranking data for the selected period.</div>';
-
   agQaLast = { a, selYm, multi };
   box.innerHTML = `
     <div class="trk-head"><div class="trk-title">${esc(a.name)} <small>· ${esc(a.sup)} · ${esc(periodLabel)}</small></div></div>
@@ -4453,7 +4440,6 @@ function buildAgentSummary() {
     <details class="ag-sec" data-k="stack"${agSecOpen.has('stack') ? ' open' : ''}>
       <summary class="sum-h">Performance stack ranking</summary>
       <div class="panel"><div class="schedule-container">${stack}</div></div>
-      <div class="panel" style="margin-top:12px"><h3>🏆 Top 10 performers</h3><div class="schedule-container">${top10}</div></div>
     </details>
     <details class="ag-sec" data-k="mcs"${agSecOpen.has('mcs') ? ' open' : ''}>
       <summary class="sum-h">Overall Metric Scorecard</summary>
