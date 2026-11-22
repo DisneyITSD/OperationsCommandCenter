@@ -578,6 +578,10 @@ body{font-family:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;background:var(
 .head-clock{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
 .page-head #liveClock{display:block;border:0;border-radius:10px;background:#f3f4f6;padding:7px 12px;font-size:12px;line-height:1.55;color:#374151;text-align:left}
 .page-head #lastUpdated{display:none}
+.sk-chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.sk-phone{background:#e3f2fd;color:#0d47a1}.sk-chat{background:#e8f5e9;color:#1b5e20}
+html[data-theme=dark] .sk-phone{background:#1b3558;color:#bcd8ff}html[data-theme=dark] .sk-chat{background:#1c3a2a;color:#b5e8c5}
+.sk-th,.sk-td{text-align:center}
 .team-seg{display:inline-flex;border:1px solid var(--blue);border-radius:999px;overflow:hidden}
 .team-seg button{margin:0;border:0;border-radius:0;background:transparent;color:var(--blue);padding:7px 14px;font-weight:600;white-space:nowrap;cursor:pointer}
 .team-seg button.on{background:var(--blue);color:#fff}
@@ -2307,6 +2311,52 @@ function applyTeamFilter(team = curTeam) {
   if (RAW.co) calledOffList = f(RAW.co);
   if (RAW.at) attTimeList = f(RAW.at);
   if (RAW.dailyRows) dailyMap = buildDailyMap(f(RAW.dailyRows));
+}
+/* ---------- Skill column (Phone / Chat) on the performance tables ----------
+   Added to the Score Summary, QA, Stack Ranking and Overall Metric Scorecard tables, right after the agent column.
+   Team comes from the roster; for agents the roster doesn't list it falls back to the tab's own Skill column. */
+let tabSkillCache = { key: '', map: new Map() };
+function tabSkill() {
+  const key = [qaList.length, metricRows.length, mcsRows.length].join('|');
+  if (tabSkillCache.key === key) return tabSkillCache.map;
+  const m = new Map();
+  qaList.forEach(r => { const t = rowTeamRaw(r), n = r['Analyst Name']; if (t && n) m.set(normName(n), t); });
+  const scan = (heads, rows, ai) => {
+    const i = heads.findIndex(h => TEAM_KEYS.includes(daKey(h)));
+    if (i < 0 || ai < 0) return;
+    rows.forEach(r => { const t = teamOfText(r[i]); if (t && r[ai]) m.set(normName(r[ai]), t); });
+  };
+  scan(metricHeads, metricRows, metricIdx.agent); scan(mcsHeads, mcsRows, mcsI.agent);
+  tabSkillCache = { key, map: m };
+  return m;
+}
+const skillLookup = name => teamIdx.get(normName(name)) || tabSkill().get(normName(name)) || '';
+const SKILL_TABLES = ['ssTable', 'ssMcsTable', 'ssStackTable', 'qaTable', 'metricTable', 'mcsTable'];
+function skillOfCell(c0) {
+  const cl = c0.cloneNode(true);
+  cl.querySelectorAll('small,.caret,.rank').forEach(x => x.remove());
+  const n = cl.textContent.replace(/\([^)]*\)\s*$/, '').replace(/[^\p{L}\p{N}\s.,'’-]/gu, ' ').replace(/\s+/g, ' ').trim();
+  return n ? skillLookup(n) : '';
+}
+function addSkillCols() {
+  SKILL_TABLES.forEach(id => {
+    const t = $(id); if (!t || !t.tHead || !t.tBodies[0]) return;
+    const hr = t.tHead.rows[0]; if (!hr) return;
+    if (!hr.querySelector(':scope > .sk-th')) { const th = document.createElement('th'); th.className = 'sk-th'; th.textContent = 'Skill'; hr.cells[0].after(th); }
+    [...t.tBodies[0].rows].forEach(tr => {
+      if (tr.querySelector(':scope > .sk-td')) return;
+      const c0 = tr.cells[0]; if (!c0 || c0.colSpan > 1) return;           // "No agents found" rows
+      const td = document.createElement('td'); td.className = 'sk-td';
+      const sk = skillOfCell(c0);
+      if (sk) td.innerHTML = `<span class="sk-chip sk-${sk.toLowerCase()}">${sk === 'Chat' ? '💬' : '📞'} ${sk}</span>`;
+      c0.after(td);
+    });
+  });
+}
+function initSkillCols() {
+  const mo = new MutationObserver(addSkillCols);                          // runs after each re-render of these tables
+  SKILL_TABLES.forEach(id => { const t = $(id); if (t && t.tHead && t.tBodies[0]) { mo.observe(t.tHead, { childList: true }); mo.observe(t.tBodies[0], { childList: true }); } });
+  addSkillCols();
 }
 function syncTeamButtons() {
   document.querySelectorAll('.team-seg button').forEach(b => { const on = b.dataset.team === curTeam; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
@@ -6641,6 +6691,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   buildIntervalOptions();
   initMinTarget(); initForecastSettings(); initPhoneSettings();
   initMenus();
+  initSkillCols();
   initMetricMonth();
   initGroupToggle();
   initQa();
