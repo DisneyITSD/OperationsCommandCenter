@@ -133,6 +133,10 @@ li.sup-h:first-child{margin-top:0}
 #upcomingBreakList li.empty,#upcomingLunchList li.empty{color:var(--gray);font-weight:400}
 #comingOnList li:not(.empty){border-left:3px solid var(--green);padding-left:8px;margin-bottom:4px}
 #goingOffList li:not(.empty){border-left:3px solid var(--red);padding-left:8px;margin-bottom:4px}
+#comingOnList[data-cols],#goingOffList[data-cols]{display:grid;column-gap:14px;align-items:start}
+#comingOnList[data-cols="2"],#goingOffList[data-cols="2"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+#comingOnList[data-cols="3"],#goingOffList[data-cols="3"]{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:700px){#comingOnList[data-cols],#goingOffList[data-cols]{grid-template-columns:1fr}}
 .chip{display:inline-block;margin:0 6px 6px 0;padding:6px 10px;border-radius:999px;background:#eef6ff;border:1px solid #cfe0f5;font-size:13px;color:var(--navy)}
 .chip.bad{background:#ffebee;border-color:#ef9a9a;color:#c62828}
 
@@ -470,6 +474,8 @@ html[data-theme=dark] #lbprrTable td.ut-yel{background:#854d0e;color:#fef9c3}
 .qq-sub{color:var(--muted);font-size:12px}
 .qq-ctl{margin-left:auto;display:flex;gap:8px}
 .qq-ctl select,.qq-ctl button{padding:6px 12px;font-size:13px;min-width:0}
+.qq-ctl button.on{background:#1e3a8a;border-color:#1e3a8a;color:#fff}
+.qq-ctl button[hidden]{display:none}
 .qq-body{display:flex;flex-wrap:wrap;gap:18px}
 .qq-bars{flex:1 1 380px;min-width:280px}
 .qq-trend{flex:1 1 300px;min-width:260px}
@@ -477,7 +483,7 @@ html[data-theme=dark] #lbprrTable td.ut-yel{background:#854d0e;color:#fef9c3}
 .qq-row:hover{background:var(--paper)}
 .qq-row.sel{background:color-mix(in srgb,var(--blue) 12%,transparent);box-shadow:inset 3px 0 0 var(--blue)}
 .qq-lab{font-weight:700}
-.qq-qt{grid-column:2 / -1;font-size:12px;line-height:1.3;opacity:.75;margin:-2px 0 3px}
+.qq-qt{grid-column:2;min-width:0;overflow-wrap:anywhere;font-size:12px;line-height:1.3;opacity:.75;margin:-2px 0 3px}
 .qq-qfull{font-size:14px;line-height:1.35;margin:0 0 12px}
 .qq-qfull small{display:block;opacity:.7;margin-top:2px}
 .qd-qt{opacity:.7;font-size:12px}
@@ -504,6 +510,110 @@ html[data-theme=dark] .qq-crit.no b{color:#f87171}
 .qq.yes .qq-fill{background:var(--green)}
 .qq.yes .qq-line{stroke:var(--green)}
 .qq.yes .qq-dot{fill:var(--green)}
+
+/* ---------- Dashboard notes (rich text, saved in this browser) ---------- */
+.notes-box{margin-top:12px;background:var(--surface,#fff);border:1px solid var(--line,#e5e7eb);border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden}
+.notes-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line,#e5e7eb)}
+.notes-head h3{margin:0;font-size:15px;font-weight:600;color:var(--ink,#111827);text-transform:none;letter-spacing:0}
+.notes-saved{font-size:12px;color:var(--muted,#6b7280)}
+.notes-bar{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:8px 10px;background:var(--paper,#f8fafc);border-bottom:1px solid var(--line,#e5e7eb)}
+.notes-bar button,.notes-bar select{height:30px;min-width:30px;padding:0 8px;border:1px solid var(--line,#d1d5db);border-radius:6px;background:var(--surface,#fff);color:var(--ink,#111827);font-size:13px;cursor:pointer;line-height:1}
+.notes-bar button:hover,.notes-bar select:hover{background:var(--paper,#eef2f7)}
+.notes-bar button.on{background:#dbeafe;border-color:#93c5fd;color:#1e3a8a}
+.notes-bar .nt-sep{width:1px;height:20px;background:var(--line,#d1d5db);margin:0 4px}
+.notes-bar label.nt-color{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 6px;border:1px solid var(--line,#d1d5db);border-radius:6px;background:var(--surface,#fff);color:var(--ink,#111827);font-size:13px;cursor:pointer}
+.notes-bar label.nt-color input{width:20px;height:20px;padding:0;border:0;background:none;cursor:pointer}
+.notes-ed{min-height:140px;max-height:60vh;overflow:auto;padding:12px 14px;font-size:14px;line-height:1.5;color:var(--ink,#111827);outline:none;word-break:break-word}
+.notes-ed:empty::before,.notes-ed[data-empty="1"]::before{content:attr(data-ph);color:var(--muted,#9ca3af);pointer-events:none}
+.notes-ed h3{margin:8px 0 4px;font-size:18px;font-weight:700;color:var(--ink,#111827);border:0;padding:0;background:none;position:static;text-transform:none;letter-spacing:0}
+.notes-ed h4{margin:6px 0 3px;font-size:15px;font-weight:700;color:var(--ink,#111827)}
+.notes-ed p,.notes-ed div{margin:0 0 4px}
+.notes-ed ul,.notes-ed ol{margin:4px 0;padding-left:22px}
+.notes-ed a{color:#2563eb}
+.notes-ed ul.nt-chk{list-style:none;padding-left:0}
+.notes-ed ul.nt-chk li{position:relative;padding-left:26px}
+.notes-ed ul.nt-chk li::before{content:"\2610";position:absolute;left:2px;top:0;cursor:pointer;font-size:15px}
+.notes-ed ul.nt-chk li.done::before{content:"\2611";color:#16a34a}
+.notes-ed ul.nt-chk li.done{text-decoration:line-through;opacity:.6}
+
+/* ---------- QA Scoring cheat sheet (questions, Yes / No wording and Score Points from the QA Scoring sheet tab) ---------- */
+#qaScoreTab .qs-wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;align-items:start}
+@media(max-width:900px){#qaScoreTab .qs-wrap{grid-template-columns:1fr}}
+#qaScoreTab .qs-list{background:var(--surface,#fff);border:1px solid var(--line,#e5e7eb);border-radius:12px;overflow:hidden}
+#qaScoreTab .qs-item{display:grid;grid-template-columns:minmax(0,1fr) 400px;align-items:start;border-bottom:1px solid var(--line,#e5e7eb)}
+#qaScoreTab .qs-main{min-width:0}
+#qaScoreTab .qs-note{padding:10px 16px 10px 4px}
+#qaScoreTab .qs-note textarea{display:block;width:100%;box-sizing:border-box;min-height:76px;max-height:300px;resize:vertical;padding:9px 11px;border:1px solid var(--line,#d1d5db);border-radius:8px;background:var(--surface,#fff);color:var(--ink,#111827);font:inherit;font-size:15px;line-height:1.45}
+#qaScoreTab .qs-note textarea:focus{outline:2px solid #93c5fd;outline-offset:0}
+/* criteria open: the comment box stretches to the full height of the question + criteria */
+#qaScoreTab .qs-item.open{align-items:stretch}
+#qaScoreTab .qs-item.open .qs-note{display:flex;flex-direction:column}
+#qaScoreTab .qs-item.open .qs-note textarea{flex:1 1 auto;max-height:none;min-height:120px}
+@media(max-width:900px){#qaScoreTab .qs-item.open .qs-note textarea{flex:none;min-height:100px}}
+
+/* Yes / No / N/A tick boxes */
+
+#qaScoreTab .qs-row{cursor:default}
+
+#qaScoreTab .qs-row:hover{background:none}
+
+#qaScoreTab .qs-opts{display:flex;flex:none;gap:6px}
+
+#qaScoreTab .qs-opt{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border:1px solid var(--line,#d1d5db);border-radius:8px;font-size:14px;font-weight:600;color:var(--ink,#111827);background:var(--surface,#fff);cursor:pointer;user-select:none}
+
+#qaScoreTab .qs-opt:hover{background:var(--paper,#f1f5f9)}
+
+#qaScoreTab .qs-opt input{width:20px;height:20px;margin:0;cursor:pointer}
+
+#qaScoreTab .qs-opt.y input{accent-color:#16a34a}#qaScoreTab .qs-opt.n input{accent-color:#dc2626}#qaScoreTab .qs-opt.a input{accent-color:#2563eb}
+
+#qaScoreTab .qs-opt.on.y{background:#dcfce7;border-color:#16a34a;color:#14532d}
+
+#qaScoreTab .qs-opt.on.n{background:#fee2e2;border-color:#dc2626;color:#7f1d1d}
+
+#qaScoreTab .qs-opt.on.a{background:#dbeafe;border-color:#2563eb;color:#1e3a8a}
+
+#qaScoreTab .qs-item.no .qs-row{background:color-mix(in srgb,#dc2626 6%,transparent)}
+
+#qaScoreTab .qs-item.na .qs-row{background:color-mix(in srgb,#2563eb 7%,transparent)}
+
+#qaScoreTab .qs-item.no .qs-pts{color:#b91c1c}
+
+#qaScoreTab .qs-item.na .qs-pts{color:#1d4ed8}
+
+@media(max-width:700px){#qaScoreTab .qs-row{flex-wrap:wrap}#qaScoreTab .qs-text{flex:1 1 100%;order:3}}
+#qaScoreTab .qs-note textarea.has{border-color:#f59e0b;background:color-mix(in srgb,#f59e0b 8%,var(--surface,#fff))}
+@media(max-width:900px){#qaScoreTab .qs-item{grid-template-columns:1fr}#qaScoreTab .qs-note{padding:0 14px 10px}}
+#qaScoreTab .qs-item:last-child{border-bottom:0}
+#qaScoreTab .qs-row{display:flex;align-items:center;gap:14px;padding:16px 16px;cursor:pointer;user-select:none}
+#qaScoreTab .qs-row:hover{background:var(--paper,#f8fafc)}
+#qaScoreTab .qs-row input{width:26px;height:26px;flex:none;accent-color:#16a34a;cursor:pointer}
+#qaScoreTab .qs-num{flex:none;min-width:44px;font-size:16px;font-weight:700;color:var(--navy,#1f3a6e)}
+#qaScoreTab .qs-text{flex:1;font-size:16px;line-height:1.4;color:var(--ink,#111827)}
+#qaScoreTab .qs-pts{flex:none;min-width:84px;text-align:right;font-size:15px;font-weight:700;color:var(--muted,#6b7280)}
+#qaScoreTab .qs-tog{flex:none;height:32px;padding:0 13px;border:1px solid var(--line,#d1d5db);border-radius:99px;background:var(--surface,#fff);color:var(--muted,#475569);font-size:14px;cursor:pointer}
+#qaScoreTab .qs-tog:hover{background:var(--paper,#eef2f7)}
+#qaScoreTab .qs-item.yes .qs-row{background:color-mix(in srgb,#16a34a 7%,transparent)}
+#qaScoreTab .qs-item.yes .qs-pts{color:#15803d}
+#qaScoreTab .qs-crit{display:none;grid-template-columns:1fr 1fr;gap:12px;padding:2px 16px 16px 72px}
+#qaScoreTab .qs-item.open .qs-crit{display:grid}
+@media(max-width:700px){#qaScoreTab .qs-crit{grid-template-columns:1fr;padding-left:16px}}
+#qaScoreTab .qs-col{border-radius:8px;padding:10px 14px;font-size:15px;line-height:1.5;color:var(--ink,#111827)}
+#qaScoreTab .qs-col.y{background:color-mix(in srgb,#16a34a 9%,transparent);border-left:3px solid #16a34a}
+#qaScoreTab .qs-col.n{background:color-mix(in srgb,#dc2626 8%,transparent);border-left:3px solid #dc2626}
+#qaScoreTab .qs-col b{display:block;margin-bottom:4px;font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+#qaScoreTab .qs-col.y b{color:#15803d}#qaScoreTab .qs-col.n b{color:#b91c1c}
+#qaScoreTab .qs-col ul{margin:0;padding-left:16px}
+#qaScoreTab .qs-side{position:sticky;top:76px;background:var(--surface,#fff);border:1px solid var(--line,#e5e7eb);border-radius:12px;padding:20px 16px;text-align:center}
+#qaScoreTab .qs-pct{font-size:52px;font-weight:800;line-height:1.1;margin:6px 0}
+#qaScoreTab .qs-pct.sc-good{color:#2e7d32}#qaScoreTab .qs-pct.sc-mid{color:#b26a00}#qaScoreTab .qs-pct.sc-low{color:#c62828}
+#qaScoreTab .qs-sub{font-size:15px;color:var(--muted,#6b7280);margin-bottom:10px}
+#qaScoreTab .qs-bar{height:12px;border-radius:99px;background:var(--line,#e5e7eb);overflow:hidden;margin:8px 0 12px}
+#qaScoreTab .qs-bar i{display:block;height:100%;background:#16a34a;transition:width .2s}
+#qaScoreTab .qs-btns{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+#qaScoreTab .qs-btns button{font-size:15px;padding:8px 14px}
+#qaScoreTab .qs-empty{padding:20px;color:var(--muted,#6b7280)}
+#qaScoreTab .qs-warn{padding:10px 14px;background:#fff7ed;color:#9a3412;font-size:13px;border-bottom:1px solid var(--line,#e5e7eb)}
 </style>
 <script>(function(){try{var m=localStorage.getItem('ditsc_theme')||'system';document.documentElement.dataset.theme=(m==='dark'||(m==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light'}catch(e){}})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
@@ -516,6 +626,8 @@ html[data-theme=dark] .qq-crit.no b{color:#f87171}
 body{font-family:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;background:var(--paper);color:var(--ink);font-size:14px;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
 .app{display:flex;min-height:100vh}.main{flex:1;min-width:0}
 .main .tab-panel{padding:0 36px 48px;max-width:1700px}
+/* Table pages fill the window: zooming the browser out gives the table more room instead of leaving an empty strip on the right */
+.main .tab-panel:has(.schedule-container){max-width:none}
 
 /* Dashboard announcements strip */
 .dash-ann{margin:14px 0 4px;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
@@ -811,6 +923,7 @@ html[data-theme=dark] td.sc-mid{color:#fbbf24!important}
 html[data-theme=dark] td.sc-low{color:#f87171!important}
 html[data-theme=dark] .trk-grid th:first-child,html[data-theme=dark] .trk-grid td:first-child,html[data-theme=dark] #mcsTable th:first-child,html[data-theme=dark] #mcsTable td:first-child{background:var(--surface)}
 html[data-theme=dark] .trk-grid .trk-sum{background:#1b2331}
+html[data-theme=dark] .trk-grid td.trk-shift{background:#1b2331;color:var(--muted)}
 html[data-theme=dark] .trk-grid tr.trk-total td,html[data-theme=dark] .trk-grid tr.trk-total td:first-child{background:#222c3d}
 html[data-theme=dark] .trk-grid td.trk-sum.st-present{background:#12301b;color:#86efac}
 html[data-theme=dark] .trk-grid td.trk-sum.st-partial{background:#3a2a12;color:#fdba74}
@@ -906,6 +1019,29 @@ html[data-theme=dark] .panel.warn h3,html[data-theme=dark] .panel.warn .attn li 
 .bar-lbl{font-size:11px;color:var(--muted);margin-top:4px}
 .bar-axis{font-size:11px;color:var(--muted);text-align:right;margin-top:4px}
 .controls [hidden]{display:none !important}
+/* Period filter: one compact control; the month picker is hidden when a preset period replaces it */
+.controls .per-sel{font-weight:600;width:auto;min-width:0}
+.controls .per-sel + .msel{margin-left:-4px}
+.per-host{display:contents}
+.msel-panel.mo-panel{max-height:340px;overflow:auto}
+.controls .cal-btn{min-width:190px}
+.cal-pop{width:292px;min-width:292px;padding:10px 10px 8px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;color:var(--ink)}
+.cal-head b{font-size:14px}
+.cal-nav{cursor:pointer;width:30px;height:30px;line-height:28px;text-align:center;border-radius:8px;border:1px solid var(--border,#d0d7de);user-select:none}
+.cal-nav:hover{background:rgba(13,110,253,.12)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px 0;text-align:center}
+.cal-w{font-size:11px;color:var(--muted);padding:4px 0;font-weight:600}
+.cal-d{padding:7px 0;border-radius:6px;cursor:pointer;font-size:13px;color:var(--ink);user-select:none}
+.cal-d:hover{background:rgba(13,110,253,.14)}
+.cal-d.dim{opacity:.38}
+.cal-d.td{font-weight:800;box-shadow:inset 0 0 0 1px rgba(13,110,253,.55)}
+.cal-d.in{background:rgba(13,110,253,.18);border-radius:0}
+.cal-d.s,.cal-d.e{background:#0d6efd;color:#fff;opacity:1}
+.cal-d.s{border-radius:6px 0 0 6px}.cal-d.e{border-radius:0 6px 6px 0}.cal-d.s.e{border-radius:6px}
+.cal-hint{margin-top:6px;font-size:11px;color:var(--muted);text-align:center}
+.controls .msel[data-per-hide]{display:none !important}
+.controls .msel-btn{min-width:130px}
 /* Filter bars stay in view while you scroll down any page */
 .main .tab-panel > .controls{position:sticky;top:0;z-index:30;background:var(--paper);padding-top:12px;padding-bottom:14px;margin-top:0}
 .tab-panel.present > .controls{top:46px}
@@ -963,6 +1099,10 @@ html[data-theme=dark] .wr-slide.wr-cover{box-shadow:0 0 0 1px #2f5666}
 .meet-links{display:flex;flex-wrap:wrap;gap:10px}
 .meet-link{padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--blue);font-size:13px;font-weight:600;text-decoration:none}
 .meet-link:hover{background:#eef2ff}
+.back-pill{display:inline-flex;align-items:center;gap:8px;margin:0 0 12px;padding:8px 16px 8px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--blue);font-size:13px;font-weight:600;text-decoration:none;box-shadow:0 1px 2px rgba(17,24,39,.06);transition:background .15s,transform .15s}
+.back-pill:hover{background:#eef2ff;transform:translateX(-2px)}
+.back-pill svg{width:16px;height:16px;flex:none}
+html[data-theme=dark] .back-pill:hover{background:#1f2837}
 .tab-panel.present{position:fixed;inset:0;z-index:9000;overflow:auto;background:var(--surface);padding:12px 24px 40px}
 .tab-panel.present > :not(.present-bar){zoom:var(--pz,1.3)}
 .tab-panel.present .schedule-container{max-height:none !important;height:auto !important}
@@ -1059,6 +1199,8 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
 .kpi-line b{color:var(--ink);font-size:14px}
 .kpi-goal{color:var(--blue);font-weight:700;font-size:13px}
 .kpi-text{margin-top:2px;color:var(--muted);font-size:13.5px;line-height:1.55}
+.kpi-wt{background:var(--blue);color:#fff;font-weight:800;font-size:13px;line-height:1;padding:4px 11px;border-radius:999px;letter-spacing:.2px;box-shadow:0 1px 3px rgba(37,99,235,.35)}
+.hd-wt{color:var(--blue);font-weight:700;text-transform:none;letter-spacing:0}
 .kpi-outro{margin:8px 0 0;padding-top:9px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;font-style:italic}
 </style>
 </head>
@@ -1110,6 +1252,7 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
         <a class="tab-btn" href="#scoreSumTab" data-tab="scoreSumTab"><svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 16V9M12 16V5M17 16v-4"/></svg><span>Summary</span></a>
         <a class="tab-btn" href="#agentSumTab" data-tab="agentSumTab" data-title="Agent Summary"><svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg><span>Agent summary</span></a>
         <a class="tab-btn" href="#qaTab" data-tab="qaTab"><svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span>Quality Assurance</span></a>
+        <a class="tab-btn" href="#qaScoreTab" data-tab="qaScoreTab" data-title="QA Scoring"><svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 12 3 3 5-6"/></svg><span>QA scoring</span></a>
         <a class="tab-btn" href="#metricTab" data-tab="metricTab" data-title="Performance Stack Ranking"><svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 8h10M7 13h6M7 18h3"/></svg><span>Stack ranking</span></a>
         <a class="tab-btn" href="#mcsTab" data-tab="mcsTab" data-title="Overall Metric Scorecard"><svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span>Metric scorecard</span></a>
       </div></div>
@@ -1144,21 +1287,7 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
 
 <div id="statusBanner" class="note red" hidden></div>
 <div id="highAnnouncements" class="note red" style="white-space:pre-wrap" hidden></div>
-<details class="kpi-card" id="kpiCard" hidden>
-  <summary class="kpi-head"><span>🎯 Team targets for the month</span><span class="kpi-chev" aria-hidden="true"></span></summary>
-  <div class="kpi-body">
-    <p class="kpi-intro">The monthly targets your team is measured against, and what each number tells you.</p>
-    <ul class="kpi-list">
-    <li><div class="kpi-line"><b>Attendance</b><span class="kpi-goal">Aim for 95% or higher</span></div><div class="kpi-text">The share of scheduled days your agents showed up. Low attendance cuts into coverage, so watch for patterns in absences and late arrivals.</div></li>
-    <li><div class="kpi-line"><b>Call and Ticket Quality</b><span class="kpi-goal">Aim for 95% or higher</span></div><div class="kpi-text">The average score from call and ticket reviews. It shows how well agents follow quality standards, and low scores point to where coaching is needed.</div></li>
-    <li><div class="kpi-line"><b>FCR (First Contact Resolution)</b><span class="kpi-goal">Aim for 82% or higher</span></div><div class="kpi-text">How often agents resolve the cast member’s issue on first contact, with no follow-ups. A dip can signal knowledge gaps or process issues.</div></li>
-    <li><div class="kpi-line"><b>Work Rate</b><span class="kpi-goal">Aim for 75% or higher</span></div><div class="kpi-text">How much of logged-in time goes to actual work. About 25% of the day is already planned for breaks and other activities, so a rate below target is worth a look at adherence.</div></li>
-    <li><div class="kpi-line"><b>Ticket Compliance</b><span class="kpi-goal">Aim for 100% or higher</span></div><div class="kpi-text">Every call should have a ticket, and tickets should match or beat calls. Below 100% means undocumented calls, so follow up with the agent.</div></li>
-    <li><div class="kpi-line"><b>Misroute Rate</b><span class="kpi-goal">Aim for below 1.030%</span></div><div class="kpi-text">How often tickets land with the wrong team. The lower the better, and a high rate usually calls for a triage refresher.</div></li>
-    </ul>
-    <p class="kpi-outro">Spot gaps early, coach with purpose, and lift the whole team. 💪</p>
-  </div>
-</details>
+<details class="kpi-card" id="kpiCard" hidden></details>
 <div id="dataUpdateNote" role="status" hidden></div>
 
 <!-- ============ DASHBOARD ============ -->
@@ -1213,6 +1342,30 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
     <h4>📊 Projected headcount (vs. minimum)</h4>
     <div id="projectionRow"></div>
   </div>
+
+  <div class="notes-box" id="notesBox">
+    <div class="notes-head"><h3>📝 Notes</h3><span class="notes-saved" id="notesSaved">Saved automatically in this browser</span></div>
+    <div class="notes-bar" id="notesBar">
+      <select id="notesBlock" title="Text style"><option value="p">Normal</option><option value="h3">Heading</option><option value="h4">Subheading</option></select>
+      <span class="nt-sep"></span>
+      <button type="button" data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+      <button type="button" data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+      <button type="button" data-cmd="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+      <button type="button" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+      <span class="nt-sep"></span>
+      <label class="nt-color" title="Text colour">A <input type="color" id="notesFore" value="#dc2626"></label>
+      <label class="nt-color" title="Highlight colour">🖍 <input type="color" id="notesBack" value="#fde047"></label>
+      <span class="nt-sep"></span>
+      <button type="button" data-cmd="insertUnorderedList" title="Bullet list">• List</button>
+      <button type="button" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
+      <button type="button" data-cmd="checklist" title="Checklist (click the box to tick)">☑ Checklist</button>
+      <span class="nt-sep"></span>
+      <button type="button" data-cmd="createLink" title="Add link">🔗</button>
+      <button type="button" data-cmd="removeFormat" title="Clear formatting">Tx</button>
+      <button type="button" data-cmd="clearAll" title="Delete the whole note">🗑 Clear</button>
+    </div>
+    <div class="notes-ed" id="notesEditor" contenteditable="true" spellcheck="true" data-ph="Type your notes here (shift handover, reminders, to-dos)..."></div>
+  </div>
 </section>
 
 <!-- ============ COVERAGE FORECAST ============ -->
@@ -1225,6 +1378,7 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
   </div>
   <div id="dailyOverviewCards" class="cards" style="margin:15px 0"></div>
   <div id="coverageTimelinePanel" class="panel"></div>
+  <div id="weekHeatmapPanel" class="panel" style="margin-top:15px"></div>
 </section>
 
 <!-- ============ PHONE COVERAGE ============ -->
@@ -1267,7 +1421,7 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
 
 <!-- ============ DAILY SCHEDULE ============ -->
 <section class="tab-panel" id="scheduleTab" hidden>
-  <div class="view-hint">📅 Shifts, breaks, lunches and supervisor for each agent on the selected date, in EST or PH time.<br>Filter by supervisor, search an agent, and click a column title to sort.</div>
+  <div class="view-hint">📅 Shifts, breaks, lunches and supervisor for each agent on the selected date, in EST or PH time.<br>Filter by supervisor or site, search an agent, and click a column title to sort.</div>
   <div class="controls">
     <select id="scheduleTimezone" onchange="buildScheduleView()">
       <option value="EST">EST</option>
@@ -1275,6 +1429,7 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
     </select>
     <input type="date" id="scheduleDate" onchange="buildScheduleView()">
     <select id="scheduleSupervisor" onchange="buildScheduleView()"><option>All Supervisors</option></select>
+    <select id="scheduleSite" onchange="buildScheduleView()"><option>All Sites</option></select>
     <input type="text" id="agentSearch" placeholder="🔍 Search Agent..." onkeyup="buildScheduleView()">
   </div>
 
@@ -1300,6 +1455,7 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
             <th onclick="sortBy('schedule','Lactation 1')">🍼 Lactation Break 1</th>
             <th onclick="sortBy('schedule','Lactation 2')">🍼 Lactation Break 2</th>
             <th onclick="sortBy('schedule','Supervisor')">🧑‍💼 Supervisor</th>
+            <th onclick="sortBy('schedule','Site')">📍 Site</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -1377,7 +1533,7 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
 <section class="tab-panel" id="ptoTab" hidden>
   <div class="view-hint">🏖️ Leave (PTO) records submitted through the PTO update form: agent, date, reason and supervisor.<br>Pick a date or click All Dates, and click a column title to sort.</div>
   <div class="controls">
-    <input type="date" id="ptoDate" onchange="buildRecordTable('pto')">
+    <span class="per-host" id="ptoPerHost"></span>
     <select id="ptoSupervisor" onchange="buildRecordTable('pto')"><option>All Supervisors</option></select>
     <button onclick="clearRecordDate('pto')">All Dates</button>
     <input type="text" id="ptoSearch" placeholder="🔍 Search Agent..." onkeyup="buildRecordTable('pto')">
@@ -1394,7 +1550,7 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
 <section class="tab-panel" id="calledOffTab" hidden>
   <div class="view-hint">🚦 Attendance exceptions submitted through the Attendance form: called off, NCNS, running late and left early, with the reason and supervisor.<br>Pick a date or click All Dates, and click a column title to sort.</div>
   <div class="controls">
-    <input type="date" id="calledOffDate" onchange="buildRecordTable('att')">
+    <span class="per-host" id="calledOffPerHost"></span>
     <select id="calledOffSupervisor" onchange="buildRecordTable('att')"><option>All Supervisors</option></select>
     <button onclick="clearRecordDate('att')">All Dates</button>
     <input type="text" id="calledOffSearch" placeholder="🔍 Search Agent..." onkeyup="buildRecordTable('att')">
@@ -1411,9 +1567,8 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
 <section class="tab-panel" id="lateTab" hidden>
   <div class="view-hint">⏱️ Actual login and logout times submitted through the Late / early time form for agents who ran late or left early.<br>Minutes late and left early are worked out from the agent's shift; a ⚠️ means more than 4 hours or an agent not on the roster, so re-check the AM/PM, date and name.</div>
   <div class="controls">
-    <input type="date" id="lateDate" onchange="buildLateTable()">
+    <span class="per-host" id="latePerHost"></span>
     <select id="lateSupervisor" onchange="buildLateTable()"><option>All Supervisors</option></select>
-    <button onclick="$('lateDate').value='';buildLateTable()">All Dates</button>
     <input type="text" id="lateSearch" placeholder="🔍 Search Agent..." onkeyup="buildLateTable()">
     <button class="blue" data-tab="attendanceTimeFormTab">+ Submit Time</button>
   </div>
@@ -1437,14 +1592,18 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
 
 <!-- ============ WEEKLY REPORT (slides) ============ -->
 <section class="tab-panel" id="weeklyReportTab" hidden>
-  <div class="view-hint">📑 One-page weekly report as slides: title, attendance, attendance trend, total number of calls and chats handled, AHT, top call drivers, QA and QA mark downs / what went well.<br>Pick <b>Weekly</b> (Monday–Sunday), <b>Monthly</b> or <b>Date range</b> (any dates from → to). It opens on the last completed week. Use ← → (or the buttons) to change slides and ‹ › to move to the previous / next week, month or period (a date range moves by its own length). The “last 4” trend slides compare the selected period with the 3 before it. QA is counted by call date. Each chart has its table underneath. In full screen, “Hide filters” (or press H) gives you just the slides.</div>
+  <div class="view-hint">📑 One-page weekly report as slides: title, attendance, attendance trend, total number of calls and chats handled, AHT, top call drivers, QA and QA mark downs / what went well.<br>Pick <b>Monthly</b> or <b>Date range</b> (any dates from → to). It opens on the last completed month. Use ← → (or the buttons) to change slides and ‹ › to move to the previous / next week, month or period (a date range moves by its own length). The “last 4” trend slides compare the selected period with the 3 before it. QA is counted by call date. Each chart has its table underneath. In full screen, “Hide filters” (or press H) gives you just the slides.</div>
   <div class="controls">
-    <select id="wrMode" onchange="wrOnMode()" title="Report period"><option value="week">Weekly (Mon–Sun)</option><option value="month">Monthly</option><option value="range">Date range</option></select>
-    <button type="button" onclick="shiftWeeklyReport(-1)" title="Previous">‹</button>
-    <input type="date" id="wrDate" onchange="buildWeeklyReport()" title="Pick any date: the week runs Monday to Sunday">
-    <input type="month" id="wrMonth" onchange="buildWeeklyReport()" hidden title="Pick the month">
-    <span id="wrRangeBox" hidden><small style="color:var(--muted)">From</small> <input type="date" id="wrFrom" onchange="buildWeeklyReport()" title="First day"> <small style="color:var(--muted)">to</small> <input type="date" id="wrTo" onchange="buildWeeklyReport()" title="Last day (up to 366 days)"></span>
-    <button type="button" onclick="shiftWeeklyReport(1)" title="Next">›</button>
+    <span class="per-host" id="wrpPerHost"></span>
+    <button type="button" id="wrPrevBtn" onclick="shiftWeeklyReport(-1)" title="Previous month">‹</button>
+    <button type="button" id="wrNextBtn" onclick="shiftWeeklyReport(1)" title="Next month">›</button>
+    <span id="wrLegacy" hidden>
+      <select id="wrMode" onchange="wrOnMode()"><option value="month">Monthly</option><option value="range">Date range</option></select>
+      <input type="date" id="wrDate" onchange="buildWeeklyReport()" hidden>
+      <input type="month" id="wrMonth" onchange="buildWeeklyReport()">
+      <input type="date" id="wrPerDate" onchange="buildWeeklyReport()" hidden>
+      <span id="wrRangeBox" hidden><input type="date" id="wrFrom" onchange="buildWeeklyReport()"><input type="date" id="wrTo" onchange="buildWeeklyReport()"></span>
+    </span>
     <small id="wrWeekLbl" style="color:var(--muted)"></small>
     <button type="button" class="present-btn" onclick="togglePresent('weeklyReportTab')" title="Full screen with larger text for the meeting (Esc to exit)">⛶ Full screen</button>
   </div>
@@ -1454,15 +1613,19 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
 
 <!-- ============ CALLED OFF & VACATION LEAVE TREND ============ -->
 <section class="tab-panel" id="leaveTrendTab" hidden>
-  <div class="view-hint">📉 Called Off and Vacation Leave only, counted as agent-days on scheduled working days.<br>Pick <b>Monthly view</b> for a year, <b>Weekly view</b> for one Monday–Sunday week, <b>Daily view</b> for one month, or <b>Date range</b> for any dates from → to. Hover a bar for the details.</div>
+  <div class="view-hint">📉 Called Off, Vacation Leave, Running Late and Left Early, counted as agent-days on scheduled working days. Running Late / Left Early follow the Attendance tracker (more than 10 minutes late or early).<br>Pick <b>Monthly view</b> for a year, <b>Weekly view</b> for one Monday–Sunday week, <b>Daily view</b> for one month, or <b>Date range</b> for any dates from → to. Hover a bar for the details.</div>
   <div class="controls">
-    <select id="lvMode" onchange="buildLeaveTrend()"><option value="month">Monthly view</option><option value="week">Weekly view (Mon–Sun)</option><option value="day">Daily view</option><option value="range">Date range</option></select>
-    <button type="button" id="lvPrev" onclick="shiftLeaveTrend(-1)" title="Previous">‹</button>
-    <select id="lvYear" onchange="buildLeaveTrend()"></select>
-    <input type="month" id="lvMonth" onchange="buildLeaveTrend()">
-    <span id="lvWeekWrap" class="lv-range" hidden><input type="date" id="lvWeek" onchange="buildLeaveTrend()" title="Pick any date: the week runs Monday to Sunday"><small id="lvWeekLbl" style="color:var(--muted)"></small></span>
-    <span id="lvRange" class="lv-range" hidden><input type="date" id="lvFrom" onchange="buildLeaveTrend()" title="From"><b>to</b><input type="date" id="lvTo" onchange="buildLeaveTrend()" title="To"></span>
-    <button type="button" id="lvNext" onclick="shiftLeaveTrend(1)" title="Next">›</button>
+    <span class="per-host" id="lvpPerHost"></span>
+    <button type="button" id="lvPrev" onclick="shiftLeaveTrend(-1)" title="Previous month">‹</button>
+    <button type="button" id="lvNext" onclick="shiftLeaveTrend(1)" title="Next month">›</button>
+    <span id="lvLegacy" hidden>
+      <select id="lvMode" onchange="buildLeaveTrend()"><option value="day">Monthly</option><option value="range">Date range</option></select>
+      <select id="lvYear" onchange="buildLeaveTrend()"></select>
+      <input type="month" id="lvMonth" onchange="buildLeaveTrend()">
+      <span id="lvWeekWrap" class="lv-range" hidden><input type="date" id="lvWeek" onchange="buildLeaveTrend()"><small id="lvWeekLbl"></small></span>
+      <span id="lvRange" class="lv-range" hidden><input type="date" id="lvFrom" onchange="buildLeaveTrend()"><b>to</b><input type="date" id="lvTo" onchange="buildLeaveTrend()"></span>
+      <input type="date" id="lvPerDate" onchange="buildLeaveTrend()" hidden>
+    </span>
     <select id="lvSupervisor" onchange="buildLeaveTrend()"><option>All Supervisors</option></select>
     <input type="text" id="lvSearch" placeholder="🔍 Search Agent..." onkeyup="buildLeaveTrend()">
     <button type="button" class="blue" onclick="refreshAttendanceData(true)">↻ Refresh</button>
@@ -1543,18 +1706,24 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
     <button class="blue" onclick="refreshAttendanceData(true)">↻ Refresh</button>
     <button type="button" class="present-btn" onclick="togglePresent('agentSumTab')" title="Full screen with larger text for the meeting (Esc to exit)">⛶ Full screen</button>
   </div>
+  <details class="kpi-card" id="kpiCardAgent" open></details>
   <div id="agSumBody"></div>
 </section>
 
 <section class="tab-panel" id="trackerTab" hidden>
   <div class="view-hint">🗓️ Per-agent attendance for the month (or one Monday–Sunday week), scored as hours worked ÷ hours expected.<br>Hover a day to see the shift and the log-in / log-out times. Click % to sort; Download CSV exports the grid.</div>
   <div class="controls">
-    <select id="trackerView" onchange="buildTracker()"><option value="month">Month view</option><option value="week">Week view (Mon–Sun)</option></select>
-    <button type="button" onclick="shiftTrackerMonth(-1)" title="Previous">‹</button>
-    <input type="month" id="trackerMonth" onchange="buildTracker()">
-    <input type="date" id="trackerWeek" onchange="buildTracker()" hidden title="Pick any date: the week runs Monday to Sunday">
-    <small id="trackerWeekLbl" hidden style="color:var(--muted)"></small>
-    <button type="button" onclick="shiftTrackerMonth(1)" title="Next">›</button>
+    <span class="per-host" id="trkPerHost"></span>
+    <button type="button" id="trackerPrev" onclick="shiftTrackerMonth(-1)" title="Previous month">‹</button>
+    <button type="button" id="trackerNext" onclick="shiftTrackerMonth(1)" title="Next month">›</button>
+    <span id="trackerLegacy" hidden>
+      <select id="trackerView" onchange="buildTracker()"><option value="month">Monthly</option><option value="range">Date range</option></select>
+      <input type="month" id="trackerMonth" onchange="buildTracker()">
+      <input type="date" id="trackerWeek" onchange="buildTracker()" hidden>
+      <input type="date" id="trackerPerDate" onchange="buildTracker()" hidden>
+      <span id="trackerRangeBox" class="lv-range" hidden><input type="date" id="trackerFrom" onchange="buildTracker()"><b>to</b><input type="date" id="trackerTo" onchange="buildTracker()"></span>
+      <small id="trackerWeekLbl" hidden></small>
+    </span>
     <select id="trackerSupervisor" onchange="buildTracker()"><option>All Supervisors</option></select>
     <input type="text" id="trackerSearch" placeholder="🔍 Search Agent..." onkeyup="buildTracker()">
     <button type="button" class="blue" id="trackerDownloadBtn" onclick="downloadTracker()">⬇ Download CSV</button>
@@ -1581,12 +1750,9 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
 <section class="tab-panel" id="lbprrTab" hidden>
   <div class="view-hint">☕ Break, Overbreak, Lunch, Overlunch, Restroom and Project time per agent per shift (LBPRR sheet), with the Total Logged-in Hours from the LOLI Actual sheet.</div>
   <div class="controls">
-    <div class="msel" id="lbprrDateWrap">
-      <button type="button" id="lbprrDateBtn" class="msel-btn">All dates ▾</button>
-      <div class="msel-panel ut-panel" id="lbprrDatePanel" hidden></div>
-    </div>
+    <span class="per-host" id="lbprrPerHost"></span>
     <select id="lbprrSup" onchange="buildLbprr()"><option>All Supervisors</option></select>
-    <select id="lbprrAgent" onchange="buildLbprr()"><option value="">All Agents</option></select>
+    <div class="msel" id="lbprrAgentWrap"><button type="button" id="lbprrAgentBtn" class="msel-btn">All Agents ▾</button><div class="msel-panel mo-panel" id="lbprrAgentPanel" hidden></div></div>
     <input type="text" id="lbprrSearch" placeholder="🔍 Search Agent..." onkeyup="buildLbprr()">
     <button type="button" onclick="clearLbprr()">Clear filters</button>
     <button type="button" id="lbprrToggleAll" onclick="utToggleAll()" style="display:none">Expand all</button>
@@ -1596,7 +1762,7 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
     <div class="summary-box">📋 Records: <span id="lbprrCount">0</span></div>
   </div>
   <div class="ut-legend">
-    <span><i style="background:#fecaca"></i>Break over 0:45:00 · Lunch over 1:00:00</span>
+    <span><i style="background:#fecaca"></i>Break 0:46:00 or more · Lunch 1:01:00 or more</span>
     <span><i style="background:#fef08a"></i>Total Logged-in Hours below 11:00:00</span>
     
   </div>
@@ -1614,15 +1780,37 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
 </section>
 
 <!-- ============ SCORECARD: QUALITY ASSURANCE ============ -->
+<section class="tab-panel" id="qaScoreTab" hidden>
+  <div class="view-hint">The score starts at 0. Tick <strong>Yes</strong> to add a question's Score Points (from the QA Scoring tab of your sheet), <strong>No</strong> for 0, or <strong>N/A</strong> to keep the points (N/A still counts as scored). The total updates as you tick. Use <strong>Criteria</strong> to see what counts as Yes or No.</div>
+  <div class="qs-wrap">
+    <div class="qs-list" id="qsList"></div>
+    <div class="qs-side">
+      <div class="qs-sub">Total score</div>
+      <div class="qs-pct" id="qsPct">-</div>
+      <div class="qs-sub" id="qsPts">0 / 0 points</div>
+      <div class="qs-bar"><i id="qsBar" style="width:0"></i></div>
+      <div class="qs-sub" id="qsCount">0 of 0 ticked</div>
+      <div class="qs-btns">
+        <button type="button" onclick="qsAll(true)">All Yes</button>
+        <button type="button" onclick="qsAll(false)">Clear ticks</button>
+        <button type="button" id="qsCritAll" onclick="qsCritAll()">Show all criteria</button>
+        <button type="button" onclick="qsClearNotes()">Clear comments</button>
+        <button type="button" class="blue" onclick="qsCopy()">Copy result</button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="tab-panel" id="qaTab" hidden>
   <div class="view-hint">✅ Quality Assurance scores by analyst, ranked by average score.<br>Tick one or more months (or Year to date); click an agent (▸) to open their audits.</div>
   <div class="controls">
+    <select id="qaPer" class="per-sel" onchange="perOnChange('qa','buildQA')" title="Report period"><option value="months">Monthly</option><option value="range">Date range</option></select><span id="qaRangeBox" hidden><input type="hidden" id="qaFrom"><input type="hidden" id="qaTo"></span>
     <div class="msel" id="qaMonthWrap">
       <button type="button" id="qaMonthBtn" class="msel-btn">Month ▾</button>
       <div class="msel-panel" id="qaMonthPanel" hidden></div>
     </div>
     <select id="qaSupervisor" onchange="buildQA()"><option>All Supervisors</option></select>
-    <select id="qaAgent" onchange="buildQA()"><option value="">All Agents</option></select>
+    <div class="msel" id="qaAgentWrap"><button type="button" id="qaAgentBtn" class="msel-btn">All Agents ▾</button><div class="msel-panel mo-panel" id="qaAgentPanel" hidden></div></div>
     <input type="text" id="qaSearch" placeholder="🔍 Search analyst or ticket..." onkeyup="buildQA()" style="width:280px">
     <button class="blue" onclick="refreshAttendanceData(true)">↻ Refresh</button>
     <button type="button" class="present-btn" onclick="togglePresent('qaTab')" title="Full screen with larger text for the meeting (Esc to exit)">⛶ Full screen</button>
@@ -1639,7 +1827,9 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
       <b>📈 What went well</b>
       <span class="qq-sub" id="qySub"></span>
       <div class="qq-ctl">
-        <button type="button" id="qyMore" onclick="qqToggle('yes')">Show all</button>
+        <button type="button" id="qyN5" onclick="qqShow('yes',5)">Top 5</button>
+        <button type="button" id="qyN10" onclick="qqShow('yes',10)">Top 10</button>
+        <button type="button" id="qyN0" onclick="qqShow('yes',0)">Show all</button>
       </div>
     </div>
     <div class="qq-body">
@@ -1653,7 +1843,9 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
       <span class="qq-sub" id="qqSub"></span>
       <div class="qq-ctl">
         <input type="hidden" id="qqSort" value="count">
-        <button type="button" id="qqMore" onclick="qqToggle('no')">Show all</button>
+        <button type="button" id="qqN5" onclick="qqShow('no',5)">Top 5</button>
+        <button type="button" id="qqN10" onclick="qqShow('no',10)">Top 10</button>
+        <button type="button" id="qqN0" onclick="qqShow('no',0)">Show all</button>
       </div>
     </div>
     <div class="qq-body">
@@ -1677,13 +1869,14 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
 <!-- ============ SCORECARD: OVERALL METRIC ============ -->
 <section class="tab-panel" id="metricTab" hidden>
   <div class="view-hint">📊 Performance stack ranking per agent.<br>Tick one or more months (or Year to date); click an agent (▸) to open their monthly scores.</div>
+  <details class="kpi-card" id="kpiCardMetric" open></details>
   <div class="controls">
     <div class="msel" id="metricMonthWrap">
       <button type="button" id="metricMonthBtn" class="msel-btn">Month ▾</button>
       <div class="msel-panel" id="metricMonthPanel" hidden></div>
     </div>
     <select id="metricSupervisor" onchange="buildMetric()"><option>All Supervisors</option></select>
-    <select id="metricAgent" onchange="buildMetric()"><option value="">All Agents</option></select>
+    <div class="msel" id="metricAgentWrap"><button type="button" id="metricAgentBtn" class="msel-btn">All Agents ▾</button><div class="msel-panel mo-panel" id="metricAgentPanel" hidden></div></div>
     <input type="text" id="metricSearch" placeholder="🔍 Search Agent..." onkeyup="buildMetric()">
     <button class="blue" onclick="refreshAttendanceData(true)">↻ Refresh</button>
     <button type="button" class="present-btn" onclick="togglePresent('metricTab')" title="Full screen with larger text for the meeting (Esc to exit)">⛶ Full screen</button>
@@ -1714,7 +1907,7 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
       <div class="msel-panel" id="mcsMonthPanel" hidden></div>
     </div>
     <select id="mcsSupervisor" onchange="buildMcs()"><option>All Supervisors</option></select>
-    <select id="mcsAgent" onchange="buildMcs()"><option value="">All Agents</option></select>
+    <div class="msel" id="mcsAgentWrap"><button type="button" id="mcsAgentBtn" class="msel-btn">All Agents ▾</button><div class="msel-panel mo-panel" id="mcsAgentPanel" hidden></div></div>
     <input type="text" id="mcsSearch" placeholder="🔍 Search Agent..." onkeyup="buildMcs()">
     <button class="blue" onclick="refreshAttendanceData(true)">↻ Refresh</button>
     <button type="button" class="present-btn" onclick="togglePresent('mcsTab')" title="Full screen with larger text for the meeting (Esc to exit)">⛶ Full screen</button>
@@ -1734,6 +1927,7 @@ html[data-theme=dark] #dataUpdateNote .du-name{color:#cfdcff}
 
 <!-- ============ MISSING AGENT CHECKER ============ -->
 <section class="tab-panel" id="missingTab" hidden>
+  <a class="back-pill" href="#lookupTab" data-tab="lookupTab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>Back to Dashboard</a>
   <div class="view-hint">🔎 Compare the agents on the CXone dashboard with your Dashboard Working list.<br>Agents on the Working list but not in your pasted list are Missing; agents in your pasted list but not on the Working list are Unexpected.</div>
   <div class="note red">
     ⚠️ <strong>Live Mode is required.</strong>
@@ -2096,6 +2290,7 @@ function showTab(id) {
 
   setPageHead(id);
   TAB_RENDERERS[id]?.();
+  if (id === 'lookupTab') window.dashPollIfStale?.();   // back on the Dashboard: catch up if the data is over a minute old
 }
 
 /* Menu items are real links (href="#tabId"), so right-click > "Open link in new tab", Ctrl/Cmd/Shift-click
@@ -2227,6 +2422,7 @@ function normalizeScheduleRow(r) {
   const o = { ...r };
   o.Name = String(r.Name ?? '').trim();
   o.Supervisor = String(r.Supervisor ?? '').trim();
+  o.Site = String(r.Site ?? '').trim();
   WEEK.forEach(d => o[d] = normShift(r[d]));
   TIME_COLS.forEach(c => o[c] = normTime(r[c]));
   return o;
@@ -2247,6 +2443,7 @@ function buildDailyMap(rows) {
     m.set(normName(x.Name) + '|' + d, {
       shift: normShift(x.Shift),
       supervisor: String(x.Supervisor ?? '').trim(),
+      site: String(x.Site ?? '').trim(),
       b1: normTime(x['Break 1']), lunch: normTime(x['Lunch']),
       b2: normTime(x['Break 2']), b3: normTime(x['Break 3']),
       l1: normTime(x['Lactation 1']), l2: normTime(x['Lactation 2'])
@@ -2270,6 +2467,7 @@ const HDR_ALIASES = (() => {
   add('Name', 'Agent', 'Agent Name', 'Analyst', 'Analyst Name', 'Employee', 'Employee Name');
   add('Supervisor', 'Supervisor Name', 'Sup', 'Team Lead', 'TL', 'Manager', 'Leader');
   add('Date'); add('Shift');
+  add('Site', 'Work Site', 'Location', 'Work Location', 'Office');
   add('Team', 'Team Name', 'Skill', 'LOB', 'Line of Business', 'Queue', 'Campaign', 'Department');
   WEEK.forEach(d => add(d, d.slice(0, 3)));
   TIME_COLS.forEach(c => add(c));
@@ -2311,22 +2509,28 @@ function applyTeamFilter(team = curTeam) {
   if (RAW.co) calledOffList = f(RAW.co);
   if (RAW.at) attTimeList = f(RAW.at);
   if (RAW.dailyRows) dailyMap = buildDailyMap(f(RAW.dailyRows));
+  /* QA, Stack ranking and Overall Metric Scorecard: team from the roster, else the tab's own Skill column, else Phone */
+  const keep = n => team === 'All' || (teamIdx.get(normName(n)) || tabSkill().get(normName(n)) || 'Phone') === team;
+  if (RAW.qa) qaList = RAW.qa.filter(r => keep(r['Analyst Name']));
+  if (RAW.metric) metricRows = RAW.metric.filter(r => keep(r[metricIdx.agent]));
+  if (RAW.mcs) mcsRows = RAW.mcs.filter(r => keep(r[mcsI.agent]));
 }
 /* ---------- Skill column (Phone / Chat) on the performance tables ----------
    Added to the Score Summary, QA, Stack Ranking and Overall Metric Scorecard tables, right after the agent column.
    Team comes from the roster; for agents the roster doesn't list it falls back to the tab's own Skill column. */
 let tabSkillCache = { key: '', map: new Map() };
 function tabSkill() {
-  const key = [qaList.length, metricRows.length, mcsRows.length].join('|');
+  const qaAll = RAW.qa || qaList, metricAll = RAW.metric || metricRows, mcsAll = RAW.mcs || mcsRows;
+  const key = [qaAll.length, metricAll.length, mcsAll.length].join('|');
   if (tabSkillCache.key === key) return tabSkillCache.map;
   const m = new Map();
-  qaList.forEach(r => { const t = rowTeamRaw(r), n = r['Analyst Name']; if (t && n) m.set(normName(n), t); });
+  qaAll.forEach(r => { const t = rowTeamRaw(r), n = r['Analyst Name']; if (t && n) m.set(normName(n), t); });
   const scan = (heads, rows, ai) => {
     const i = heads.findIndex(h => TEAM_KEYS.includes(daKey(h)));
     if (i < 0 || ai < 0) return;
     rows.forEach(r => { const t = teamOfText(r[i]); if (t && r[ai]) m.set(normName(r[ai]), t); });
   };
-  scan(metricHeads, metricRows, metricIdx.agent); scan(mcsHeads, mcsRows, mcsI.agent);
+  scan(metricHeads, metricAll, metricIdx.agent); scan(mcsHeads, mcsAll, mcsI.agent);
   tabSkillCache = { key, map: m };
   return m;
 }
@@ -2444,7 +2648,8 @@ const loadPtoWeekly = () => guard('ptoWeekly', "Couldn't load the PTOWEEKLY tab"
 
 /* QA tab: Analyst Name | Supervisor | CallDate | TicketNumber | Notes | Score | ... */
 const loadQA = () => guard('qa', "Couldn't load the QA tab", async () => {
-  qaList = (await fetchCSV(URLS.qa, { need: 'Analyst Name' })).filter(r => String(r['Analyst Name'] ?? '').trim());
+  RAW.qa = (await fetchCSV(URLS.qa, { need: 'Analyst Name' })).filter(r => String(r['Analyst Name'] ?? '').trim());
+  qaList = RAW.qa; applyTeamFilter();
 });
 
 /* QA Scoring tab: QA# | Question | Yes | No  ->  the wording of each question (Q1 - Q25) plus its Yes / No scoring values */
@@ -2455,11 +2660,11 @@ const loadQAScoring = () => guard('qaScoring', "Couldn't load the QA Scoring tab
   if (h < 0) throw new Error('no "QA#" header found - check the tab gid and sharing');
   const heads = rows[h].map(c => clean(c).toLowerCase());
   const col = re => heads.findIndex(x => re.test(x));
-  const iN = col(/^qa\s*#?$/), iQ = col(/^question/), iY = col(/^yes$/), iNo = col(/^no$/);
+  const iN = col(/^qa\s*#?$/), iQ = col(/^question/), iY = col(/^yes$/), iNo = col(/^no$/), iP = col(/^(score\s*)?points?$|^score$/);
   const map = new Map();
   rows.slice(h + 1).forEach(r => {
     const m = clean(r[iN]).match(/\d+/); if (!m) return;                 // "Q5", "QAQ5", "5" -> 5
-    map.set(parseInt(m[0], 10), { text: iQ >= 0 ? clean(r[iQ]) : '', yes: iY >= 0 ? clean(r[iY]) : '', no: iNo >= 0 ? clean(r[iNo]) : '' });
+    map.set(parseInt(m[0], 10), { text: iQ >= 0 ? clean(r[iQ]) : '', yes: iY >= 0 ? clean(r[iY]) : '', no: iNo >= 0 ? clean(r[iNo]) : '', pts: iP >= 0 ? clean(r[iP]) : '', hasPts: iP >= 0 });
   });
   qaQMap = map;
 });
@@ -2474,7 +2679,8 @@ const loadMetric = () => guard('metric', "Couldn't load the Performance Stack Ra
   const find = re => metricHeads.findIndex(x => re.test(x));
   metricIdx = { month: find(/^month$/i), agent: find(/^agent name$/i), sup: find(/^supervisor$/i), total: find(/^total$/i) };
   metricWeights = h > 0 ? rows[h - 1].map(clean) : [];
-  metricRows = rows.slice(h + 1).filter(r => clean(r[metricIdx.agent])).map(r => metricHeads.map((_, i) => clean(r[i])));
+  RAW.metric = rows.slice(h + 1).filter(r => clean(r[metricIdx.agent])).map(r => metricHeads.map((_, i) => clean(r[i])));
+  metricRows = RAW.metric; applyTeamFilter();
   if (!metricSortSet && metricIdx.total >= 0) {            // first load: highest TOTAL first
     sortState.metric = { col: metricIdx.total, asc: false };
     metricSortSet = true;
@@ -2489,7 +2695,7 @@ const shiftFor = (r, date) => dailyFor(r, date)?.shift ?? r[dayName(date)];
 function rowFor(r, date) {
   const d = dailyFor(r, date);
   if (!d) return r;
-  return { ...r, [dayName(date)]: d.shift, Supervisor: d.supervisor || r.Supervisor,
+  return { ...r, [dayName(date)]: d.shift, Supervisor: d.supervisor || r.Supervisor, Site: d.site || r.Site,
            'Break 1': d.b1, 'Lunch': d.lunch, 'Break 2': d.b2, 'Break 3': d.b3,
            'Lactation 1': d.l1 || r['Lactation 1'], 'Lactation 2': d.l2 || r['Lactation 2'] };
 }
@@ -2528,6 +2734,7 @@ const TAB_RENDERERS = {
   agentSumTab: buildAgentSummary,
   trackerTab: buildTracker,
   qaTab: buildQA,
+  qaScoreTab: () => buildQaScorer(),
   metricTab: buildMetric,
   mcsTab: buildMcs,
   forecastTab: refreshForecast,
@@ -2566,13 +2773,14 @@ function toggleRealtime() {
   clearInterval(realtimeTimer);
   if (realtimeMode) {
     updateRealtime();
-    realtimeTimer = setInterval(updateRealtime, REFRESH_MS);
+    realtimeTimer = setInterval(() => { if (activeTab === 'lookupTab') updateRealtime(); }, REFRESH_MS);   // Live Mode ticks only while the Dashboard is open
   }
 }
 
 function updateRealtime() {
   const now = estNow(), today = ymd(now);
-  ['selectedDate', 'ptoDate', 'calledOffDate', 'scheduleDate'].forEach(id => $(id).value = today);
+  ['selectedDate', 'scheduleDate'].forEach(id => $(id).value = today);
+  perSetRange('pto', today, today); perSetRange('calledOff', today, today);
   $('interval').value = `${pad(now.getHours())}:${now.getMinutes() >= 30 ? '30' : '00'}`;
   renderAll();
 }
@@ -2898,6 +3106,7 @@ function renderHighAnnouncements() {
 function refreshForecast() {
   buildDailyOverview();
   buildCoverageTimeline();
+  buildWeekHeatmap();
 }
 
 /* Coverage for one shift: leave and Called Off / NCNS take the agent out for the whole shift.
@@ -2943,6 +3152,80 @@ function coverageSlots(date) {
     slots.push({ time: toHHMM(m), expected, available });
   }
   return slots;
+}
+
+/* Week heatmap: scheduled headcount per 30-minute interval for the Monday-Sunday week of the chosen date.
+   Pure shift-schedule headcount (same as "Expected" above): NO PTO, called-off, late or left-early deductions. */
+function weekHeatmapData(monday) {
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i), ds = ymd(d);
+    const counts = new Array(48).fill(0);
+    estData.forEach(r => {
+      const shifts = shiftsAround(r, ds);
+      for (let k = 0; k < 48; k++) {
+        const m = k * 30;
+        if (shifts.some(s => s.start <= m && m < s.end)) counts[k]++;
+      }
+    });
+    days.push({ ds, d, counts });
+  }
+  return days;
+}
+
+function buildWeekHeatmap() {
+  const host = $('weekHeatmapPanel');
+  const date = $('forecastDate')?.value;
+  if (!host || !date) return;
+
+  const b = parseYMD(date);
+  const monday = new Date(b.getFullYear(), b.getMonth(), b.getDate() - (b.getDay() + 6) % 7);
+  const days = weekHeatmapData(monday);
+  const all = days.flatMap(x => x.counts), sorted = [...all].sort((a, b) => a - b);
+  const min = sorted[0], max = sorted[sorted.length - 1], mid = (sorted[Math.floor((sorted.length - 1) / 2)] + sorted[Math.ceil((sorted.length - 1) / 2)]) / 2;
+  const sunday = days[6].d, fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+  /* Excel-style 3-colour scale: red (lowest) -> yellow (median) -> green (highest) */
+  const RED = [248, 105, 107], YEL = [255, 235, 132], GRN = [99, 190, 123];
+  const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+  const colour = n => {
+    let c;
+    if (max === min) c = YEL;
+    else if (n <= mid) c = mid === min ? YEL : mix(RED, YEL, (n - min) / (mid - min));
+    else c = mix(YEL, GRN, (n - mid) / (max - mid));
+    return [`rgb(${c[0]},${c[1]},${c[2]})`, '#1f2937'];
+  };
+
+  const head = days.map(x => {
+    const sel = x.ds === date;
+    return `<th style="padding:6px 4px;font-size:12px;text-align:center;${sel ? 'color:#0d6efd' : ''}">${x.d.toLocaleDateString('en-US', { weekday: 'short' })}<br><span style="font-weight:400">${fmt(x.d)}</span></th>`;
+  }).join('');
+
+  const rows = [];
+  for (let k = 0; k < 48; k++) {
+    const cells = days.map(x => {
+      const n = x.counts[k], [bg, fg] = colour(n);
+      return `<td title="${esc(x.d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }))} ${fmtAMPM(toHHMM(k * 30))}: ${n} scheduled" style="background:${bg};color:${fg};text-align:center;font-size:12px;font-weight:600;padding:4px 2px;border:1px solid #fff;min-width:64px">${n}</td>`;
+    }).join('');
+    const hr = k % 2 === 0;
+    rows.push(`<tr><th style="text-align:right;padding:0 8px 0 0;font-size:11px;font-weight:${hr ? 600 : 400};color:${hr ? '#374151' : '#9ca3af'};white-space:nowrap">${fmtAMPM(toHHMM(k * 30))}</th>${cells}</tr>`);
+  }
+
+  const legend = [...new Set([min, Math.round((min + mid) / 2), Math.round(mid), Math.round((mid + max) / 2), max])].map(n => {
+    const [bg, fg] = colour(n);
+    return `<span style="background:${bg};color:${fg};padding:2px 10px;border-radius:4px;font-size:12px;font-weight:600;border:1px solid var(--border)">${n}</span>`;
+  }).join(' ');
+
+  host.innerHTML = `
+    <h3>🔥 Week Heatmap <span style="font-size:14px;font-weight:500;color:var(--muted)">· ${fmt(monday)} – ${fmt(sunday)}</span></h3>
+    <div style="color:var(--muted);font-size:13px;margin:6px 0 10px;line-height:1.6">Scheduled agents per 30-minute interval, Monday–Sunday, straight from the shift schedule (no PTO, absence or late / left-early deductions). Red = fewest agents, yellow = median, green = most. Follows the date picked above.</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;font-size:12px;color:var(--muted)">Fewer ${legend} More</div>
+    <div style="overflow-x:auto">
+      <table style="border-collapse:collapse;width:100%;max-width:760px">
+        <thead><tr><th></th>${head}</tr></thead>
+        <tbody>${rows.join('')}</tbody>
+      </table>
+    </div>`;
 }
 
 function buildDailyOverview() {
@@ -3105,9 +3388,22 @@ function buildScheduleView() {
   const isPH = $('scheduleTimezone').value === 'PH';
   const source = isPH ? phData : estData;
 
+  /* Site filter: list every site found in the roster / Schedule By Date, keep the current pick */
+  const siteSel = $('scheduleSite'), siteAll = 'All Sites';
+  const sites = [...new Set([...estData, ...phData].map(r => r.Site).concat([...dailyMap.values()].map(d => d.site)).filter(Boolean))].sort();
+  if (siteSel.dataset.opts !== sites.join('|')) {
+    const prevSite = siteSel.value;
+    siteSel.innerHTML = `<option>${siteAll}</option>` + sites.map(x => `<option>${esc(x)}</option>`).join('');
+    siteSel.dataset.opts = sites.join('|');
+    siteSel.value = sites.includes(prevSite) ? prevSite : siteAll;
+  }
+  const site = siteSel.value;
+  const siteByName = new Map(estData.filter(r => r.Site).map(r => [normName(r.Name), r.Site]));
+
   const rows = source
     .map(r => isPH ? r : rowFor(r, date))
-    .filter(r => (sup === ALL || r.Supervisor === sup) && (!q || up(r.Name).includes(q)))
+    .map(r => r.Site ? r : { ...r, Site: siteByName.get(normName(r.Name)) || dailyFor(r, date)?.site || '' })   // PH tab may have no Site column: borrow it from the EST roster
+    .filter(r => (sup === ALL || r.Supervisor === sup) && (site === siteAll || r.Site === site) && (!q || up(r.Name).includes(q)))
     .map(r => ({ r, shift: r[day] || 'OFF', ...getAgentState(r, day, date) }));
 
   const { col, asc } = sortState.schedule;
@@ -3134,6 +3430,7 @@ function buildScheduleView() {
       <td>${isOff(shift) || !isLact(r.Name) ? '' : formatTimeRange(r['Lactation 1'], LACTATION_MIN)}</td>
       <td>${isOff(shift) || !isLact(r.Name) ? '' : formatTimeRange(r['Lactation 2'], LACTATION_MIN)}</td>
       <td>${esc(r.Supervisor)}</td>
+      <td>${esc(r.Site || '')}</td>
     </tr>`).join('');
 
   $('dvWorking').textContent = counts.WORKING;
@@ -3357,12 +3654,20 @@ function buildRosterView() {
    TEAM ROSTER (agents per supervisor)
    ===================================================================== */
 function buildTeamView() {
-  const sup = $('teamSupervisor').value;
+  /* Team roster always lists ALL agents (Phone + Chat), whatever the Phone / Chat switch is set to */
+  const all = RAW.est && RAW.est.length ? RAW.est : estData;
+  const supSel = $('teamSupervisor'), prevSup = supSel.value;
+  supSel.innerHTML = `<option>${ALL}</option>` + [...new Set(all.map(x => x.Supervisor).filter(Boolean))].sort((a, b) => a.localeCompare(b)).map(s => `<option>${esc(s)}</option>`).join('');
+  if ([...supSel.options].some(o => o.value === prevSup)) supSel.value = prevSup;
+  const sup = supSel.value;
   const q = up($('teamSearch').value);
-  const groups = {};
-  estData.forEach(r => {
-    if (q && !up(r.Name).includes(q)) return;
-    (groups[r.Supervisor || 'Unassigned'] ??= []).push(r.Name);
+  const groups = {}, seen = new Set();
+  all.forEach(r => {
+    if (!r.Name || (q && !up(r.Name).includes(q))) return;
+    const sp = r.Supervisor || 'Unassigned', key = sp + '|' + normName(r.Name);
+    if (seen.has(key)) return;
+    seen.add(key);
+    (groups[sp] ??= []).push({ name: r.Name, team: rowTeam(r) });
   });
   const entries = Object.entries(groups)
     .filter(([s]) => sup === ALL || s === sup)
@@ -3374,7 +3679,7 @@ function buildTeamView() {
   $('teamList').innerHTML = entries.length ? entries.map(([name, agents]) => `
     <div class="group" style="--c:${supColor(name) || '#6c757d'}">
       <div class="group-title"><span>🧑‍💼 ${esc(name)}</span><small>${agents.length} agent${agents.length === 1 ? '' : 's'}</small></div>
-      <ol>${agents.sort((a, b) => a.localeCompare(b)).map(a => `<li>${esc(a)}</li>`).join('')}</ol>
+      <ol>${agents.sort((a, b) => (b.team === curTeam) - (a.team === curTeam) || a.name.localeCompare(b.name)).map(a => `<li>${esc(a.name)} <span class="sk-chip sk-${a.team.toLowerCase()}" title="${a.team}" aria-label="${a.team}">${a.team === 'Chat' ? '💬' : '📞'}</span></li>`).join('')}</ol>
     </div>`).join('')
     : '<div class="empty" style="--c:#6c757d">No agents found</div>';
 }
@@ -3390,8 +3695,8 @@ const recordCell = (r, c) => {
   return !v || up(v) === 'FALSE' ? '—' : esc(convertShiftRange(v));
 };
 const RECORD_VIEWS = {
-  pto: { table: 'ptoTable',       list: () => ptoList,       sup: 'ptoSupervisor',       date: 'ptoDate',       search: 'ptoSearch',       empty: 'No PTO records found' },
-  att: { table: 'calledOffTable', list: () => calledOffList, sup: 'calledOffSupervisor', date: 'calledOffDate', search: 'calledOffSearch', empty: 'No Called Off records found' }
+  pto: { table: 'ptoTable',       list: () => ptoList,       sup: 'ptoSupervisor',       date: 'ptoDate',       per: 'ptoPer',       search: 'ptoSearch',       empty: 'No PTO records found' },
+  att: { table: 'calledOffTable', list: () => calledOffList, sup: 'calledOffSupervisor', date: 'calledOffDate', per: 'calledOffPer', search: 'calledOffSearch', empty: 'No Called Off records found' }
 };
 
 function buildRecordTable(kind) {
@@ -3401,7 +3706,7 @@ function buildRecordTable(kind) {
   table.tHead.innerHTML = '<tr>' + Object.entries(RECORD_COLS)
     .map(([c, title]) => `<th onclick="sortBy('${kind}','${c}')">${title}</th>`).join('') + '</tr>';
 
-  const sup = $(v.sup).value, date = $(v.date).value, q = up($(v.search).value);
+  const sup = $(v.sup).value, R = perRecRange(v.per, v.date), q = up($(v.search).value);
   const { col, asc } = sortState[kind];
   const dir = asc ? 1 : -1;
 
@@ -3417,7 +3722,7 @@ function buildRecordTable(kind) {
   const rows = withSup.filter(r =>
     (sup === ALL || r.Supervisor === sup) &&
     (!q || up(r.Name).includes(q)) &&
-    (!date || normalizeDate(r['EST Date']) === date)
+    perInRange(normalizeDate(r['EST Date']), R)
   );
 
   if (col) rows.sort((a, b) => col === 'EST Date'
@@ -3429,7 +3734,8 @@ function buildRecordTable(kind) {
 }
 
 function clearRecordDate(kind) {
-  $(RECORD_VIEWS[kind].date).value = '';
+  const v = RECORD_VIEWS[kind];
+  $(v.per).value = 'all'; $(v.date).value = ''; $(v.date).hidden = true;
   buildRecordTable(kind);
 }
 
@@ -3470,9 +3776,9 @@ function lateRows() {
 }
 
 function buildLateTable() {
-  const sup = $('lateSupervisor').value, date = $('lateDate').value, q = up($('lateSearch').value);
+  const sup = $('lateSupervisor').value, R = perRecRange('latePer', 'lateDate'), q = up($('lateSearch').value);
   const rows = lateRows()
-    .filter(x => (sup === ALL || x.supervisor === sup) && (!date || x.date === date) && (!q || up(x.name).includes(q)))
+    .filter(x => (sup === ALL || x.supervisor === sup) && perInRange(x.date, R) && (!q || up(x.name).includes(q)))
     .sort((a, b) => b.date.localeCompare(a.date) || a.name.localeCompare(b.name));
 
   const t = v => { const n = normTime(v); return n ? fmtAMPM(n) : '—'; };
@@ -3558,11 +3864,49 @@ function fillAgentSelect(selId, names) {
   if (list.includes(prev)) sel.value = prev;
   return sel.value;
 }
+/* Agent filter with tick boxes: tick one or more agents; nothing ticked = All Agents.
+   Returns the Set of ticked agents (normName keys). The list follows the other filters; ticked agents that drop out of it are unticked. */
+const agMulti = {};
+function fillAgentMulti(id, names, rebuild) {
+  const st = agMulti[id] || (agMulti[id] = { sel: new Set(), key: '', wired: false });
+  st.rebuild = rebuild;
+  const list = [...new Map(names.filter(Boolean).map(n => [normName(n), String(n).trim()])).values()].sort((a, b) => a.localeCompare(b));
+  const have = new Set(list.map(n => normName(n)));
+  [...st.sel].forEach(k => { if (!have.has(k)) st.sel.delete(k); });
+  const panel = $(id + 'Panel'), btn = $(id + 'Btn');
+  if (!st.wired) {
+    st.wired = true;
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      Object.keys(agMulti).forEach(o => { if (o !== id) $(o + 'Panel').hidden = true; });
+      panel.hidden = !panel.hidden;
+    });
+    $(id + 'Wrap').addEventListener('click', e => e.stopPropagation());
+    document.addEventListener('click', () => { panel.hidden = true; });
+    panel.addEventListener('change', e => {
+      const t = e.target;
+      if (t.dataset.all !== undefined) st.sel.clear();
+      else if (t.dataset.n) t.checked ? st.sel.add(t.dataset.n) : st.sel.delete(t.dataset.n);
+      st.rebuild();
+    });
+  }
+  const key = list.join('\u0001');
+  if (st.key !== key) {                       // only rebuild the list when the agents changed, so the panel keeps its scroll position
+    st.key = key;
+    panel.innerHTML = '<label class="ytd"><input type="checkbox" data-all> All Agents</label>' +
+      list.map(n => `<label><input type="checkbox" data-n="${esc(normName(n))}"> ${esc(n)}</label>`).join('');
+  }
+  panel.querySelectorAll('input[data-n]').forEach(c => { c.checked = st.sel.has(c.dataset.n); });
+  panel.querySelector('input[data-all]').checked = !st.sel.size;
+  btn.textContent = (!st.sel.size ? 'All Agents' : st.sel.size === 1 ? (list.find(n => st.sel.has(normName(n))) || 'All Agents') : st.sel.size + ' agents') + ' ▾';
+  return st.sel;
+}
 
 /* Quality Assurance: ranked like the Performance Stack Ranking.
    Tick one or more months (or Year to date). Each agent is one row (average score, audits, latest call);
    open it to see the audits, or - with several months ticked - the months, and open a month to see its audits. */
 function buildQA() {
+  calMount('qa', buildQA);
   const all = qaList.map((x, qid) => {
     const date = normalizeDate(x.CallDate);
     return { analyst: String(x['Analyst Name'] ?? '').trim(), supervisor: String(x.Supervisor ?? '').trim(), date, ym: date.slice(0, 7),
@@ -3571,12 +3915,14 @@ function buildQA() {
 
   qaMonths = [...new Set(all.map(x => x.ym))].sort();
   if (!qaSelInit && qaMonths.length) { qaSel = new Set([qaMonths[qaMonths.length - 1]]); qaSelInit = true; }
+  const qaR = perRangeOf('qa');
+  if (qaR) qaSel = new Set(perMonthsTouched(qaR));
   qaSel = new Set([...qaSel].filter(m => qaMonths.includes(m)));
   if (!qaSel.size && qaMonths.length) qaSel.add(qaMonths[qaMonths.length - 1]);
   $('qaMonthWrap').hidden = !qaMonths.length;
   renderQaMonthPicker();
   const multi = qaSel.size > 1;
-  const picked = all.filter(x => qaSel.has(x.ym));
+  const picked = all.filter(x => qaSel.has(x.ym) && perInRange(x.date, qaR));
 
   /* Supervisor list follows the ticked months */
   const supSel = $('qaSupervisor'), prevSup = supSel.value;
@@ -3584,10 +3930,10 @@ function buildQA() {
   supSel.innerHTML = `<option>${ALL}</option>` + sups.map(s => `<option>${esc(s)}</option>`).join('');
   if (sups.includes(prevSup)) supSel.value = prevSup;
   const sup = supSel.value, q = up($('qaSearch').value);
-  const ag = fillAgentSelect('qaAgent', picked.filter(x => sup === ALL || x.supervisor === sup).map(x => x.analyst));
+  const ags = fillAgentMulti('qaAgent', picked.filter(x => sup === ALL || x.supervisor === sup).map(x => x.analyst), buildQA);
 
   const rows = picked
-    .filter(x => (sup === ALL || x.supervisor === sup) && (!ag || normName(x.analyst) === normName(ag)) && (!q || up(`${x.analyst} ${x.ticket}`).includes(q)))
+    .filter(x => (sup === ALL || x.supervisor === sup) && (!ags.size || ags.has(normName(x.analyst))) && (!q || up(`${x.analyst} ${x.ticket}`).includes(q)))
     .sort((a, b) => b.date.localeCompare(a.date) || a.analyst.localeCompare(b.analyst));
 
   const avgOf = list => {
@@ -3670,7 +4016,7 @@ function buildQA() {
 /* ---------- QA: which questions (Q1 - Q25) are answered "No" the most, and how that moves month by month ----------
    Follows the QA filters: the bars use the ticked months + supervisor + search; the trend line uses every month (same supervisor + search).
    Only Yes / No answers count; N/A and blank answers are skipped. "No %" = No / (Yes + No). Click a bar to see that question's trend. */
-const qqUi = { no: { p: 'qq', sel: null, all: false, word: 'No' }, yes: { p: 'qy', sel: null, all: false, word: 'Yes' } };   // What went wrong (No) / What went well (Yes)
+const qqUi = { no: { p: 'qq', sel: null, n: 10, word: 'No' }, yes: { p: 'qy', sel: null, n: 10, word: 'Yes' } };   // What went wrong (No) / What went well (Yes)
 let qqLast = { rows: [], trend: [] }, qqBound = false;
 const qaAnswerKind = v => { const s = String(v ?? '').trim().toLowerCase(); return /^(no|n)$/.test(s) ? 'no' : /^(yes|y)$/.test(s) ? 'yes' : ''; };
 const qaQInfo = label => qaQMap.get(parseInt(String(label).replace(/\D/g, ''), 10) || 0) || null;
@@ -3689,7 +4035,7 @@ function qaQuestionStats(rows) {
   });
   return [...m.values()].map(e => ({ ...e, tot: e.no + e.yes, rate: e.no + e.yes ? e.no / (e.no + e.yes) * 100 : 0, yrate: e.no + e.yes ? e.yes / (e.no + e.yes) * 100 : 0 }));
 }
-function qqToggle(kind) { qqUi[kind].all = !qqUi[kind].all; buildQaQuestions(); }
+function qqShow(kind, n) { qqUi[kind].n = n; buildQaQuestions(); }          // n = 5, 10, or 0 for all
 function qqTrendHtml(label, kind) {
   const W_ = qqUi[kind].word;
   const byMonth = new Map();
@@ -3731,14 +4077,19 @@ function buildQaQuestions(rows, trend) {
     const stats = allStats.slice(), rateOf = s => kind === 'no' ? s.rate : s.yrate, W_ = u.word;
     stats.sort((a, b) => b[kind] - a[kind] || rateOf(b) - rateOf(a) || a.n - b.n);
     $(u.p + 'Sub').textContent = `${qqLast.rows.length} audit${qqLast.rows.length === 1 ? '' : 's'} · N/A and blank answers are skipped`;
-    $(u.p + 'More').hidden = stats.length <= 10;
-    $(u.p + 'More').textContent = u.all ? 'Show top 10' : `Show all ${stats.length}`;
+    const cur = u.n && u.n < stats.length ? u.n : 0;                              // a Top N that is as long as the list is the same as "all"
+    [5, 10, 0].forEach(k => {
+      const b = $(u.p + 'N' + k);
+      b.hidden = k === 0 ? stats.length <= 5 : stats.length <= k;                  // hide a choice that would show everything anyway
+      b.classList.toggle('on', cur === k);
+      if (k === 0) b.textContent = `Show all ${stats.length}`;
+    });
     if (!stats.length) {
       $(u.p + 'Bars').innerHTML = '<div class="qq-note">No Yes / No answers found in the question columns for these filters.</div>';
       $(u.p + 'Trend').innerHTML = ''; return;
     }
     if (!u.sel || !stats.some(s => s.label === u.sel)) u.sel = stats[0].label;
-    const shown = u.all ? stats : stats.slice(0, 10), max = Math.max(...shown.map(s => s[kind])) || 1;
+    const shown = cur ? stats.slice(0, cur) : stats, max = Math.max(...shown.map(s => s[kind])) || 1;
     $(u.p + 'Bars').innerHTML = shown.map(s => `
     <div class="qq-row${s.label === u.sel ? ' sel' : ''}" data-q="${esc(s.label)}" title="${s[kind]} ${W_} of ${s.tot} answered (${rateOf(s).toFixed(1)}%) – click for the monthly trend">
       <span class="qq-lab">${esc(s.label)}</span>
@@ -3930,6 +4281,7 @@ const METRIC_BANDS = {
   'fcr':                     { good: 10, mid: 6,  tip: 'Green: 10 pts (FCR >=82%) | Amber: 6-8 pts (60-81%) | Red: <=4 pts' },
   'work rate':               { good: 25, mid: 15, tip: 'Green: 25 pts (work rate >=75%) | Amber: 15-20 pts (70-74%) | Red: <=10 pts' },
   'misroute rate':           { good: 5,  mid: 2,  tip: 'Green: 5 pts (misroute <1.030%) | Amber: 2-3 pts (1.031-1.99%) | Red: 0 pts' },
+  'compliance':              { good: 5,  mid: 3,  tip: 'Green: 5 pts (compliance >=97%) | Amber: 3-4 pts (80-96%) | Red: <=2 pts (<80%)' },
   'total':                   { good: 85, mid: 60, tip: 'Green: >=85 pts | Amber: 60-84 pts | Red: <60 pts' }
 };
 const metricBand = i => METRIC_BANDS[String(metricHeads[i] || '').toLowerCase().trim()] || null;
@@ -3941,14 +4293,261 @@ function mcsBand(head, v, months) {
   if (typeof n !== 'number') return '';
   if (k === 'qa') return n >= 95 ? 'good' : n >= 85 ? 'mid' : 'low';
   if (k === 'workingrate') return n >= 75 ? 'good' : n >= 70 ? 'mid' : 'low';
-  if (k === 'compliance') return n >= 100 ? 'good' : 'low';
+  if (k === 'compliance') return n >= 97 ? 'good' : n >= 80 ? 'mid' : 'low';      // 5 pts >=97% | 4-3 pts 80-96% | 2-1 pts below 80%
   if (k === 'misroutes') return months > 1 ? '' : n < 1.03 ? 'good' : n < 2 ? 'mid' : 'low';   // several months are added up, so the per-month target no longer applies
   if (k.startsWith('fcrcount')) return n >= 82 ? 'good' : n >= 60 ? 'mid' : 'low';
   return '';
 }
 
 /* Columns shown in the Performance Stack Ranking table, in this order (matched by header name) */
-const METRIC_SHOW = ['agent name', 'attendance', 'call and ticket quality', 'fcr', 'misroute rate', 'work rate', 'total', 'supervisor'];
+const METRIC_SHOW = ['agent name', 'attendance', 'call and ticket quality', 'fcr', 'work rate', 'compliance', 'misroute rate', 'total', 'supervisor'];
+/* Columns that only exist for certain months: header name -> month number (11 = November). Shown only while that month is ticked. */
+const METRIC_MONTH_ONLY = { 'compliance': [11] };
+const metricMonthNums = labels => labels.map(l => SS_MON.findIndex(x => String(l).toLowerCase().includes(x)) + 1);
+const metricShowCols = monthNums => METRIC_SHOW.filter(n => !METRIC_MONTH_ONLY[n] || METRIC_MONTH_ONLY[n].some(m => monthNums.includes(m)))
+  .map(n => metricHeads.findIndex(h => h.toLowerCase().trim() === n)).filter(i => i >= 0);
+
+/* Scorecard weights (points out of 100) by month: November onward (Compliance added) and October backwards.
+   A set is used only when every ticked month belongs to it; a mix of the two shows no weights. */
+const METRIC_WEIGHT_SETS = [
+  { months: [11], w: { 'attendance': 35, 'call and ticket quality': 25, 'work rate': 15, 'fcr': 15, 'compliance': 5, 'misroute rate': 5, 'total': 100 } },
+  { months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], w: { 'attendance': 35, 'call and ticket quality': 25, 'work rate': 25, 'fcr': 10, 'misroute rate': 5, 'total': 100 } }
+];
+const metricWeightsFor = monthNums => monthNums.length ? (METRIC_WEIGHT_SETS.find(st => monthNums.every(m => st.months.includes(m))) || {}).w || null : null;
+const metricWeightHtml = (i, monthNums) => {
+  const sheetW = metricWeights[i] || '';
+  if (/^\d+(\.\d+)?%$/.test(sheetW)) return `<small>${esc(sheetW)}</small>`;       // a weight typed in the sheet wins
+  const W = metricWeightsFor(monthNums), w = W && W[String(metricHeads[i] || '').toLowerCase().trim()];
+  return w != null ? `<span class="hd-wt">(${w})</span>` : '';
+};
+
+/* "Team targets for the month": one card, filled into every .kpi-card on the page */
+const KPI_ITEMS = [
+  ['Attendance', 'attendance', 'Aim for 95% or higher', 'The share of scheduled days your agents showed up. Low attendance cuts into coverage, so watch for patterns in absences and late arrivals.'],
+  ['Call and Ticket Quality', 'call and ticket quality', 'Aim for 95% or higher', 'The average score from call and ticket reviews. It shows how well agents follow quality standards, and low scores point to where coaching is needed.'],
+  ['FCR (First Contact Resolution)', 'fcr', 'Aim for 82% or higher', 'How often agents resolve the cast member’s issue on first contact, with no follow-ups. A dip can signal knowledge gaps or process issues.'],
+  ['Work Rate', 'work rate', 'Aim for 75% or higher', 'How much of logged-in time goes to actual work. About 25% of the day is already planned for breaks and other activities, so a rate below target is worth a look at adherence.'],
+  ['Ticket Compliance', 'compliance', 'Aim for 97% or higher', 'Every call should have a ticket. Below 97% means undocumented calls, so follow up with the agent.'],
+  ['Misroute Rate', 'misroute rate', 'Aim for below 1.030%', 'How often tickets land with the wrong team. The lower the better, and a high rate usually calls for a triage refresher.']
+];
+/* Months ticked on the page this card sits on (the weights follow them) */
+function kpiMonthNums(card) {
+  try {
+    if (card.id === 'kpiCardMetric') return metricMonthNums([...metricSel]);
+    if (card.id === 'kpiCardAgent') return [...agSumSel].map(ym => +ym.slice(5, 7));
+    if (card.id === 'kpiCard') return [...ssSel].map(ym => +ym.slice(5, 7));
+  } catch (e) {}
+  return [];
+}
+function renderKpiCards() {
+  document.querySelectorAll('details.kpi-card').forEach(d => {
+    const W = metricWeightsFor(kpiMonthNums(d));
+    d.innerHTML = '<summary class="kpi-head"><span>🎯 Team targets for the month</span><span class="kpi-chev" aria-hidden="true"></span></summary>' +
+      '<div class="kpi-body"><p class="kpi-intro">The monthly targets your team is measured against, and what each number tells you.</p><ul class="kpi-list">' +
+      KPI_ITEMS.map(([n, k, g, t]) => `<li><div class="kpi-line"><b>${n}</b><span class="kpi-goal">${g}</span>${W && W[k] != null ? `<span class="kpi-wt" title="Points this metric is worth in the stack ranking">${W[k]} pts</span>` : ''}</div><div class="kpi-text">${t}</div></li>`).join('') +
+      '</ul><p class="kpi-outro">Spot gaps early, coach with purpose, and lift the whole team. 💪</p></div>';
+  });
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', renderKpiCards); else renderKpiCards();
+
+/* =====================================================================
+   PERIOD FILTER: Year to date / Month to date / Week to date (Mon–Sun) / Date.
+   Every period runs up to today (EST). The monthly score pages use the months the period touches.
+   ===================================================================== */
+const PER_PRESETS = ['ytd', 'mtd', 'wtd', 'date'];
+const perIsPreset = m => PER_PRESETS.includes(m);
+function perRange(mode, dateStr) {
+  const t = parseYMD(ymd(estNow())), today = ymd(t);
+  if (mode === 'ytd') return { from: `${t.getFullYear()}-01-01`, to: today };
+  if (mode === 'mtd') return { from: `${t.getFullYear()}-${pad(t.getMonth() + 1)}-01`, to: today };
+  if (mode === 'wtd') return { from: ymd(new Date(t.getFullYear(), t.getMonth(), t.getDate() - (t.getDay() + 6) % 7)), to: today };
+  const d = dateStr || today;
+  return { from: d, to: d };
+}
+const perInRange = (d, R) => !R || (R.test ? R.test(d) : d >= R.from && d <= R.to);
+function perMonthsTouched(R) {
+  const out = []; let [y, m] = R.from.slice(0, 7).split('-').map(Number); const [y2, m2] = R.to.slice(0, 7).split('-').map(Number);
+  while (y < y2 || (y === y2 && m <= m2)) { out.push(`${y}-${pad(m)}`); if (++m > 12) { m = 1; y++; } }
+  return out;
+}
+/* Period picked on a monthly score page (null = "Pick months", the month ticks decide) */
+function perSyncMonthPicker(p) {
+  const w = $(p + 'MonthWrap'), s = $(p + 'Per');
+  if (!w || !s) return;
+  if (s.value === 'months') delete w.dataset.perHide; else w.dataset.perHide = '1';
+}
+const perRangeOf = p => {
+  const s = $(p + 'Per');
+  if (!s || !s.value || s.value === 'months') return null;
+  let a = $(p + 'From').value, b = $(p + 'To').value; if (!a || !b) return null;
+  if (a > b) [a, b] = [b, a];
+  return { from: a, to: b };
+};
+function perOnChange(p, fn) {
+  const box = $(p + 'RangeBox');
+  if (box) {
+    box.hidden = $(p + 'Per').value !== 'range';
+    calMount(p, window[fn]); calDefaults(p); calSync(p);
+  }
+  perSyncMonthPicker(p);
+  window[fn]();
+}
+/* Ticking months by hand goes back to "Pick months" */
+document.addEventListener('change', e => {
+  const panel = e.target.closest && e.target.closest('.msel-panel');
+  if (!panel || !/MonthPanel$/.test(panel.id)) return;
+  const p = panel.id.replace(/MonthPanel$/, ''), s = $(p + 'Per');
+  if (s && s.value !== 'months') { s.value = 'months'; if ($(p + 'RangeBox')) $(p + 'RangeBox').hidden = true; perSyncMonthPicker(p); }
+}, true);
+
+/* =====================================================================
+   PERIOD PICKER: PTO, Called Off, Late, Break/Lunch, Leave Trend, Tracker, Weekly Report
+   Monthly    = tick one or more months, or Year to date
+   Date range = one calendar: click the first day, then the last day (the days in between are highlighted)
+   ===================================================================== */
+const PERP = {};
+const PERP_FN = { pto: () => buildRecordTable('pto'), calledOff: () => buildRecordTable('att'), late: () => buildLateTable(), lbprr: () => buildLbprr(), lvp: () => buildLeaveTrend(), trk: () => buildTracker(), wrp: () => buildWeeklyReport() };
+const perFmtMonth = ym => { const [y, m] = ym.split('-').map(Number); return new Date(y, m - 1, 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }); };
+const perFmtDay = (d, yr) => parseYMD(d).toLocaleDateString('en-US', yr ? { month: 'short', day: 'numeric', year: 'numeric' } : { month: 'short', day: 'numeric' });
+function perMonthRange(ym) { const [y, m] = ym.split('-').map(Number); return { from: `${ym}-01`, to: ymd(new Date(y, m, 0)) }; }
+const perCurMonth = () => ymd(estNow()).slice(0, 7);
+const perPrevMonth = () => { const t = estNow(); return ymd(new Date(t.getFullYear(), t.getMonth() - 1, 1)).slice(0, 7); };
+/* Months offered in the list = the months that have data on file for that page (newest first) */
+const perDm = (rows, f) => (rows || []).map(f);
+const PERP_DATES = {
+  pto: () => perDm(ptoList, r => normalizeDate(r['EST Date'])),
+  calledOff: () => perDm(calledOffList, r => normalizeDate(r['EST Date'])),
+  late: () => perDm(lateRows(), x => x.date),
+  lbprr: () => perDm(lbprrRows(), x => x.date),
+  lvp: () => [...perDm(ptoList, r => normalizeDate(r['EST Date'])), ...perDm(calledOffList, r => normalizeDate(r['EST Date']))],
+  trk: () => [...loliIdx.values()].flatMap(a => a.map(x => x.date)),
+  wrp: () => [...[...loliIdx.values()].flatMap(a => a.map(x => x.date)), ...perDm(ptoList, r => normalizeDate(r['EST Date'])), ...perDm(calledOffList, r => normalizeDate(r['EST Date'])), ...perDm(callDriverRows, x => x.d)]
+};
+function perMonthList(p, st) {
+  let ds = []; try { ds = PERP_DATES[p] ? PERP_DATES[p]() : []; } catch (e) {}
+  const set = new Set(ds.map(d => String(d || '').slice(0, 7)).filter(m => /^\d{4}-\d{2}$/.test(m)));
+  if (st) st.months.forEach(m => set.add(m));              // a month you ticked stays in the list
+  if (!set.size) set.add(perCurMonth());
+  return [...set].sort().reverse();
+}
+const perIsSingle = st => !!st && st.mode === 'month' && !st.ytd && st.months.size === 1;
+
+/* ---- one-calendar range picker (writes the hidden <p>From / <p>To inputs) ---- */
+function calDefaults(p) { const t = ymd(estNow()); if (!$(p + 'From').value) $(p + 'From').value = t.slice(0, 8) + '01'; if (!$(p + 'To').value) $(p + 'To').value = t; }
+function calSync(p) {
+  const b = $(p + 'CalBtn'); if (!b) return;
+  const a = $(p + 'From').value, c = $(p + 'To').value;
+  b.textContent = '📅 ' + (!a ? 'Pick dates' : a === c ? perFmtDay(a, true) : a.slice(0, 4) === c.slice(0, 4) ? perFmtDay(a) + ' – ' + perFmtDay(c, true) : perFmtDay(a, true) + ' – ' + perFmtDay(c, true)) + ' ▾';
+}
+function calMount(p, onChange) {
+  const box = $(p + 'RangeBox'); if (!box || box.dataset.cal) return;
+  box.dataset.cal = '1'; box.classList.add('msel');
+  box.insertAdjacentHTML('beforeend', `<button type="button" class="msel-btn cal-btn" id="${p}CalBtn"></button><div class="msel-panel cal-pop" id="${p}CalPanel" hidden></div>`);
+  const btn = $(p + 'CalBtn'), pop = $(p + 'CalPanel'), fromI = $(p + 'From'), toI = $(p + 'To');
+  let vy = 0, vm = 0, picking = false, hov = '';
+  const setView = d => { const t = parseYMD(d || ymd(estNow())); vy = t.getFullYear(); vm = t.getMonth(); };
+  function draw() {
+    const first = new Date(vy, vm, 1), start = new Date(vy, vm, 1 - (first.getDay() + 6) % 7), today = ymd(estNow());
+    let lo = fromI.value, hi = toI.value;
+    if (picking && hov) { lo = fromI.value; hi = hov; if (hi < lo) [lo, hi] = [hi, lo]; }
+    const cells = [];
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i), k = ymd(d);
+      const cls = ['cal-d', d.getMonth() !== vm ? 'dim' : '', k === today ? 'td' : '', k === lo ? 's' : '', k === hi ? 'e' : '', k > lo && k < hi ? 'in' : ''].filter(Boolean).join(' ');
+      cells.push(`<div class="${cls}" data-d="${k}">${d.getDate()}</div>`);
+    }
+    pop.innerHTML = `<div class="cal-head"><span class="cal-nav" data-nav="-1" title="Previous month">‹</span><b>${first.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</b><span class="cal-nav" data-nav="1" title="Next month">›</span></div>` +
+      `<div class="cal-grid">${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(w => `<div class="cal-w">${w}</div>`).join('')}${cells.join('')}</div>` +
+      `<div class="cal-hint">${picking ? 'Now click the last day' : 'Click the first day, then the last day'}</div>`;
+  }
+  box.addEventListener('click', e => e.stopPropagation());
+  btn.addEventListener('click', () => {
+    pop.hidden = !pop.hidden;
+    if (pop.hidden) return;
+    document.querySelectorAll('.mo-panel,.cal-pop').forEach(x => { if (x !== pop) x.hidden = true; });
+    calDefaults(p); setView(fromI.value); picking = false; hov = ''; draw();
+    pop.style.left = ''; pop.style.right = '';
+    if (pop.getBoundingClientRect().right > window.innerWidth - 8) { pop.style.left = 'auto'; pop.style.right = '0'; }
+  });
+  pop.addEventListener('click', e => {
+    const nav = e.target.closest('[data-nav]');
+    if (nav) { vm += +nav.dataset.nav; if (vm < 0) { vm = 11; vy--; } if (vm > 11) { vm = 0; vy++; } draw(); return; }
+    const c = e.target.closest('[data-d]'); if (!c) return;
+    const d = c.dataset.d;
+    if (!picking) { fromI.value = toI.value = d; picking = true; }
+    else { const a = fromI.value; if (d < a) { toI.value = a; fromI.value = d; } else toI.value = d; picking = false; pop.hidden = true; }
+    hov = ''; calSync(p); draw(); onChange();
+  });
+  pop.addEventListener('mouseover', e => { if (!picking) return; const c = e.target.closest('[data-d]'); if (c && c.dataset.d !== hov) { hov = c.dataset.d; draw(); } });
+  calSync(p);
+}
+document.addEventListener('click', () => document.querySelectorAll('.mo-panel,.cal-pop').forEach(x => x.hidden = true));
+
+/* ---- Monthly (several months / Year to date) + Date range, mounted into <span id="<p>PerHost"> ---- */
+function perpState(p) {
+  if (PERP[p]) return PERP[p];
+  const host = $(p + 'PerHost'); if (!host) return null;
+  const st = PERP[p] = { mode: 'month', ytd: false, months: new Set([p === 'wrp' ? perPrevMonth() : perCurMonth()]) };
+  host.innerHTML = `<select id="${p}Per" class="per-sel" title="Report period"><option value="month">Monthly</option><option value="range">Date range</option></select>` +
+    `<div class="msel" id="${p}MoWrap"><button type="button" class="msel-btn" id="${p}MoBtn"></button><div class="msel-panel mo-panel" id="${p}MoPanel" hidden></div></div>` +
+    `<span id="${p}RangeBox" hidden><input type="hidden" id="${p}From"><input type="hidden" id="${p}To"></span>`;
+  const fire = () => { perpSync(p); (PERP_FN[p] || (() => {}))(); };
+  $(p + 'Per').addEventListener('change', e => { st.mode = e.target.value; if (st.mode === 'range') calDefaults(p); fire(); });
+  $(p + 'MoWrap').addEventListener('click', e => e.stopPropagation());
+  $(p + 'MoBtn').addEventListener('click', () => {
+    const pn = $(p + 'MoPanel'); document.querySelectorAll('.mo-panel,.cal-pop').forEach(x => { if (x !== pn) x.hidden = true; });
+    perpSync(p);                                              // refresh the month list from the data loaded so far
+    pn.hidden = !pn.hidden;
+  });
+  $(p + 'MoPanel').addEventListener('change', e => {
+    const i = e.target;
+    if (i.dataset.ytd !== undefined) { st.ytd = i.checked; if (i.checked) st.months.clear(); else if (!st.months.size) st.months.add(perCurMonth()); }
+    else if (i.dataset.m) { i.checked ? st.months.add(i.dataset.m) : st.months.delete(i.dataset.m); if (i.checked) st.ytd = false; if (!st.months.size && !st.ytd) st.months.add(perCurMonth()); }
+    fire();
+  });
+  calMount(p, fire);
+  perpSync(p);
+  return st;
+}
+function perpSync(p) {
+  const st = PERP[p]; if (!st) return;
+  $(p + 'Per').value = st.mode;
+  $(p + 'MoWrap').hidden = st.mode !== 'month'; $(p + 'RangeBox').hidden = st.mode !== 'range';
+  const n = st.months.size;
+  $(p + 'MoBtn').textContent = (st.ytd ? 'Year to date' : n === 1 ? perFmtMonth([...st.months][0]) : n + ' months') + ' ▾';
+  const pn = $(p + 'MoPanel'), keep = pn.scrollTop;
+  pn.innerHTML = `<label class="ytd"><input type="checkbox" data-ytd ${st.ytd ? 'checked' : ''}> 📅 Year to date</label>` +
+    perMonthList(p, st).map(m => `<label><input type="checkbox" data-m="${m}" ${!st.ytd && st.months.has(m) ? 'checked' : ''}> ${perFmtMonth(m)}</label>`).join('');
+  pn.scrollTop = keep;
+  calSync(p);
+}
+/* The chosen period: from / to (the whole stretch) and test(date) (exactly the ticked months, Year to date or range) */
+function perpR(p) {
+  const st = perpState(p); if (!st) return null;
+  const today = ymd(estNow());
+  if (st.mode === 'range') {
+    calDefaults(p);
+    let a = $(p + 'From').value, b = $(p + 'To').value; if (a > b) [a, b] = [b, a];
+    return { from: a, to: b, test: d => d >= a && d <= b };
+  }
+  if (st.ytd) { const a = today.slice(0, 4) + '-01-01'; return { from: a, to: today, test: d => d >= a && d <= today }; }
+  const ms = [...st.months].sort(), set = new Set(ms);
+  return { from: `${ms[0]}-01`, to: perMonthRange(ms[ms.length - 1]).to, test: d => set.has(d.slice(0, 7)) };
+}
+const perRecRange = selId => perpR(selId.replace(/Per$/, ''));
+function perSetRange(p, from, to) {
+  const st = perpState(p); if (!st) return;
+  st.mode = 'range'; $(p + 'From').value = from; $(p + 'To').value = to; perpSync(p);
+}
+function perpReset(p) {
+  const st = perpState(p); if (!st) return;
+  st.mode = 'month'; st.ytd = false; st.months = new Set([perCurMonth()]); $(p + 'From').value = $(p + 'To').value = ''; perpSync(p);
+}
+function perpShift(p, d, fn) {
+  const st = PERP[p]; if (!perIsSingle(st)) return;
+  const [y, m] = [...st.months][0].split('-').map(Number), t = new Date(y, m - 1 + d, 1);
+  st.months = new Set([`${t.getFullYear()}-${pad(t.getMonth() + 1)}`]); perpSync(p); fn();
+}
 
 function buildMetric() {
   const table = $('metricTable');
@@ -3965,10 +4564,12 @@ function buildMetric() {
   /* Month picker: default = last month in the sheet (same as before) */
   const months = metricMonthList();
   if (!metricSelInit && months.length) { metricSel = new Set([months[months.length - 1]]); metricSelInit = true; }
+  { const R = perRangeOf('metric'); if (R) { const t = perMonthsTouched(R); metricSel = new Set(months.filter(l => t.some(ym => ssMonthMatches(l, ym)))); } }
   metricSel = new Set([...metricSel].filter(m => months.includes(m)));
   if (!metricSel.size && months.length) metricSel.add(months[months.length - 1]);
   $('metricMonthWrap').hidden = !months.length;
   renderMetricMonthPicker(months);
+  renderKpiCards();
 
   const inMonth = metricRows.filter(r => !months.length || metricSel.has(r[I.month]));
   const data = metricSel.size > 1 ? metricAggregate(inMonth) : inMonth;
@@ -3979,9 +4580,9 @@ function buildMetric() {
   supSel.innerHTML = `<option>${ALL}</option>` + sups.map(s => `<option>${esc(s)}</option>`).join('');
   if (sups.includes(prevSup)) supSel.value = prevSup;
   const sup = supSel.value, q = up($('metricSearch').value);
-  const ag = fillAgentSelect('metricAgent', data.filter(r => sup === ALL || supOf(r) === sup).map(r => r[I.agent]));
+  const ags = fillAgentMulti('metricAgent', data.filter(r => sup === ALL || supOf(r) === sup).map(r => r[I.agent]), buildMetric);
 
-  const rows = data.filter(r => (sup === ALL || supOf(r) === sup) && (!ag || normName(r[I.agent]) === normName(ag)) && (!q || up(r[I.agent]).includes(q)));
+  const rows = data.filter(r => (sup === ALL || supOf(r) === sup) && (!ags.size || ags.has(normName(r[I.agent]))) && (!q || up(r[I.agent]).includes(q)));
   const maxOf = metricHeads.map((_, i) => metricMax(i));
 
   /* Top 3 podium (always by TOTAL, whatever column the table is sorted by) */
@@ -4027,10 +4628,10 @@ function buildMetric() {
   }
 
   /* Only the columns in METRIC_SHOW are displayed */
-  const cols = METRIC_SHOW.map(n => metricHeads.findIndex(h => h.toLowerCase().trim() === n)).filter(i => i >= 0);
+  const cols = metricShowCols(metricMonthNums([...metricSel]));
   const isPct = v => /^\d+(\.\d+)?%$/.test(v || '');
   table.tHead.innerHTML = '<tr>' + cols.map(i =>
-    `<th onclick="sortBy('metric',${i})">${esc(metricHeads[i])}${isPct(metricWeights[i]) ? `<small>${esc(metricWeights[i])}</small>` : ''}</th>`
+    `<th onclick="sortBy('metric',${i})">${esc(metricHeads[i])}${metricWeightHtml(i, metricMonthNums([...metricSel]))}</th>`
   ).join('') + '</tr>';
 
   /* One table cell. agentHtml replaces the agent cell's content (rank + name, or a month label). */
@@ -4112,7 +4713,8 @@ const loadMcs = () => guard('mcs', "Couldn't load the Overall Metric Scorecard t
     if (i < 0) mcsMissing.push(name);
     else if (!mcsCols.includes(i)) mcsCols.push(i);
   });
-  mcsRows = rows.slice(h + 1).filter(r => clean(r[mcsI.agent])).map(r => mcsHeads.map((_, i) => clean(r[i])));
+  RAW.mcs = rows.slice(h + 1).filter(r => clean(r[mcsI.agent])).map(r => mcsHeads.map((_, i) => clean(r[i])));
+  mcsRows = RAW.mcs; applyTeamFilter();
 });
 
 let mcsSel = new Set(), mcsSelInit = false;
@@ -4200,6 +4802,7 @@ function buildMcs() {
   let months = I.month >= 0 ? [...new Set(mcsRows.map(r => r[I.month]).filter(Boolean))] : [];
   if (months.every(m => !isNaN(Date.parse(m + ' 1, 2000')))) months.sort((a, b) => Date.parse(a + ' 1, 2000') - Date.parse(b + ' 1, 2000'));
   if (!mcsSelInit && months.length) { mcsSel = new Set([months[months.length - 1]]); mcsSelInit = true; }
+  { const R = perRangeOf('mcs'); if (R) { const t = perMonthsTouched(R); mcsSel = new Set(months.filter(l => t.some(ym => ssMonthMatches(l, ym)))); } }
   mcsSel = new Set([...mcsSel].filter(m => months.includes(m)));
   if (!mcsSel.size && months.length) mcsSel.add(months[months.length - 1]);
   const view = mcsSel.size > 1 ? 'agent' : 'summary';      // several months: monthly rows + Total row per agent
@@ -4214,9 +4817,9 @@ function buildMcs() {
   supSel.innerHTML = `<option>${ALL}</option>` + sups.map(s => `<option>${esc(s)}</option>`).join('');
   if (sups.includes(prevSup)) supSel.value = prevSup;
   const sup = supSel.value, q = up($('mcsSearch').value);
-  const ag = fillAgentSelect('mcsAgent', (view === 'agent' ? picked : inMonth).filter(r => sup === ALL || supOf(r) === sup).map(r => r[I.agent]));
+  const ags = fillAgentMulti('mcsAgent', (view === 'agent' ? picked : inMonth).filter(r => sup === ALL || supOf(r) === sup).map(r => r[I.agent]), buildMcs);
 
-  const rows = (view === 'agent' ? picked : inMonth).filter(r => (sup === ALL || supOf(r) === sup) && (!ag || normName(r[I.agent]) === normName(ag)) && (!q || up(r[I.agent]).includes(q)));
+  const rows = (view === 'agent' ? picked : inMonth).filter(r => (sup === ALL || supOf(r) === sup) && (!ags.size || ags.has(normName(r[I.agent]))) && (!q || up(r[I.agent]).includes(q)));
 
   table.classList.toggle('nosort', view === 'agent');
   if (view === 'agent') {
@@ -4364,6 +4967,8 @@ function buildShiftChanges(date, mins, supFilter) {
     ? coming.sort(byTime).map(x => li(x, 'starts')).join('') : emptyItem('#28a745', 'No one starting');
   $('goingOffList').innerHTML = going.length
     ? going.sort(byTime).map(x => li(x, 'ends')).join('') : emptyItem('#dc3545', 'No one finishing');
+  /* Long lists flow into 2 columns (5+ people) or 3 columns (13+ people) */
+  [['comingOnList', coming.length], ['goingOffList', going.length]].forEach(([id, n]) => { const el = $(id); if (n >= 13) el.dataset.cols = '3'; else if (n >= 5) el.dataset.cols = '2'; else delete el.dataset.cols; });
   $('shiftWindowLabel').textContent = `(${fmtAMPM(toHHMM(mins))} – ${fmtAMPM(toHHMM(mins + WINDOW))})`;
 
   const chips = [];
@@ -4397,9 +5002,9 @@ const SHIFT_HOURS_DEFAULT = 11;
 /* ---------- Unavailable Time page: Break / Overbreak / Lunch / Overlunch / Restroom / Project (LBPRR tab) + Total Logged-in Hours (LOLI Actual tab) ----------
    Columns are found by their header words, so the order in the sheet doesn't matter. Times are shown as written in the sheet.
    Total Logged-in Hours is looked up in the LOLI Actual tab by agent name + shift date.
-   Colour legend: Break > 0:45:00 and Lunch > 1:00:00 = red; Total Logged-in Hours < 11:00:00 = yellow; Overbreak / Overlunch of 0:00:00 are left blank. */
+   Colour legend: Break >= 0:46:00 and Lunch >= 1:01:00 = red; Total Logged-in Hours < 11:00:00 = yellow; Overbreak / Overlunch of 0:00:00 are left blank. */
 const LBPRR_COLS = [['brk', 'Break'], ['lunch', 'Lunch'], ['rest', 'Restroom'], ['proj', 'Project']];
-const UT_BREAK_MAX = 45 * 60, UT_LUNCH_MAX = 60 * 60, UT_HOURS_MIN = 11 * 3600;
+const UT_BREAK_RED = 46 * 60, UT_LUNCH_RED = 61 * 60, UT_HOURS_MIN = 11 * 3600;
 const utSel = { m: new Set(), d: new Set() };
 let utInit = false;
 const utOpen = new Set();   // agents whose daily rows are expanded (multi-date view)
@@ -4412,8 +5017,8 @@ const utMonthLabel = ym => new Date(+ym.slice(0, 4), +ym.slice(5, 7) - 1, 1).toL
 const utShow = (k, v) => (k === 'ob' || k === 'ol') && utSecs(v) === 0 ? '' : v;
 function utClass(k, v) {
   const s = utSecs(v); if (s == null) return '';
-  if (k === 'brk' && s > UT_BREAK_MAX) return 'ut-red';
-  if (k === 'lunch' && s > UT_LUNCH_MAX) return 'ut-red';
+  if (k === 'brk' && s >= UT_BREAK_RED) return 'ut-red';
+  if (k === 'lunch' && s >= UT_LUNCH_RED) return 'ut-red';
   if (k === 'hours' && s < UT_HOURS_MIN) return 'ut-yel';
   return '';
 }
@@ -4447,10 +5052,11 @@ function lbprrRows() {
   return out.sort((a, b) => b.date.localeCompare(a.date) || a.name.localeCompare(b.name));
 }
 function lbprrFiltered(all) {
-  const sup = $('lbprrSup').value, agent = $('lbprrAgent').value, q = up($('lbprrSearch').value);
+  const sup = $('lbprrSup').value, ags = agMulti.lbprrAgent ? agMulti.lbprrAgent.sel : new Set(), q = up($('lbprrSearch').value);
+  const R = perRecRange('lbprrPer');
   const rows = (all || lbprrRows()).filter(x =>
-    (!utSel.m.size || utSel.m.has(x.date.slice(0, 7))) && (!utSel.d.size || utSel.d.has(x.date)) &&
-    (sup === ALL || x.sup === sup) && (!agent || x.name === agent) && (!q || up(x.name).includes(q)));
+    perInRange(x.date, R) &&
+    (sup === ALL || x.sup === sup) && (!ags.size || ags.has(normName(x.name))) && (!q || up(x.name).includes(q)));
   /* Sort by the clicked header; blank cells (and 0:00:00 Overbreak / Overlunch) always go last */
   const { k, asc } = utSortState, text = k === 'name' || k === 'date';
   const val = x => text ? x[k] : (s => (s === 0 && (k === 'ob' || k === 'ol')) ? null : s)(utSecs(x[k]));
@@ -4468,29 +5074,8 @@ function utTotals(list) {
     return (s || (k !== 'ob' && k !== 'ol')) ? utFmt(s) : '';
   });
 }
-function utRenderPanel(all) {
-  const ms = [...new Set(all.map(x => x.date.slice(0, 7)))].sort().reverse();
-  const ds = [...new Set(all.map(x => x.date))].sort().reverse();
-  const box = (t, k, label) => `<label><input type="checkbox" data-t="${t}" data-k="${k}" ${utSel[t].has(k) ? 'checked' : ''}> ${esc(label)}</label>`;
-  const p = $('lbprrDatePanel'), keep = p.querySelector('.ut-dates')?.scrollTop || 0;
-  p.innerHTML =
-    `<div class="ut-h"><span>Month</span><button type="button" data-clear="1">Clear</button></div>` + ms.map(m => box('m', m, utMonthLabel(m))).join('') +
-    `<div class="ut-h"><span>Dates</span></div><div class="ut-dates">` + ds.map(d => box('d', d, fmtDate(parseYMD(d)))).join('') + `</div>`;
-  const sc = p.querySelector('.ut-dates'); if (sc) sc.scrollTop = keep;
-  const n = utSel.m.size + utSel.d.size;
-  $('lbprrDateBtn').textContent = (n ? [['m', 'month'], ['d', 'date']].filter(([t]) => utSel[t].size)
-      .map(([t, w]) => `${utSel[t].size} ${w}${utSel[t].size > 1 ? 's' : ''}`).join(' · ') : 'All dates') + ' ▾';
-}
 function utInitOnce() {
   if (utInit) return; utInit = true;
-  $('lbprrDateBtn').addEventListener('click', e => { e.stopPropagation(); $('lbprrDatePanel').hidden = !$('lbprrDatePanel').hidden; });
-  $('lbprrDateWrap').addEventListener('click', e => e.stopPropagation());
-  document.addEventListener('click', () => $('lbprrDatePanel').hidden = true);
-  $('lbprrDatePanel').addEventListener('change', e => {
-    const i = e.target; if (!i.dataset.t) return;
-    i.checked ? utSel[i.dataset.t].add(i.dataset.k) : utSel[i.dataset.t].delete(i.dataset.k);
-    buildLbprr();
-  });
   $('lbprrTable').tHead.addEventListener('click', e => {
     const th = e.target.closest('th'); if (!th || !th.dataset.sort) return;
     const k = th.dataset.sort;
@@ -4503,7 +5088,6 @@ function utInitOnce() {
     const n = tr.dataset.ag; utOpen.has(n) ? utOpen.delete(n) : utOpen.add(n);
     buildLbprr();
   });
-  $('lbprrDatePanel').addEventListener('click', e => { if (e.target.dataset.clear) { Object.values(utSel).forEach(s => s.clear()); buildLbprr(); } });
 }
 function utToggleAll() {
   const all = utGroupNames.length && utGroupNames.every(n => utOpen.has(n));
@@ -4512,23 +5096,21 @@ function utToggleAll() {
 }
 function clearLbprr() {
   Object.values(utSel).forEach(s => s.clear());
-  $('lbprrSup').value = ALL; $('lbprrAgent').value = ''; $('lbprrSearch').value = '';
+  perpReset('lbprr');
+  $('lbprrSup').value = ALL; if (agMulti.lbprrAgent) agMulti.lbprrAgent.sel.clear(); $('lbprrSearch').value = '';
   buildLbprr();
 }
 function buildLbprr() {
   utInitOnce();
   const all = lbprrRows();
   /* Supervisor + Agent drop-downs (the agent list follows the chosen supervisor; the current choice is kept) */
-  const supSel = $('lbprrSup'), agSel = $('lbprrAgent');
+  const supSel = $('lbprrSup');
   const sups = [...new Set(estData.map(x => x.Supervisor).filter(Boolean))].sort();
   const prevSup = supSel.value || ALL;
   supSel.innerHTML = `<option>${ALL}</option>` + sups.map(s => `<option>${esc(s)}</option>`).join('');
   supSel.value = sups.includes(prevSup) ? prevSup : ALL;
   const names = [...new Set(all.filter(x => supSel.value === ALL || x.sup === supSel.value).map(x => x.name))].sort((a, b) => a.localeCompare(b));
-  const prevAg = agSel.value;
-  agSel.innerHTML = `<option value="">All Agents</option>` + names.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
-  agSel.value = names.includes(prevAg) ? prevAg : '';
-  utRenderPanel(all);
+  fillAgentMulti('lbprrAgent', names, buildLbprr);
 
   $('lbprrTable').tHead.querySelectorAll('th').forEach(th => th.querySelector('.ut-arr').textContent = th.dataset.sort === utSortState.k ? (utSortState.asc ? '▲' : '▼') : '');
   const rows = lbprrFiltered(all), v = s => s ? esc(s) : '—';
@@ -4541,7 +5123,7 @@ function buildLbprr() {
       ${(() => { const cls = utClass('hours', x.hours); return `<td${cls ? ` class="${cls}"` : ''}><strong>${v(x.hours)}</strong></td>`; })()}
     </tr>`;
   /* Several dates picked (dates, months or years that cover more than one day): group by agent, one row per date, then that agent's Total */
-  const grouped = (utSel.d.size || utSel.m.size) && new Set(rows.map(x => x.date)).size > 1;
+  const grouped = new Set(rows.map(x => x.date)).size > 1;
   let html;
   if (!rows.length) {
     html = `<tr><td colspan="7">${lbprrError ? 'Couldn\u2019t load the LBPRR tab (' + esc(lbprrError) + ') \u2013 check the tab name and sharing' : 'No records found'}</td></tr>`;
@@ -5266,9 +5848,11 @@ function buildAgentSummary() {
     agSumSel = new Set([(withScores.length ? withScores : D.yms).slice(-1)[0]]);
     agSumSelInit = true;
   }
+  { const R = perRangeOf('agSum'); if (R) agSumSel = new Set(perMonthsTouched(R)); }
   agSumSel = new Set([...agSumSel].filter(m => D.yms.includes(m)));
   if (!agSumSel.size) agSumSel.add(D.yms[D.yms.length - 1]);
   renderAgSumMonthPicker();
+  renderKpiCards();
   const a = D.agents.find(x => x.name === sel.value);
   if (!a) { box.innerHTML = '<div class="my-lbl">Pick an agent to see their summary.</div>'; return; }
   try { localStorage.setItem(AGSUM_KEY, a.name); } catch (e) {}
@@ -5330,7 +5914,7 @@ function buildAgentSummary() {
 
   /* Performance Stack Ranking: same as the table above (the agent's rows for the ticked months and a Total / average row for several months) */
   const I = metricIdx;
-  const stackCols = METRIC_SHOW.map(n => metricHeads.findIndex(h => h.toLowerCase().trim() === n)).filter(i => i >= 0 && i !== I.agent && i !== I.sup);
+  const stackCols = metricShowCols(selYm.map(ym => +ym.slice(5, 7))).filter(i => i !== I.agent && i !== I.sup);
   const myM = metricRows.filter(r => normName(r[I.agent]) === normName(a.name)).sort((p, q) => rankM(p[I.month]) - rankM(q[I.month]));
   const mTicked = myM.filter(r => inSel(r, I.month));
   const stackCell = (r, i) => {
@@ -5339,7 +5923,7 @@ function buildAgentSummary() {
     return /no data/i.test(v || '') ? '<td class="nodata">No Data</td>' : `<td class="${i === I.total ? 'overall' : ''}${sc}"${bd ? ` title="${esc(bd.tip)}"` : ''}>${esc(v) || '—'}</td>`;
   };
   const stackRow = (label, r, attr) => `<tr${attr || ''}><td>${label}</td>${stackCols.map(i => stackCell(r, i)).join('')}</tr>`;
-  const stack = mTicked.length && stackCols.length ? `<table id="agSumStack" class="nosort"><thead><tr><th>Month</th>${stackCols.map(i => `<th>${esc(metricHeads[i])}${/^\d+(\.\d+)?%$/.test(metricWeights[i] || '') ? `<small>${esc(metricWeights[i])}</small>` : ''}</th>`).join('')}</tr></thead><tbody>${
+  const stack = mTicked.length && stackCols.length ? `<table id="agSumStack" class="nosort"><thead><tr><th>Month</th>${stackCols.map(i => `<th>${esc(metricHeads[i])}${metricWeightHtml(i, selYm.map(ym => +ym.slice(5, 7)))}</th>`).join('')}</tr></thead><tbody>${
     mTicked.map(r => stackRow(esc(r[I.month] || '—'), r)).join('') +
     (multi && mTicked.length > 1 ? stackRow('Total / average', metricAggregate(mTicked)[0]).replace('<tr>', '<tr class="agsum-total">') : '')
   }</tbody></table>`
@@ -5464,8 +6048,18 @@ const wrFmt = dt => dt.toLocaleDateString('en-US', { month: 'short', day: 'numer
 const WR_MAX = 366;
 let wrPrev = null, wrClip = false;
 const wrMonthDays = ym => { const [y, m] = ym.split('-').map(Number); return Array.from({ length: new Date(y, m, 0).getDate() }, (_, i) => ymd(new Date(y, m - 1, i + 1))); };
+function wrSync() {
+  const st = perpState('wrp'); if (!st) return false;
+  const single = perIsSingle(st);
+  if (single) { $('wrMode').value = 'month'; $('wrMonth').value = [...st.months][0]; }
+  else { const R = perpR('wrp'); $('wrMode').value = 'range'; $('wrFrom').value = R.from; $('wrTo').value = R.to; }
+  return single;
+}
 function wrCurDays() {
-  const mode = $('wrMode').value, now = estNow();
+  wrSync();
+  const raw = $('wrMode').value, now = estNow();
+  if (perIsPreset(raw)) { if (!$('wrPerDate').value) $('wrPerDate').value = ymd(now); const R = perRange(raw, $('wrPerDate').value); $('wrFrom').value = R.from; $('wrTo').value = R.to; }
+  const mode = perIsPreset(raw) ? 'range' : raw;
   wrClip = false;
   if (mode === 'month') {
     if (!$('wrMonth').value) $('wrMonth').value = ymd(new Date(now.getFullYear(), now.getMonth() - 1, 1)).slice(0, 7);      // last completed month
@@ -5488,13 +6082,7 @@ function wrOnMode() {
   if (wrPrev) { const a = wrPrev[0], b = wrPrev[wrPrev.length - 1]; $('wrDate').value = a; $('wrMonth').value = a.slice(0, 7); $('wrFrom').value = a; $('wrTo').value = b; }   // keep the period you were looking at
   buildWeeklyReport();
 }
-function shiftWeeklyReport(d) {
-  const mode = $('wrMode').value, days = wrCurDays(), n = days.length;
-  if (mode === 'month') { const [y, m] = days[0].split('-').map(Number); $('wrMonth').value = ymd(new Date(y, m - 1 + d, 1)).slice(0, 7); }
-  else if (mode === 'range') { $('wrFrom').value = ymd(wrAdd(parseYMD(days[0]), d * n)); $('wrTo').value = ymd(wrAdd(parseYMD(days[n - 1]), d * n)); }
-  else { $('wrDate').value = ymd(wrAdd(parseYMD(days[0]), 7 * d)); }
-  buildWeeklyReport();
-}
+function shiftWeeklyReport(d) { perpShift('wrp', d, buildWeeklyReport); }
 function wrGo(i) {
   const sl = document.querySelectorAll('#wrSlides .wr-slide');
   if (!sl.length) return;
@@ -5575,9 +6163,10 @@ function buildWeeklyReport() {
 }
 function buildWeeklyReportInner() {
   const box = $('wrSlides'), now = estNow(), today = ymd(now);
-  const mode = $('wrMode').value, days = wrCurDays(), nd = days.length, dLast = days[nd - 1], mon = parseYMD(days[0]), sun = parseYMD(dLast);
+  const wrSingle = wrSync();
+  const raw = $('wrMode').value, days = wrCurDays(), mode = perIsPreset(raw) ? 'range' : raw, nd = days.length, dLast = days[nd - 1], mon = parseYMD(days[0]), sun = parseYMD(dLast);
   wrPrev = days;
-  $('wrDate').hidden = mode !== 'week'; $('wrMonth').hidden = mode !== 'month'; $('wrRangeBox').hidden = mode !== 'range';
+  $('wrPrevBtn').hidden = $('wrNextBtn').hidden = !wrSingle;
   const U = mode === 'month' ? ['month', 'months', 'Month'] : mode === 'range' ? ['period', 'periods', 'Period'] : ['week', 'weeks', 'Week'];
   const tw = 'this ' + U[0], sameYr = mon.getFullYear() === sun.getFullYear();
   const rangeLbl = mode === 'month' ? mon.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : sameYr ? wrFmt(mon) + ' – ' + wrFmt(sun) + ', ' + sun.getFullYear() : wrFmt(mon) + ', ' + mon.getFullYear() + ' – ' + wrFmt(sun) + ', ' + sun.getFullYear();
@@ -5848,7 +6437,23 @@ function buildWeeklyReportInner() {
 
 /* Days shown on the tracker: the picked month, or one Monday-to-Sunday week */
 function trackerDays() {
-  if ($('trackerView').value === 'week') {
+  trkSync();
+  const tv = $('trackerView').value;
+  if (tv === 'range') {
+    const t = ymd(estNow());
+    if (!$('trackerFrom').value) $('trackerFrom').value = t.slice(0, 8) + '01';
+    if (!$('trackerTo').value) $('trackerTo').value = t;
+    let a = $('trackerFrom').value, b = $('trackerTo').value; if (a > b) [a, b] = [b, a];
+    const out = [];
+    for (let d = parseYMD(a); ymd(d) <= b && out.length < 366; d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1)) out.push(ymd(d));
+    return out;
+  }
+  if (perIsPreset(tv)) {
+    const R = perRange(tv, $('trackerPerDate').value), out = [];
+    for (let d = parseYMD(R.from); ymd(d) <= R.to; d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1)) out.push(ymd(d));
+    return out;
+  }
+  if (tv === 'week') {
     const b = parseYMD($('trackerWeek').value || ymd(estNow())), mon = new Date(b.getFullYear(), b.getMonth(), b.getDate() - (b.getDay() + 6) % 7);
     return Array.from({ length: 7 }, (_, i) => ymd(new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + i)));
   }
@@ -5904,10 +6509,14 @@ document.addEventListener('keydown', e => {
 
 function buildTracker() {
   const body = $('trackerBody');
-  const wk = $('trackerView').value === 'week';
-  $('trackerMonth').hidden = wk; $('trackerWeek').hidden = !wk; $('trackerWeekLbl').hidden = !wk;
+  const trkSingle = trkSync();
+  const tv = $('trackerView').value, wk = tv === 'week', pre = perIsPreset(tv);
+  const rg = tv === 'range';
+  $('trackerPrev').hidden = $('trackerNext').hidden = !trkSingle;
+  $('trackerMonth').hidden = tv !== 'month'; $('trackerRangeBox').hidden = !rg; $('trackerWeek').hidden = true; $('trackerPerDate').hidden = true; $('trackerWeekLbl').hidden = !rg;
   if (!$('trackerWeek').value) $('trackerWeek').value = ymd(estNow());
-  if (wk) { const wd = trackerDays(), f = d => parseYMD(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); $('trackerWeekLbl').textContent = 'Mon ' + f(wd[0]) + ' – Sun ' + f(wd[6]); }
+  if (!$('trackerPerDate').value) $('trackerPerDate').value = ymd(estNow());
+  if (rg) { const wd = trackerDays(), f = d => parseYMD(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); $('trackerWeekLbl').textContent = f(wd[0]) + ' – ' + f(wd[wd.length - 1]) + ' (' + wd.length + ' day' + (wd.length === 1 ? '' : 's') + ')'; }
   const rosterN = estData.filter(r => loliIdx.has(normName(r.Name))).length;
   const fmtLong = d => parseYMD(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   const LEG = [
@@ -5991,7 +6600,7 @@ function downloadTracker() {
   rows.push([]);
   rows.push(['P = Present, U = Upcoming, LATE / LE / SH = Late / Left early / Short hours (* = estimated half shift), NCNS / CO = Called off, VL / SL / ML / BRV = Leave, OFF = Off']);
 
-  const filename = `attendance-tracker-${$('trackerView').value === 'week' ? days[0] + '-week' : ym}.csv`;
+  const filename = `attendance-tracker-${$('trackerView').value === 'range' ? $('trackerView').value + '-' + days[0] + '_to_' + days[days.length - 1] : $('trackerView').value === 'week' ? days[0] + '-week' : ym}.csv`;
   const csv = '\uFEFF' + rows.map(r => r.map(csvCell).join(',')).join('\r\n');   // BOM keeps Excel happy with UTF-8
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
@@ -6003,19 +6612,14 @@ function downloadTracker() {
   toast('⬇ Downloaded ' + filename);
 }
 
-function shiftTrackerMonth(delta) {
-  if ($('trackerView').value === 'week') {
-    const b = parseYMD($('trackerWeek').value || ymd(estNow()));
-    b.setDate(b.getDate() + 7 * delta);
-    $('trackerWeek').value = ymd(b);
-    buildTracker();
-    return;
-  }
-  const [y, m] = ($('trackerMonth').value || ymd(estNow()).slice(0, 7)).split('-').map(Number);
-  const d = new Date(y, m - 1 + delta, 1);
-  $('trackerMonth').value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
-  buildTracker();
+function trkSync() {
+  const st = perpState('trk'); if (!st) return false;
+  const single = perIsSingle(st);
+  if (single) { $('trackerView').value = 'month'; $('trackerMonth').value = [...st.months][0]; }
+  else { const R = perpR('trk'); $('trackerView').value = 'range'; $('trackerFrom').value = R.from; $('trackerTo').value = R.to; }
+  return single;
 }
+function shiftTrackerMonth(delta) { perpShift('trk', delta, buildTracker); }
 
 /* =====================================================================
    SCORECARD SUMMARY
@@ -6170,10 +6774,10 @@ function buildSsStack(selYms, bySup, q) {
     return (dir * (typeof x === 'string' || typeof y === 'string' ? String(x).localeCompare(String(y)) : x - y)) || String(a[I.agent]).localeCompare(String(b[I.agent]));
   });
 
-  const cols = METRIC_SHOW.map(n => metricHeads.findIndex(h => h.toLowerCase().trim() === n)).filter(i => i >= 0);
+  const cols = metricShowCols(selYms.map(ym => +ym.slice(5, 7)));
   const isPct = v => /^\d+(\.\d+)?%$/.test(v || '');
   const arrow = i => sc === i ? (col >= 0 ? (asc ? ' ▲' : ' ▼') : ' ▼') : '';
-  table.tHead.innerHTML = '<tr>' + cols.map(i => `<th onclick="ssStackSortBy(${i})">${esc(metricHeads[i])}${arrow(i)}${isPct(metricWeights[i]) ? `<small>${esc(metricWeights[i])}</small>` : ''}</th>`).join('') + '</tr>';
+  table.tHead.innerHTML = '<tr>' + cols.map(i => `<th onclick="ssStackSortBy(${i})">${esc(metricHeads[i])}${arrow(i)}${metricWeightHtml(i, selYms.map(ym => +ym.slice(5, 7)))}</th>`).join('') + '</tr>';
 
   wireSsGroups();
   const byAg = new Map();
@@ -6235,14 +6839,24 @@ function ssMonthPoint(tym, rows, idx, today) {
    Counts agent-days on scheduled working days, up to today only. Called Off = plain called-off records (NCNS, Late and Left Early are not included);
    Vacation Leave = VL records only (Sick, Bereavement and other leave are not included).
    ===================================================================== */
-const LV_COL = { co: '#dc3545', vl: '#17a2b8' };
+const LV_COL = { co: '#dc3545', vl: '#17a2b8', late: '#ff9800', le: '#9c27b0' };
 const lvCache = { key: '', map: new Map() };
 let lvInit = false;
-function lvDay(date, rows, idxCo, idxPto, ck) {
-  if (date > ymd(estNow())) return { date, co: [], vl: [], sched: 0, sb: {}, cb: {}, vb: {} };   // only today and earlier days are counted (not cached, so it counts once the day arrives)
-  const mk = ck + '|' + date;
+let lvAttIdx = { k: '', idx: null };
+function lvIdx() {   // same attendance index the Attendance tracker uses (Attendance form + Late / early time form)
+  const k = [ptoList.length, calledOffList.length, attTimeList.length].join('|');
+  if (lvAttIdx.k !== k) lvAttIdx = { k, idx: { pto: indexRecords(ptoList), att: indexAttendance(calledOffList, attTimeList) } };
+  return lvAttIdx.idx;
+}
+function lvDay(date, rows, idxCo, idxPto, ck, withLate = false) {
+  const todayStr = ymd(estNow());
+  if (date > todayStr) return { date, co: [], vl: [], late: [], le: [], sched: 0, sb: {}, cb: {}, vb: {}, lb: {}, eb: {} };   // only today and earlier days are counted (not cached, so it counts once the day arrives)
+  const mk = ck + '|' + date + (withLate ? '|L' : '');
+  const dk = [estData.length, ptoList.length, calledOffList.length, attTimeList.length, loliInfo.lastDate || ''].join('|');
+  if (lvCache.dk !== dk) { lvCache.dk = dk; lvCache.map.clear(); }
   if (lvCache.map.has(mk)) return lvCache.map.get(mk);
-  const co = [], vl = [], sb = {}, cb = {}, vb = {}; let sched = 0;
+  const co = [], vl = [], late = [], le = [], sb = {}, cb = {}, vb = {}, lb = {}, eb = {}; let sched = 0;
+  const aidx = withLate ? lvIdx() : null;
   rows.forEach(r => {
     if (isOff(shiftFor(r, date))) return;
     sched++;
@@ -6250,42 +6864,43 @@ function lvDay(date, rows, idxCo, idxPto, ck) {
     const key = normName(r.Name) + '|' + date, p = idxPto.get(key);
     if (p) { if (matchType(PTO_TYPES, p.Reason, { ...PTO_OTHER, label: p.Reason || 'Leave' }).code === 'VL') { vl.push(r.Name); vb[sp] = (vb[sp] || 0) + 1; } return; }
     const c = idxCo.get(key);
-    if (c && matchType(ATT_TYPES, c.Reason, ATT_OTHER).code === 'CO') { co.push(r.Name); cb[sp] = (cb[sp] || 0) + 1; }
+    if (c && matchType(ATT_TYPES, c.Reason, ATT_OTHER).code === 'CO') { co.push(r.Name); cb[sp] = (cb[sp] || 0) + 1; return; }
+    if (!withLate) return;
+    /* Running Late / Left Early: same rule as the Attendance tracker (more than the 10-minute grace period late or early, or a submitted Late / Left early record) */
+    const a = attendanceFor(r, date, todayStr, aidx);
+    if (a.kind !== 'partial') return;
+    if (a.code === 'LATE' || a.code === 'L/LE') { late.push(r.Name); lb[sp] = (lb[sp] || 0) + 1; }
+    if (a.code === 'LE' || a.code === 'L/LE') { le.push(r.Name); eb[sp] = (eb[sp] || 0) + 1; }
   });
-  const out = { date, co, vl, sched, sb, cb, vb };
+  const out = { date, co, vl, late, le, sched, sb, cb, vb, lb, eb };
   lvCache.map.set(mk, out);
   return out;
 }
-const lvAddBy = (t, sp, co, vl, sched) => { const x = t[sp] ||= { co: 0, vl: 0, sched: 0 }; x.co += co; x.vl += vl; x.sched += sched; };
-const lvDayBy = d => { const t = {}; Object.keys(d.sb).forEach(sp => lvAddBy(t, sp, d.cb[sp] || 0, d.vb[sp] || 0, d.sb[sp])); return t; };
-const lvMergeBy = (t, b) => Object.keys(b).forEach(sp => lvAddBy(t, sp, b[sp].co, b[sp].vl, b[sp].sched));
-function shiftLeaveTrend(d) {
-  if ($('lvMode').value === 'week') {
-    const t = parseYMD($('lvWeek').value || ymd(estNow()));
-    t.setDate(t.getDate() + 7 * d);
-    $('lvWeek').value = ymd(t);
-  } else if ($('lvMode').value === 'day') {
-    const [y, m] = ($('lvMonth').value || ymd(estNow()).slice(0, 7)).split('-').map(Number), t = new Date(y, m - 1 + d, 1);
-    $('lvMonth').value = `${t.getFullYear()}-${pad(t.getMonth() + 1)}`;
-  } else {
-    const ys = $('lvYear'), i = ys.selectedIndex - d;      // the list runs newest first
-    if (i >= 0 && i < ys.options.length) ys.selectedIndex = i;
-  }
-  buildLeaveTrend();
+const lvAddBy = (t, sp, co, vl, sched, late = 0, le = 0) => { const x = t[sp] ||= { co: 0, vl: 0, late: 0, le: 0, sched: 0 }; x.co += co; x.vl += vl; x.late += late; x.le += le; x.sched += sched; };
+const lvDayBy = d => { const t = {}; Object.keys(d.sb).forEach(sp => lvAddBy(t, sp, d.cb[sp] || 0, d.vb[sp] || 0, d.sb[sp], (d.lb || {})[sp] || 0, (d.eb || {})[sp] || 0)); return t; };
+const lvMergeBy = (t, b) => Object.keys(b).forEach(sp => lvAddBy(t, sp, b[sp].co, b[sp].vl, b[sp].sched, b[sp].late || 0, b[sp].le || 0));
+function lvSync() {
+  const st = perpState('lvp'); if (!st) return false;
+  const single = perIsSingle(st);
+  if (single) { $('lvMode').value = 'day'; $('lvMonth').value = [...st.months][0]; }
+  else { const R = perpR('lvp'); $('lvMode').value = 'range'; $('lvFrom').value = R.from; $('lvTo').value = R.to; }
+  return single;
 }
+function shiftLeaveTrend(d) { perpShift('lvp', d, buildLeaveTrend); }
 function buildLeaveTrend() {
-  const now = estNow(), cy = now.getFullYear(), mode = $('lvMode').value, range = mode === 'range', week = mode === 'week', daily = mode !== 'month';
+  const lvSingle = lvSync();
+  const now = estNow(), cy = now.getFullYear(), rawMode = $('lvMode').value, pre = perIsPreset(rawMode), mode = pre ? 'range' : rawMode, range = mode === 'range', week = mode === 'week', daily = mode !== 'month';
   if (!lvInit) {
-    lvInit = true; $('lvMonth').value = ymd(now).slice(0, 7);
-    $('lvFrom').value = ymd(now).slice(0, 7) + '-01'; $('lvTo').value = ymd(now); $('lvWeek').value = ymd(now);
+    lvInit = true; $('lvWeek').value = ymd(now);
   }
+  if (pre) { if (!$('lvPerDate').value) $('lvPerDate').value = ymd(now); const R = perRange(rawMode, $('lvPerDate').value); $('lvFrom').value = R.from; $('lvTo').value = R.to; }
   const yrs = new Set([cy]);
   [...ptoList, ...calledOffList].forEach(x => { const y = +normalizeDate(x['EST Date']).slice(0, 4); if (y > 2000 && y < 2100) yrs.add(y); });
   const ys = $('lvYear'), prevY = ys.value;
   ys.innerHTML = [...yrs].sort((a, b) => b - a).map(y => `<option>${y}</option>`).join('');
   ys.value = [...ys.options].some(o => o.value === prevY) ? prevY : String(cy);
-  ys.hidden = mode !== 'month'; $('lvMonth').hidden = mode !== 'day'; $('lvRange').hidden = !range; $('lvWeekWrap').hidden = !week;
-  $('lvPrev').hidden = $('lvNext').hidden = range;
+  ys.hidden = mode !== 'month'; $('lvMonth').hidden = mode !== 'day'; $('lvRange').hidden = rawMode !== 'range'; $('lvPerDate').hidden = rawMode !== 'date'; $('lvWeekWrap').hidden = !week;
+  $('lvPrev').hidden = $('lvNext').hidden = !lvSingle;
   if (!$('lvMonth').value) $('lvMonth').value = ymd(now).slice(0, 7);
 
   if (!estData.length) { $('lvChart').innerHTML = '<div class="empty" style="--c:#6c757d">Schedule data must be loaded first</div>'; $('lvTable').tHead.innerHTML = ''; $('lvTable').tBodies[0].innerHTML = ''; $('lvTableTitle').textContent = ''; return; }
@@ -6293,8 +6908,6 @@ function buildLeaveTrend() {
   const sup = $('lvSupervisor').value, q = up($('lvSearch').value);
   const rows = estData.filter(r => (sup === ALL || r.Supervisor === sup) && (!q || up(r.Name).includes(q)));
   const idxCo = indexRecords(calledOffList), idxPto = indexRecords(ptoList);
-  const ckey = [estData.length, ptoList.length, calledOffList.length].join('|');
-  if (lvCache.key !== ckey) { lvCache.key = ckey; lvCache.map.clear(); }
   const ck = sup + '|' + q;
   const dim = (y, m) => new Date(y, m, 0).getDate();
   const today = ymd(now), shortD = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -6322,40 +6935,42 @@ function buildLeaveTrend() {
       dates = Array.from({ length: dim(yy, mm) }, (_, i) => ymd(new Date(yy, mm - 1, i + 1)));
     }
     dayItems = dates.map((date, i) => {
-      const dt = parseYMD(date), d = lvDay(date, rows, idxCo, idxPto, ck);
+      const dt = parseYMD(date), d = lvDay(date, rows, idxCo, idxPto, ck, true);
       const first = dt.getDate() === 1 || i === 0;
-      return { date, lbl: (range || week) && first ? dt.toLocaleDateString('en-US', { month: 'short' }) + ' ' + dt.getDate() : String(dt.getDate()), sub: dayName(date).slice(0, 2), bold: date === today, co: d.co.length, vl: d.vl.length, sched: d.sched, names: d, by: lvDayBy(d), title: dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) };
+      return { date, lbl: (range || week) && first ? dt.toLocaleDateString('en-US', { month: 'short' }) + ' ' + dt.getDate() : String(dt.getDate()), sub: dayName(date).slice(0, 2), bold: date === today, co: d.co.length, vl: d.vl.length, late: d.late.length, le: d.le.length, sched: d.sched, names: d, by: lvDayBy(d), title: dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) };
     });
     if (range && dayItems.length > 62) {                       // long ranges: one pair of bars per month so the chart stays readable
       const by = new Map();
-      dayItems.forEach(p => { const k = p.date.slice(0, 7), t = by.get(k) || { lbl: ssMonShort(k), sub: '', bold: k === today.slice(0, 7), co: 0, vl: 0, sched: 0, by: {}, title: ssYmLabel(k) }; t.co += p.co; t.vl += p.vl; t.sched += p.sched; lvMergeBy(t.by, p.by); by.set(k, t); });
+      dayItems.forEach(p => { const k = p.date.slice(0, 7), t = by.get(k) || { lbl: ssMonShort(k), sub: '', bold: k === today.slice(0, 7), co: 0, vl: 0, late: 0, le: 0, sched: 0, by: {}, title: ssYmLabel(k) }; t.co += p.co; t.vl += p.vl; t.late += p.late; t.le += p.le; t.sched += p.sched; lvMergeBy(t.by, p.by); by.set(k, t); });
       items = [...by.values()];
     } else { items = dayItems; dense = true; }
   } else {
     const yy = +ys.value;
     scope = String(yy);
     items = Array.from({ length: 12 }, (_, i) => {
-      let co = 0, vl = 0, sched = 0; const by = {};
-      for (let d = 1; d <= dim(yy, i + 1); d++) { const x = lvDay(ymd(new Date(yy, i, d)), rows, idxCo, idxPto, ck); co += x.co.length; vl += x.vl.length; sched += x.sched; lvMergeBy(by, lvDayBy(x)); }
-      return { lbl: ssMonShort(`${yy}-${pad(i + 1)}`), sub: '', bold: `${yy}-${pad(i + 1)}` === today.slice(0, 7), co, vl, sched, by, title: ssYmLabel(`${yy}-${pad(i + 1)}`) };
+      let co = 0, vl = 0, late = 0, le = 0, sched = 0; const by = {};
+      for (let d = 1; d <= dim(yy, i + 1); d++) { const x = lvDay(ymd(new Date(yy, i, d)), rows, idxCo, idxPto, ck, true); co += x.co.length; vl += x.vl.length; late += x.late.length; le += x.le.length; sched += x.sched; lvMergeBy(by, lvDayBy(x)); }
+      return { lbl: ssMonShort(`${yy}-${pad(i + 1)}`), sub: '', bold: `${yy}-${pad(i + 1)}` === today.slice(0, 7), co, vl, late, le, sched, by, title: ssYmLabel(`${yy}-${pad(i + 1)}`) };
     });
   }
 
   /* cards + chart */
   const tot = k => items.reduce((a, p) => a + p[k], 0), sched = tot('sched');
   const rate = k => sched ? (tot(k) / sched * 100).toFixed(1) + '% of scheduled days' : '';
-  const max = Math.max(1, ...items.map(p => Math.max(p.co, p.vl)));
+  const max = Math.max(1, ...items.map(p => Math.max(p.co, p.vl, p.late, p.le)));
   const bar = (p, k, label) => `<div class="gb-bar" title="${esc(p.title)}: ${p[k]} ${label} day${p[k] === 1 ? '' : 's'}${p.sched ? ' (' + (p[k] / p.sched * 100).toFixed(1) + '% of ' + p.sched + ' scheduled)' : ''}">${!dense || p[k] ? `<span>${p[k]}</span>` : ''}<div style="height:${p[k] ? Math.max(3, p[k] / max * 100) : 0}%;background:${LV_COL[k]}"></div></div>`;
   /* few days = wider bars and columns so each day is easy to compare; many days = thin bars (scrolls sideways past a month) */
   const n = items.length;
-  const gbStyle = !dense ? '' : n <= 7 ? ' style="--bw:44px;--cw:130px;--gg:6px;justify-content:center"' : n <= 14 ? ' style="--bw:30px;--cw:90px;--gg:5px;justify-content:center"' : n <= 31 ? ' style="--bw:16px"' : ` style="min-width:${n * 22}px"`;
+  const gbStyle = !dense ? '' : n <= 7 ? ' style="--bw:34px;--cw:170px;--gg:5px;justify-content:center"' : n <= 14 ? ' style="--bw:22px;--cw:112px;--gg:4px;justify-content:center"' : n <= 31 ? ' style="--bw:11px"' : ` style="min-width:${n * 40}px"`;
   $('lvChart').innerHTML =
     `<div class="lv-top">
       <div class="lv-card" style="--c:${LV_COL.co}"><b>${tot('co')}</b>Called Off days · ${esc(scope)}<br><small>${rate('co')}</small></div>
       <div class="lv-card" style="--c:${LV_COL.vl}"><b>${tot('vl')}</b>Vacation Leave days · ${esc(scope)}<br><small>${rate('vl')}</small></div>
+      <div class="lv-card" style="--c:${LV_COL.late}"><b>${tot('late')}</b>Running Late days · ${esc(scope)}<br><small>${rate('late')}</small></div>
+      <div class="lv-card" style="--c:${LV_COL.le}"><b>${tot('le')}</b>Left Early days · ${esc(scope)}<br><small>${rate('le')}</small></div>
     </div>
-    <div class="lv-legend"><span><i style="background:${LV_COL.co}"></i>Called Off</span><span><i style="background:${LV_COL.vl}"></i>Vacation Leave</span></div>
-    <div style="overflow-x:auto"><div class="gb${dense ? ' dense' : ''}"${gbStyle}>${items.map(p => `<div class="gb-col"><div class="gb-pair">${bar(p, 'co', 'Called Off')}${bar(p, 'vl', 'Vacation Leave')}</div>
+    <div class="lv-legend"><span><i style="background:${LV_COL.co}"></i>Called Off</span><span><i style="background:${LV_COL.vl}"></i>Vacation Leave</span><span><i style="background:${LV_COL.late}"></i>Running Late</span><span><i style="background:${LV_COL.le}"></i>Left Early</span></div>
+    <div style="overflow-x:auto"><div class="gb${dense ? ' dense' : ''}"${gbStyle}>${items.map(p => `<div class="gb-col"><div class="gb-pair">${bar(p, 'co', 'Called Off')}${bar(p, 'vl', 'Vacation Leave')}${bar(p, 'late', 'Running Late')}${bar(p, 'le', 'Left Early')}</div>
       <div class="bar-lbl" style="${p.bold ? 'font-weight:800;color:var(--ink)' : ''}${dense ? ';font-size:10px;white-space:nowrap' : ''}">${esc(p.lbl)}</div>${p.sub ? `<div class="gb-sub">${esc(p.sub)}</div>` : ''}</div>`).join('')}</div></div>
     <div class="bar-axis">Agent-days on scheduled working days · supervisor / search filters apply · counted up to today only (upcoming days are not counted)${range && dayItems.length > 62 ? ' · long range: bars are grouped by month' : ''}</div>`;
 
@@ -6368,17 +6983,17 @@ function buildLeaveTrend() {
     const names = uniqueSupervisors().filter(sp => tb[sp]);
     const list = names.map(sp => ({ sp, ...tb[sp] }));
     const pct = (v, t) => t ? (v / t * 100).toFixed(1) + '%' : '—';
-    const smax = Math.max(1, ...list.map(x => Math.max(x.co, x.vl)));
+    const smax = Math.max(1, ...list.map(x => Math.max(x.co, x.vl, x.late, x.le)));
     const sbar = (x, k, label) => `<div class="gb-bar" title="${esc(x.sp)}: ${x[k]} ${label} day${x[k] === 1 ? '' : 's'} (${pct(x[k], x.sched)} of ${x.sched} scheduled)"><span>${x[k]}</span><div style="height:${x[k] ? Math.max(3, x[k] / smax * 100) : 0}%;background:${LV_COL[k]}"></div></div>`;
-    const sums = { co: 0, vl: 0, sched: 0 }; list.forEach(x => { sums.co += x.co; sums.vl += x.vl; sums.sched += x.sched; });
-    const cell = x => x && (x.co || x.vl) ? `<span style="color:${LV_COL.co};font-weight:700">${x.co}</span> · <span style="color:${LV_COL.vl};font-weight:700">${x.vl}</span>` : '<span style="color:var(--muted)">–</span>';
+    const sums = { co: 0, vl: 0, late: 0, le: 0, sched: 0 }; list.forEach(x => { sums.co += x.co; sums.vl += x.vl; sums.late += x.late; sums.le += x.le; sums.sched += x.sched; });
+    const cell = x => x && (x.co || x.vl || x.late || x.le) ? `<span style="color:${LV_COL.co};font-weight:700">${x.co}</span> · <span style="color:${LV_COL.vl};font-weight:700">${x.vl}</span> · <span style="color:${LV_COL.late};font-weight:700">${x.late}</span> · <span style="color:${LV_COL.le};font-weight:700">${x.le}</span>` : '<span style="color:var(--muted)">–</span>';
     supBox.innerHTML = list.length ? `
-      <div class="lv-legend"><span><i style="background:${LV_COL.co}"></i>Called Off</span><span><i style="background:${LV_COL.vl}"></i>Vacation Leave</span></div>
-      <div class="gb dense" style="--bw:44px;--cw:150px;--gg:6px;justify-content:center">${list.map(x => `<div class="gb-col"><div class="gb-pair">${sbar(x, 'co', 'Called Off')}${sbar(x, 'vl', 'Vacation Leave')}</div><div class="bar-lbl" style="font-size:12px">${esc(x.sp)}</div></div>`).join('')}</div>
-      <div class="schedule-container" style="height:auto;max-height:none;margin-top:14px"><table class="nosort"><thead><tr><th>Supervisor</th><th>Called Off</th><th>Called Off %</th><th>Vacation Leave</th><th>Vacation Leave %</th><th>Scheduled days</th></tr></thead><tbody>
-        ${list.map(x => `<tr><td>${esc(x.sp)}</td><td>${x.co}</td><td>${pct(x.co, x.sched)}</td><td>${x.vl}</td><td>${pct(x.vl, x.sched)}</td><td>${x.sched}</td></tr>`).join('')}
-        <tr style="font-weight:800"><td>Total</td><td>${sums.co}</td><td>${pct(sums.co, sums.sched)}</td><td>${sums.vl}</td><td>${pct(sums.vl, sums.sched)}</td><td>${sums.sched}</td></tr></tbody></table></div>
-      <h4 style="margin:16px 0 6px">Trend by supervisor <small style="font-weight:400;color:var(--muted)">(<span style="color:${LV_COL.co}">Called Off</span> · <span style="color:${LV_COL.vl}">Vacation Leave</span> per ${dense ? 'day' : 'month'})</small></h4>
+      <div class="lv-legend"><span><i style="background:${LV_COL.co}"></i>Called Off</span><span><i style="background:${LV_COL.vl}"></i>Vacation Leave</span><span><i style="background:${LV_COL.late}"></i>Running Late</span><span><i style="background:${LV_COL.le}"></i>Left Early</span></div>
+      <div class="gb dense" style="--bw:34px;--cw:190px;--gg:5px;justify-content:center">${list.map(x => `<div class="gb-col"><div class="gb-pair">${sbar(x, 'co', 'Called Off')}${sbar(x, 'vl', 'Vacation Leave')}${sbar(x, 'late', 'Running Late')}${sbar(x, 'le', 'Left Early')}</div><div class="bar-lbl" style="font-size:12px">${esc(x.sp)}</div></div>`).join('')}</div>
+      <div class="schedule-container" style="height:auto;max-height:none;margin-top:14px"><table class="nosort"><thead><tr><th>Supervisor</th><th>Called Off</th><th>Called Off %</th><th>Vacation Leave</th><th>Vacation Leave %</th><th>Running Late</th><th>Running Late %</th><th>Left Early</th><th>Left Early %</th><th>Scheduled days</th></tr></thead><tbody>
+        ${list.map(x => `<tr><td>${esc(x.sp)}</td><td>${x.co}</td><td>${pct(x.co, x.sched)}</td><td>${x.vl}</td><td>${pct(x.vl, x.sched)}</td><td>${x.late}</td><td>${pct(x.late, x.sched)}</td><td>${x.le}</td><td>${pct(x.le, x.sched)}</td><td>${x.sched}</td></tr>`).join('')}
+        <tr style="font-weight:800"><td>Total</td><td>${sums.co}</td><td>${pct(sums.co, sums.sched)}</td><td>${sums.vl}</td><td>${pct(sums.vl, sums.sched)}</td><td>${sums.late}</td><td>${pct(sums.late, sums.sched)}</td><td>${sums.le}</td><td>${pct(sums.le, sums.sched)}</td><td>${sums.sched}</td></tr></tbody></table></div>
+      <h4 style="margin:16px 0 6px">Trend by supervisor <small style="font-weight:400;color:var(--muted)">(<span style="color:${LV_COL.co}">Called Off</span> · <span style="color:${LV_COL.vl}">Vacation Leave</span> · <span style="color:${LV_COL.late}">Running Late</span> · <span style="color:${LV_COL.le}">Left Early</span> per ${dense ? 'day' : 'month'})</small></h4>
       <div class="schedule-container" style="height:auto;max-height:none;overflow-x:auto"><table class="nosort"><thead><tr><th>Supervisor</th>${items.map(p => `<th style="text-align:center;white-space:nowrap">${esc(p.lbl)}${p.sub ? `<br><small>${esc(p.sub)}</small>` : ''}</th>`).join('')}</tr></thead><tbody>
         ${list.map(x => `<tr><td style="white-space:nowrap">${esc(x.sp)}</td>${items.map(p => `<td style="text-align:center;white-space:nowrap">${cell(p.by[x.sp])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`
       : '<div class="empty" style="--c:#6c757d">No supervisors found</div>';
@@ -6387,20 +7002,20 @@ function buildLeaveTrend() {
   const head = $('lvTable').tHead, body = $('lvTable').tBodies[0];
   if (daily) {
     $('lvTableTitle').textContent = 'Who was off · ' + scope;
-    head.innerHTML = '<tr><th>Date</th><th>Called Off</th><th>Vacation Leave</th></tr>';
+    head.innerHTML = '<tr><th>Date</th><th>Called Off</th><th>Vacation Leave</th><th>Running Late</th><th>Left Early</th></tr>';
     /* "3 · First Name" then every other agent on its own line */
     const names = l => l.length ? `<b>${l.length}</b> · ` + l.slice().sort((a, b) => a.localeCompare(b)).map(esc).join('<br>') : '—';
-    const days = dayItems.filter(p => p.co || p.vl);
+    const days = dayItems.filter(p => p.co || p.vl || p.late || p.le);
     const yr = (range || week) && new Set(dayItems.map(p => p.date.slice(0, 4))).size > 1;
     body.innerHTML = days.length
-      ? days.map(p => `<tr><td style="white-space:nowrap;vertical-align:top">${esc(p.title)}${yr ? ', ' + p.date.slice(0, 4) : ''}</td><td class="lv-names" style="vertical-align:top">${names(p.names.co)}</td><td class="lv-names" style="vertical-align:top">${names(p.names.vl)}</td></tr>`).join('')
-      : '<tr><td colspan="3" style="text-align:left">No Called Off or Vacation Leave in these dates</td></tr>';
+      ? days.map(p => `<tr><td style="white-space:nowrap;vertical-align:top">${esc(p.title)}${yr ? ', ' + p.date.slice(0, 4) : ''}</td><td class="lv-names" style="vertical-align:top">${names(p.names.co)}</td><td class="lv-names" style="vertical-align:top">${names(p.names.vl)}</td><td class="lv-names" style="vertical-align:top">${names(p.names.late)}</td><td class="lv-names" style="vertical-align:top">${names(p.names.le)}</td></tr>`).join('')
+      : '<tr><td colspan="5" style="text-align:left">No Called Off, Vacation Leave, Running Late or Left Early in these dates</td></tr>';
   } else {
     $('lvTableTitle').textContent = 'Month by month · ' + scope;
-    head.innerHTML = '<tr><th>Month</th><th>Called Off</th><th>Called Off %</th><th>Vacation Leave</th><th>Vacation Leave %</th><th>Scheduled days</th></tr>';
+    head.innerHTML = '<tr><th>Month</th><th>Called Off</th><th>Called Off %</th><th>Vacation Leave</th><th>Vacation Leave %</th><th>Running Late</th><th>Running Late %</th><th>Left Early</th><th>Left Early %</th><th>Scheduled days</th></tr>';
     const pc = (v, s) => s ? (v / s * 100).toFixed(1) + '%' : '—';
-    body.innerHTML = items.map(p => `<tr><td>${esc(p.title)}</td><td>${p.co}</td><td>${pc(p.co, p.sched)}</td><td>${p.vl}</td><td>${pc(p.vl, p.sched)}</td><td>${p.sched}</td></tr>`).join('') +
-      `<tr style="font-weight:800"><td>Total</td><td>${tot('co')}</td><td>${pc(tot('co'), sched)}</td><td>${tot('vl')}</td><td>${pc(tot('vl'), sched)}</td><td>${sched}</td></tr>`;
+    body.innerHTML = items.map(p => `<tr><td>${esc(p.title)}</td><td>${p.co}</td><td>${pc(p.co, p.sched)}</td><td>${p.vl}</td><td>${pc(p.vl, p.sched)}</td><td>${p.late}</td><td>${pc(p.late, p.sched)}</td><td>${p.le}</td><td>${pc(p.le, p.sched)}</td><td>${p.sched}</td></tr>`).join('') +
+      `<tr style="font-weight:800"><td>Total</td><td>${tot('co')}</td><td>${pc(tot('co'), sched)}</td><td>${tot('vl')}</td><td>${pc(tot('vl'), sched)}</td><td>${tot('late')}</td><td>${pc(tot('late'), sched)}</td><td>${tot('le')}</td><td>${pc(tot('le'), sched)}</td><td>${sched}</td></tr>`;
   }
 }
 
@@ -6475,9 +7090,11 @@ function buildScoreSummary() {
   const nowD = estNow();
   ssMonths = Array.from({ length: nowD.getMonth() + 1 }, (_, i) => `${nowD.getFullYear()}-${pad(i + 1)}`);
   if (!ssSelInit) { ssSel = new Set([ssMonths[ssMonths.length - 1]]); ssSelInit = true; }
+  { const R = perRangeOf('ss'); if (R) ssSel = new Set(perMonthsTouched(R)); }
   ssSel = new Set([...ssSel].filter(m => ssMonths.includes(m)));
   if (!ssSel.size) ssSel.add(ssMonths[ssMonths.length - 1]);
   renderSsMonthPicker();
+  renderKpiCards();
   const selYms = ssMonths.filter(m => ssSel.has(m)), ym = selYms[selYms.length - 1];   // ym = latest ticked month
   $('ssLegend').innerHTML =
     '<span class="trk-chip st-present">Green: on target</span><span class="trk-chip st-partial">Amber: below target</span><span class="trk-chip st-absent">Red: well below</span>' +
@@ -6698,25 +7315,40 @@ window.addEventListener('DOMContentLoaded', async () => {
   initMcsMonth();
 
   const today = ymd(estNow());
-  ['selectedDate', 'ptoDate', 'calledOffDate', 'scheduleDate', 'forecastDate', 'phoneDate']
+  ['selectedDate', 'scheduleDate', 'forecastDate', 'phoneDate']
     .forEach(id => $(id).value = today);
+  perSetRange('pto', today, today); perSetRange('calledOff', today, today);
   $('trackerMonth').value = today.slice(0, 7);
   renderDisputeForm(); syncTeamButtons();
 
-  await Promise.all([loadSchedules(), loadAttendance(), loadDaily(), loadQA(), loadQAScoring(), loadMetric(), loadMcs(), loadDailyAgent(), loadCallDrivers(), loadAttendancePoints(), loadPtoWeekly()]);
-  renderAll();
+  /* Fast start: the Dashboard only needs schedules, attendance and daily data, so it opens as soon as those three are in.
+     QA, metrics, scorecards, call drivers etc. load in the background and the open page is re-rendered when they arrive.
+     If the page was opened straight onto another tab (a #link), wait for everything first, as before. */
+  const loadCore = () => [loadSchedules(), loadAttendance(), loadDaily()];
+  const loadScores = () => [loadQA(), loadQAScoring(), loadMetric(), loadMcs(), loadDailyAgent(), loadCallDrivers(), loadAttendancePoints(), loadPtoWeekly()];
+  const hashTab = location.hash.slice(1);
+  if (!hashTab || hashTab === 'lookupTab') {
+    const scoresReady = Promise.all(loadScores());                    // starts now, in parallel with the core data
+    await Promise.all(loadCore());
+    renderAll();
+    scoresReady.then(() => { lastScoresLoad = Date.now(); renderAll(); });
+  } else {
+    await Promise.all([...loadCore(), ...loadScores()]);
+    renderAll();
+  }
   showTabFromHash();
 
   updateClock();
   setInterval(updateClock, 1000);
   let lastPoll = Date.now(), pollBusy = false;
   const poll = async () => {
-    if (document.hidden || pollBusy) return;
+    if (document.hidden || pollBusy || activeTab !== 'lookupTab') return;   // auto-refresh only while the Dashboard is open
     pollBusy = true; lastPoll = Date.now();
     try { await refreshAttendanceData(false, Date.now() - lastScoresLoad > SCORES_REFRESH_MS); } finally { pollBusy = false; }
   };
   setInterval(poll, REFRESH_MS);
   document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - lastPoll > REFRESH_MS) poll(); });
+  window.dashPollIfStale = () => { if (Date.now() - lastPoll > REFRESH_MS) poll(); };   // called when you come back to the Dashboard
 });
 </script>
 <script>
@@ -6798,7 +7430,7 @@ async function loadDataUpdates(){
   try { renderDataUpdate(activeTab); } catch (e) {}
 }
 window.addEventListener('DOMContentLoaded', loadDataUpdates);
-setInterval(() => { if (!document.hidden) loadDataUpdates(); }, 60000);
+setInterval(() => { if (!document.hidden && activeTab === 'lookupTab') loadDataUpdates(); }, 60000);   // auto-refresh only on the Dashboard
 </script>
 <script>
 /* Sidebar: collapsible groups + the "Submit a form" menu */
@@ -6949,6 +7581,7 @@ window.addEventListener('load', () => setPageHead(activeTab));
   /* Pickers with no onchange handler are refreshed by their own button, so do that instead */
   const ACTION = { selectedDate: () => runLookup(), forecastDate: () => refreshForecast() };
   document.querySelectorAll('input[type="date"]').forEach(inp => {
+    if (inp.closest('.controls') && !['selectedDate', 'forecastDate', 'phoneDate', 'scheduleDate'].includes(inp.id)) return;   // period filters have their own pickers
     const mk = (dir, glyph, title) => {
       const b = document.createElement('button');
       b.type = 'button'; b.textContent = glyph; b.title = title; b.setAttribute('aria-label', title);
@@ -6986,6 +7619,143 @@ window.addEventListener('load', () => setPageHead(activeTab));
     try { localStorage.setItem(KEY, hide ? '1' : '0'); } catch (e) {}
   });
 })();
+
+/* ---------- Dashboard notes: rich-text editor, autosaved to this browser ---------- */
+(function () {
+  const KEY = 'ditsc_sup_notes';
+  const ed = document.getElementById('notesEditor'), bar = document.getElementById('notesBar'), stamp = document.getElementById('notesSaved');
+  if (!ed || !bar) return;
+  let saved = null, timer = null;
+  const flag = () => { ed.dataset.empty = (ed.textContent.trim() === '' && !ed.querySelector('li,img')) ? '1' : '0'; };
+  try { ed.innerHTML = localStorage.getItem(KEY) || ''; } catch (e) {}
+  flag();
+  const save = () => {
+    flag();
+    try { localStorage.setItem(KEY, ed.innerHTML); stamp.textContent = 'Saved ' + new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
+    catch (e) { stamp.textContent = 'Could not save in this browser'; }
+  };
+  const queueSave = () => { stamp.textContent = 'Saving...'; clearTimeout(timer); timer = setTimeout(save, 400); };
+  /* remember the selection so toolbar controls that take focus (colour pickers, the style drop-down) still apply to it */
+  document.addEventListener('selectionchange', () => {
+    const sel = window.getSelection();
+    if (sel.rangeCount && ed.contains(sel.anchorNode)) saved = sel.getRangeAt(0).cloneRange();
+    syncState();
+  });
+  const restore = () => { ed.focus(); if (saved) { const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(saved); } };
+  const exec = (cmd, val) => { restore(); document.execCommand('styleWithCSS', false, true); document.execCommand(cmd, false, val || null); queueSave(); syncState(); };
+  function syncState() {
+    bar.querySelectorAll('button[data-cmd]').forEach(b => {
+      const c = b.dataset.cmd;
+      if (['bold', 'italic', 'underline', 'strikeThrough', 'insertUnorderedList', 'insertOrderedList'].includes(c)) {
+        let on = false; try { on = document.queryCommandState(c); } catch (e) {}
+        b.classList.toggle('on', on && saved && ed.contains(saved.startContainer));
+      }
+    });
+  }
+  bar.addEventListener('mousedown', e => { if (e.target.closest('button')) e.preventDefault(); });
+  bar.addEventListener('click', e => {
+    const b = e.target.closest('button[data-cmd]'); if (!b) return;
+    const c = b.dataset.cmd;
+    if (c === 'checklist') { restore(); document.execCommand('insertHTML', false, '<ul class="nt-chk"><li><br></li></ul>'); queueSave(); }
+    else if (c === 'createLink') {
+      restore(); const url = prompt('Link address (https://...)'); if (url) exec('createLink', /^https?:\/\//i.test(url) ? url : 'https://' + url);
+    }
+    else if (c === 'clearAll') { if (confirm('Delete the whole note?')) { ed.innerHTML = ''; save(); } }
+    else exec(c);
+  });
+  document.getElementById('notesFore').addEventListener('input', e => exec('foreColor', e.target.value));
+  document.getElementById('notesBack').addEventListener('input', e => exec('hiliteColor', e.target.value));
+  document.getElementById('notesBlock').addEventListener('change', e => { exec('formatBlock', '<' + e.target.value + '>'); });
+  ed.addEventListener('input', queueSave);
+  ed.addEventListener('blur', save);
+  /* tick / untick a checklist item by clicking its box */
+  ed.addEventListener('click', e => {
+    const li = e.target.closest('ul.nt-chk > li');
+    if (li && e.clientX - li.getBoundingClientRect().left < 24) { li.classList.toggle('done'); save(); }
+  });
+  /* links open in a new tab */
+  ed.addEventListener('click', e => { const a = e.target.closest('a[href]'); if (a && (e.ctrlKey || e.metaKey)) window.open(a.href, '_blank', 'noopener'); });
+})();
+
+/* ---------- QA Scoring cheat sheet: tick Yes / No / N/A per question. Yes and N/A earn the question's Score Points (QA Scoring sheet tab), No earns 0; Criteria shows the Yes / No wording ---------- */
+const qsAns = new Map(), qsNotes = new Map();            // question number -> 'yes' | 'no' | 'na', and comment text
+const qsEarns = a => a === 'yes' || a === 'na';
+const qsPoints = v => { const n = parseFloat(String(v == null ? '' : v).replace(/[^0-9.\-]/g, '')); return isNaN(n) ? 0 : n; };
+const qsFmt = n => String(parseFloat(n.toFixed(2)));
+const qsLines = t => String(t || '').split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+const qsList = t => { const l = qsLines(t); return l.length > 1 ? '<ul>' + l.map(x => `<li>${esc(x)}</li>`).join('') + '</ul>' : esc(l[0] || ''); };
+const QS_LABEL = { yes: 'Yes', no: 'No', na: 'N/A' };
+function qsRows() { return [...qaQMap.entries()].sort((a, b) => a[0] - b[0]); }
+function buildQaScorer() {
+  const rows = qsRows(), box = $('qsList');
+  if (!rows.length) {
+    box.innerHTML = `<div class="qs-empty">${esc(loadErrors.qaScoring || 'The QA Scoring tab has no questions yet. Check the tab sharing and that it has QA# | Question | Yes | No | Score Points columns.')}</div>`;
+    qsTotals(); return;
+  }
+  const noPts = !rows.some(([, q]) => q.hasPts);
+  const open = new Set([...document.querySelectorAll('#qsList .qs-item.open')].map(x => +x.dataset.q));
+  const opts = n => [['yes', 'Yes', 'y'], ['no', 'No', 'n'], ['na', 'N/A', 'a']]
+    .map(([v, l, c]) => `<label class="qs-opt ${c}"><input type="checkbox" data-q="${n}" data-v="${v}">${l}</label>`).join('');
+  box.innerHTML = (noPts ? '<div class="qs-warn">Could not find a "Score Points" column in the QA Scoring tab, so every question shows 0 points.</div>' : '') +
+    rows.map(([n, q]) =>
+      `<div class="qs-item${open.has(n) ? ' open' : ''}" data-q="${n}"><div class="qs-main"><div class="qs-row" data-q="${n}">` +
+      `<span class="qs-num">Q${n}</span><span class="qs-text">${esc(q.text || '')}</span><span class="qs-opts">${opts(n)}</span><span class="qs-pts"></span>` +
+      `<button type="button" class="qs-tog" title="Show what counts as Yes or No">Criteria</button></div>` +
+      `<div class="qs-crit"><div class="qs-col y"><b>Yes</b>${qsList(q.yes)}</div><div class="qs-col n"><b>No</b>${qsList(q.no)}</div></div></div>` +
+      `<div class="qs-note"><textarea data-n="${n}" rows="2" placeholder="Comment / recommendation if marked down" class="${qsNotes.get(n) ? 'has' : ''}">${esc(qsNotes.get(n) || '')}</textarea></div></div>`).join('');
+  box.oninput = e => { const t = e.target.closest('textarea[data-n]'); if (!t) return; const n = +t.dataset.n; t.value.trim() ? qsNotes.set(n, t.value) : qsNotes.delete(n); t.classList.toggle('has', !!t.value.trim()); };
+  box.onchange = e => {
+    const c = e.target.closest('input[data-v]'); if (!c) return;
+    const n = +c.dataset.q; c.checked ? qsAns.set(n, c.dataset.v) : qsAns.delete(n);      // one answer per question; unticking clears it
+    qsTotals();
+  };
+  box.onclick = e => { const b = e.target.closest('.qs-tog'); if (!b) return; e.preventDefault(); b.closest('.qs-item').classList.toggle('open'); qsCritBtn(); };
+  qsTotals(); qsCritBtn();
+}
+function qsCritBtn() {
+  const items = [...document.querySelectorAll('#qsList .qs-item')], btn = $('qsCritAll');
+  if (btn) btn.textContent = items.length && items.every(x => x.classList.contains('open')) ? 'Hide all criteria' : 'Show all criteria';
+}
+function qsCritAll() {
+  const items = [...document.querySelectorAll('#qsList .qs-item')], allOpen = items.length && items.every(x => x.classList.contains('open'));
+  items.forEach(x => x.classList.toggle('open', !allOpen)); qsCritBtn();
+}
+function qsTotals() {
+  const rows = qsRows();
+  let got = 0, max = 0, ny = 0, nn = 0, nna = 0;
+  rows.forEach(([n, q]) => {
+    const y = qsPoints(q.pts), a = qsAns.get(n), earned = qsEarns(a);
+    got += earned ? y : 0; max += y;                   // Yes and N/A keep the points, No / not answered = 0; the maximum is every question's Score Points
+    if (a === 'yes') ny++; else if (a === 'no') nn++; else if (a === 'na') nna++;
+    const item = document.querySelector(`#qsList .qs-item[data-q="${n}"]`);
+    if (!item) return;
+    item.classList.toggle('yes', a === 'yes'); item.classList.toggle('no', a === 'no'); item.classList.toggle('na', a === 'na');
+    item.querySelectorAll('input[data-v]').forEach(c => { const on = c.dataset.v === a; c.checked = on; c.closest('.qs-opt').classList.toggle('on', on); });
+    item.querySelector('.qs-pts').textContent = `${qsFmt(earned ? y : 0)} / ${qsFmt(y)} pts`;
+  });
+  const pct = max > 0 ? got / max * 100 : 0;
+  $('qsPct').textContent = pct.toFixed(1) + '%';
+  $('qsPct').className = 'qs-pct' + qaBand(pct);
+  $('qsPts').textContent = `${qsFmt(got)} / ${qsFmt(max)} points`;
+  $('qsBar').style.width = Math.max(0, Math.min(100, pct)) + '%';
+  $('qsCount').innerHTML = `${ny + nn + nna} of ${rows.length} answered<br>Yes ${ny} &middot; No ${nn} &middot; N/A ${nna}`;
+}
+function qsAll(on) {
+  qsRows().forEach(([n]) => on ? qsAns.set(n, 'yes') : qsAns.delete(n));
+  qsTotals();
+}
+function qsClearNotes() {
+  qsNotes.clear();
+  document.querySelectorAll('#qsList textarea[data-n]').forEach(t => { t.value = ''; t.classList.remove('has'); });
+}
+function qsCopy() {
+  const lines = qsRows().map(([n, q]) => {
+    const a = qsAns.get(n), y = qsPoints(q.pts);
+    return `Q${n} ${a ? QS_LABEL[a] : '-'} (${qsFmt(qsEarns(a) ? y : 0)}/${qsFmt(y)}) - ${q.text || ''}` + (qsNotes.get(n) ? `\n    Comment: ${qsNotes.get(n).trim().replace(/\s*\n\s*/g, ' ')}` : '');
+  });
+  const txt = `QA score: ${$('qsPct').textContent} (${$('qsPts').textContent})\n` + lines.join('\n');
+  (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(() => toast('QA result copied'), () => toast('Could not copy'));
+}
 </script>
 </body>
 </html>
